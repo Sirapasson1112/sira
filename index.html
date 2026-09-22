@@ -380,7 +380,7 @@
   .paper-sign-table td { text-align: center; padding-top: 26px; font-size: 12px; line-height: 2; }
   .paper-doc-footer { display: flex; justify-content: space-between; font-size: 10.5px; color: #4b5563; padding-top: 6px; border-top: 1px solid #e5e7eb; }
   @media print {
-    .sidebar, .topbar, .page-head, .back-link, .insp-actions, .insp-tabs { display: none !important; }
+    .sidebar, .topbar, .page-head, .back-link, .insp-actions, .insp-tabs, .modal-overlay, .toast, .notif-panel { display: none !important; }
     .content { padding: 0 !important; }
     .paper-sheet { max-width: 100% !important; }
     .paper-wrap { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
@@ -425,6 +425,34 @@
   }
   .menu-btn { display: none; }
   .scroll-x-hint { font-size: 11px; color: var(--text-faint); padding: 0 20px 12px; }
+
+  /* Modal dialog */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.55); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal-panel { background: var(--card); border-radius: 16px; max-width: 560px; width: 100%; max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 60px -20px rgba(0,0,0,0.45); }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--card-line); position: sticky; top: 0; background: var(--card); }
+  .modal-head h3 { margin: 0; font-size: 15px; font-weight: 800; }
+  .modal-close { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--card-line); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-soft); flex: none; }
+  .modal-close svg { width: 14px; height: 14px; }
+  .modal-body { padding: 18px 22px; }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 22px; border-top: 1px solid var(--card-line); }
+
+  /* Toast */
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%,20px); background: var(--ink); color: #fff; padding: 11px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 300; box-shadow: 0 14px 30px -10px rgba(0,0,0,0.4); max-width: 90vw; text-align: center; }
+  .toast.show { opacity: 1; transform: translate(-50%,0); }
+
+  /* Notification dropdown */
+  .notif-panel { position: absolute; top: 44px; right: 0; width: 280px; background: var(--card); border: 1px solid var(--card-line); border-radius: 12px; box-shadow: var(--shadow-card); padding: 6px; z-index: 60; }
+  .notif-head { font-size: 12.5px; font-weight: 800; padding: 8px 10px 4px; }
+
+  /* Toggle switch */
+  .switch { position: relative; display: inline-block; width: 40px; height: 22px; vertical-align: middle; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider { position: absolute; cursor: pointer; inset: 0; background: var(--card-line); transition: .2s; border-radius: 999px; }
+  .switch .slider::before { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  .switch input:checked + .slider { background: var(--brand); }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+  .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -462,10 +490,10 @@
       </div>
       <div class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" placeholder="ค้นหาสายป้อน, อุปกรณ์, สถานที่...">
+        <input type="text" id="topSearchInput" placeholder="ค้นหาสายป้อน, อุปกรณ์, สถานที่..." onkeydown="if(event.key==='Enter') runTopSearch(this.value)">
       </div>
       <div class="topbar-spacer"></div>
-      <div class="icon-btn" title="การแจ้งเตือน">
+      <div class="icon-btn" id="notifBellBtn" title="การแจ้งเตือน" onclick="toggleNotifications(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
         <span class="dot"></span>
       </div>
@@ -545,19 +573,78 @@ function goTo(id){
   requestAnimationFrame(() => { if (window.initChartsFor) window.initChartsFor(id); });
 }
 
+/* ===================== SHARED UI: modal / toast / notifications ===================== */
+function openModal(title, bodyHtml, footerHtml){
+  let overlay = document.getElementById("modalOverlay");
+  if (!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "modalOverlay";
+    overlay.className = "modal-overlay";
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `<div class="modal-panel">
+    <div class="modal-head"><h3>${title}</h3><button class="modal-close" onclick="closeModal()">${ic('plus', 'style="transform:rotate(45deg)"')}</button></div>
+    <div class="modal-body">${bodyHtml}</div>
+    ${footerHtml ? `<div class="modal-foot">${footerHtml}</div>` : ""}
+  </div>`;
+  overlay.classList.add("open");
+  overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
+}
+window.openModal = openModal;
+window.closeModal = function(){
+  const overlay = document.getElementById("modalOverlay");
+  if (overlay) overlay.classList.remove("open");
+};
+
+let toastTimer;
+function showToast(msg){
+  let el = document.getElementById("toastEl");
+  if (!el){
+    el = document.createElement("div");
+    el.id = "toastEl";
+    el.className = "toast";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+window.showToast = showToast;
+
+function closeNotifOnOutside(e){
+  const panel = document.getElementById("notifPanel");
+  const bell = document.getElementById("notifBellBtn");
+  if (panel && bell && !bell.contains(e.target)){
+    panel.remove();
+    document.removeEventListener("click", closeNotifOnOutside);
+  }
+}
+window.toggleNotifications = function(e){
+  if (e) e.stopPropagation();
+  const existing = document.getElementById("notifPanel");
+  if (existing){ existing.remove(); document.removeEventListener("click", closeNotifOnOutside); return; }
+  const panel = document.createElement("div");
+  panel.id = "notifPanel";
+  panel.className = "notif-panel";
+  panel.innerHTML = `
+    <div class="notif-head">การแจ้งเตือนล่าสุด</div>
+    <div class="mini-stat-row"><span class="dot" style="background:var(--red)"></span><span class="lbl">LBS-0210 แถวเสาธงเกิดคลิกลัดวงจร</span></div>
+    <div class="mini-stat-row"><span class="dot" style="background:var(--amber)"></span><span class="lbl">TR-0078 อุณหภูมิสูงกว่าเกณฑ์</span></div>
+    <div class="mini-stat-row"><span class="dot" style="background:var(--green)"></span><span class="lbl">PM-0067 ดำเนินการเสร็จสิ้น</span></div>
+  `;
+  document.getElementById("notifBellBtn").appendChild(panel);
+  setTimeout(() => document.addEventListener("click", closeNotifOnOutside), 0);
+};
+
+window.runTopSearch = function(query){
+  const q = (query || "").trim();
+  if (!q){ showToast("กรุณาพิมพ์คำค้นหา"); return; }
+  showToast(`ค้นหา "${q}" — เลือกเมนูด้านซ้ายเพื่อดูรายการที่เกี่ยวข้อง`);
+};
+
 /* ===================== helpers ===================== */
 function badge(text, kind){ return `<span class="badge ${kind}">${text}</span>`; }
-function rowActions(){
-  return `<button class="row-icon-btn" title="ดู">${ic('eye')}</button> <button class="row-icon-btn" title="แก้ไข">${ic('edit')}</button>`;
-}
-function pager(pages, active){
-  let html = `<button class="pg-btn">${ic('chevL')}</button>`;
-  const shown = [1,2,3];
-  shown.forEach(p => html += `<button class="pg-btn ${p===active?'active':''}">${p}</button>`);
-  html += `<span class="pg-dots">…</span><button class="pg-btn">${pages}</button>`;
-  html += `<button class="pg-btn">${ic('chevR')}</button>`;
-  return html;
-}
 function statusBadge(status){
   const map = {
     "ใช้งาน":"green", "เสร็จสิ้น":"green",
@@ -568,17 +655,135 @@ function statusBadge(status){
   };
   return badge(status, map[status] || "gray");
 }
-function assetTable(cols, rows, {countTxt, pages, page}={}){
-  let thead = cols.map(c=>`<th>${c}</th>`).join("");
-  let tbody = rows.map(r => `<tr>${r.map((cell,i)=> i===r.length-2 ? `<td>${statusBadge(cell)}</td>` : (i===r.length-1 ? `<td>${rowActions()}</td>` : `<td>${cell}</td>`)).join("")}</tr>`).join("");
-  return `
-    <div class="table-wrap">
-      <table><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table>
-    </div>
-    <div class="table-foot">
-      <div class="count">${countTxt}</div>
-      <div class="pager">${pager(pages, page)}</div>
-    </div>`;
+/* ===================== DATA TABLE ENGINE (search + filter + real pagination + add/view/edit) ===================== */
+const TableState = {};
+
+function initAssetTable(tableId, config){
+  TableState[tableId] = { data: config.data, page: 1, pageSize: config.pageSize || 4, search: "", status: "", config };
+  renderTable(tableId);
+}
+
+function getFilteredRows(tableId){
+  const st = TableState[tableId];
+  let rows = st.data;
+  if (st.status) rows = rows.filter(r => r.status === st.status);
+  if (st.search){
+    const q = st.search.toLowerCase();
+    rows = rows.filter(r => st.config.searchKeys.some(k => String(r[k] ?? "").toLowerCase().includes(q)));
+  }
+  return rows;
+}
+
+function buildPagerHtml(tableId, page, totalPages){
+  let html = `<button class="pg-btn" onclick="gotoTablePage('${tableId}',${page-1})" ${page<=1?"disabled":""}>${ic('chevL')}</button>`;
+  const windowSize = 3;
+  let start = Math.max(1, page-1);
+  let end = Math.min(totalPages, start+windowSize-1);
+  start = Math.max(1, end-windowSize+1);
+  if (start > 1){ html += `<button class="pg-btn" onclick="gotoTablePage('${tableId}',1)">1</button>`; if (start > 2) html += `<span class="pg-dots">…</span>`; }
+  for (let p = start; p <= end; p++) html += `<button class="pg-btn ${p===page?"active":""}" onclick="gotoTablePage('${tableId}',${p})">${p}</button>`;
+  if (end < totalPages){ if (end < totalPages-1) html += `<span class="pg-dots">…</span>`; html += `<button class="pg-btn" onclick="gotoTablePage('${tableId}',${totalPages})">${totalPages}</button>`; }
+  html += `<button class="pg-btn" onclick="gotoTablePage('${tableId}',${page+1})" ${page>=totalPages?"disabled":""}>${ic('chevR')}</button>`;
+  return html;
+}
+
+function renderTable(tableId){
+  const st = TableState[tableId];
+  if (!st) return;
+  const rows = getFilteredRows(tableId);
+  const totalPages = Math.max(1, Math.ceil(rows.length / st.pageSize));
+  if (st.page > totalPages) st.page = totalPages;
+  const startIdx = (st.page - 1) * st.pageSize;
+  const pageRows = rows.slice(startIdx, startIdx + st.pageSize);
+  const cols = st.config.columns;
+  const thead = cols.map(c => `<th>${c.label}</th>`).join("") + "<th>สถานะ</th><th>จัดการ</th>";
+  const tbody = pageRows.map(r => {
+    const cells = cols.map(c => `<td>${r[c.key]}</td>`).join("");
+    return `<tr>${cells}<td>${statusBadge(r.status)}</td><td>
+      <button class="row-icon-btn" title="ดู" onclick="viewAssetRow('${tableId}','${r.id}')">${ic('eye')}</button>
+      <button class="row-icon-btn" title="แก้ไข" onclick="editAssetRow('${tableId}','${r.id}')">${ic('edit')}</button>
+    </td></tr>`;
+  }).join("") || `<tr><td colspan="${cols.length+2}" style="text-align:center; color:var(--text-faint); padding:26px;">ไม่พบข้อมูลที่ตรงกับการค้นหา</td></tr>`;
+  const tableWrap = document.getElementById(tableId+"-table-wrap");
+  if (tableWrap) tableWrap.innerHTML = `<table><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table>`;
+  const countEl = document.getElementById(tableId+"-count");
+  if (countEl) countEl.textContent = rows.length ? `แสดง ${startIdx+1}-${Math.min(startIdx+st.pageSize, rows.length)} จาก ${rows.length} รายการ` : "ไม่พบข้อมูล";
+  const pagerEl = document.getElementById(tableId+"-pager");
+  if (pagerEl) pagerEl.innerHTML = buildPagerHtml(tableId, st.page, totalPages);
+  const kpiEl = document.getElementById(tableId+"-kpi-total");
+  if (kpiEl) kpiEl.textContent = st.data.length;
+  if (tableId === "workorder") renderWorkOrderChips();
+}
+
+window.gotoTablePage = function(tableId, page){
+  const st = TableState[tableId]; if (!st) return;
+  st.page = Math.max(1, page);
+  renderTable(tableId);
+};
+window.setTableSearch = function(tableId, value){
+  const st = TableState[tableId]; if (!st) return;
+  st.search = value; st.page = 1; renderTable(tableId);
+};
+window.setTableStatus = function(tableId, value){
+  const st = TableState[tableId]; if (!st) return;
+  st.status = value; st.page = 1; renderTable(tableId);
+};
+
+function statusOptionsFor(tableId){
+  return TableState[tableId].config.statusOptions || ["ใช้งาน","ซ่อมบำรุง","หยุดใช้งาน"];
+}
+function fieldFormHtml(tableId, values){
+  const st = TableState[tableId];
+  const fields = st.config.columns.map(c => `<div class="insp-field"><label>${c.label}</label><input type="text" id="tf-${c.key}" value="${values && values[c.key]!==undefined ? values[c.key] : ""}"></div>`).join("");
+  const opts = statusOptionsFor(tableId).map(s => `<option value="${s}" ${values && values.status===s ? "selected" : ""}>${s}</option>`).join("");
+  return `<div class="insp-header-grid">${fields}<div class="insp-field"><label>สถานะ</label><select id="tf-status" class="select-sm" style="width:100%;">${opts}</select></div></div>`;
+}
+
+window.viewAssetRow = function(tableId, rowId){
+  const st = TableState[tableId]; const row = st.data.find(r => r.id === rowId); if (!row) return;
+  const rowsHtml = st.config.columns.map(c => `<div class="mini-stat-row"><span class="lbl">${c.label}</span><span class="val">${row[c.key]}</span></div>`).join("")
+    + `<div class="mini-stat-row"><span class="lbl">สถานะ</span><span class="val">${statusBadge(row.status)}</span></div>`;
+  openModal(`รายละเอียด — ${row.code || row.id}`, `<div class="mini-stat-list">${rowsHtml}</div>`, `<button class="btn" onclick="closeModal()">ปิด</button>`);
+};
+window.editAssetRow = function(tableId, rowId){
+  openModal(`แก้ไขรายการ`, fieldFormHtml(tableId, TableState[tableId].data.find(r => r.id === rowId)),
+    `<button class="btn" onclick="closeModal()">ยกเลิก</button><button class="btn primary" onclick="saveAssetEdit('${tableId}','${rowId}')">บันทึก</button>`);
+};
+window.saveAssetEdit = function(tableId, rowId){
+  const st = TableState[tableId]; const row = st.data.find(r => r.id === rowId); if (!row) return;
+  st.config.columns.forEach(c => { const el = document.getElementById("tf-"+c.key); if (el) row[c.key] = el.value; });
+  const statusEl = document.getElementById("tf-status"); if (statusEl) row.status = statusEl.value;
+  closeModal(); renderTable(tableId); showToast("บันทึกการแก้ไขแล้ว");
+};
+window.openAddAssetModal = function(tableId){
+  openModal(`เพิ่มรายการใหม่`, fieldFormHtml(tableId, null),
+    `<button class="btn" onclick="closeModal()">ยกเลิก</button><button class="btn primary" onclick="saveNewAssetRow('${tableId}')">เพิ่มรายการ</button>`);
+};
+window.saveNewAssetRow = function(tableId){
+  const st = TableState[tableId];
+  const newRow = { id: tableId + "-new-" + Date.now() };
+  st.config.columns.forEach(c => { const el = document.getElementById("tf-"+c.key); newRow[c.key] = el ? el.value : ""; });
+  const statusEl = document.getElementById("tf-status"); newRow.status = statusEl ? statusEl.value : (statusOptionsFor(tableId)[0]);
+  st.data.unshift(newRow);
+  st.page = 1;
+  closeModal(); renderTable(tableId); showToast("เพิ่มรายการเรียบร้อยแล้ว");
+};
+
+function renderWorkOrderChips(){
+  const st = TableState["workorder"]; if (!st) return;
+  const chipsEl = document.getElementById("workorder-chips"); if (!chipsEl) return;
+  const groups = [
+    { label:"ทั้งหมด", value:"" },
+    { label:"รอดำเนินการ", value:"รอดำเนินการ" },
+    { label:"กำลังดำเนินการ", value:"กำลังดำเนินการ" },
+    { label:"เสร็จสิ้น", value:"เสร็จสิ้น" },
+    { label:"เกินกำหนด", value:"เกินกำหนด" },
+    { label:"ยกเลิก", value:"ยกเลิก" },
+  ];
+  chipsEl.innerHTML = groups.map(g => {
+    const count = g.value ? st.data.filter(r => r.status === g.value).length : st.data.length;
+    return `<div class="chip ${st.status===g.value?"active":""}" onclick="setTableStatus('workorder','${g.value}')">${g.label}<span class="n">${count}</span></div>`;
+  }).join("");
 }
 
 /* ===================== PAGE: DASHBOARD ===================== */
@@ -589,8 +794,8 @@ const pageDashboard = `
     <p>สรุปสถานะงาน PM ทั้งหมดของหน่วยงาน ณ วันที่ 22 ก.ย. 2568</p>
   </div>
   <div class="head-actions">
-    <button class="btn">${ic('calendar')} 22 ก.ย. 2568</button>
-    <button class="btn primary">${ic('plus')} สร้างงาน PM</button>
+    <button class="btn" onclick="showToast('เลือกช่วงวันที่ (เดโม)')">${ic('calendar')} 22 ก.ย. 2568</button>
+    <button class="btn primary" onclick="openCreatePmModal()">${ic('plus')} สร้างงาน PM</button>
   </div>
 </div>
 
@@ -637,7 +842,7 @@ const pageDashboard = `
 
 <div class="grid two-col">
   <div class="card">
-    <div class="panel-head" style="padding:18px 20px 0;"><h3>งาน PM ใกล้ถึงกำหนด</h3><span class="link-more">ดูทั้งหมด</span></div>
+    <div class="panel-head" style="padding:18px 20px 0;"><h3>งาน PM ใกล้ถึงกำหนด</h3><span class="link-more" onclick="goTo('workorder')">ดูทั้งหมด</span></div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>วันที่</th><th>รหัสงาน</th><th>อุปกรณ์</th><th>สถานะ</th></tr></thead>
@@ -651,7 +856,7 @@ const pageDashboard = `
     <div style="height:14px"></div>
   </div>
   <div class="card">
-    <div class="panel-head" style="padding:18px 20px 0;"><h3>แจ้งเตือน / เหตุการณ์สำคัญ</h3><span class="link-more">ดูทั้งหมด</span></div>
+    <div class="panel-head" style="padding:18px 20px 0;"><h3>แจ้งเตือน / เหตุการณ์สำคัญ</h3><span class="link-more" onclick="toggleNotifications()">ดูทั้งหมด</span></div>
     <div class="mini-stat-list" style="padding:8px 0 6px;">
       <div class="mini-stat-row"><span class="dot" style="background:var(--red)"></span><span class="lbl">LBS-0210 แถวเสาธงกิดคลิกลัดวงจร</span><span class="val" style="font-size:11px; color:var(--text-faint); font-weight:600;">21 ก.ย. 68</span></div>
       <div class="mini-stat-row"><span class="dot" style="background:var(--amber)"></span><span class="lbl">TR-0078 อุณหภูมิสูงกว่าเกณฑ์</span><span class="val" style="font-size:11px; color:var(--text-faint); font-weight:600;">21 ก.ย. 68</span></div>
@@ -666,16 +871,16 @@ const pagePmPlanning = `
 <div class="page-head">
   <div><h1>วางแผนงานบำรุงรักษาเชิงป้องกัน (PM)</h1><p>วางแผนงาน PM ประจำเดือนกันยายน 2568</p></div>
   <div class="head-actions">
-    <button class="btn">มุมมองปฏิทิน</button>
-    <button class="btn">มุมมองรายการ</button>
-    <button class="btn primary">${ic('plus')} สร้างงาน PM</button>
+    <button class="btn" onclick="showToast('กำลังแสดงมุมมองปฏิทิน')">มุมมองปฏิทิน</button>
+    <button class="btn" onclick="showPmListView()">มุมมองรายการ</button>
+    <button class="btn primary" onclick="openCreatePmModal()">${ic('plus')} สร้างงาน PM</button>
   </div>
 </div>
 <div class="grid two-col">
   <div class="card">
     <div class="cal-head">
       <div><h3>กันยายน 2568</h3><div class="sub">แผนงาน PM ทั้งหมดในเดือนนี้</div></div>
-      <div class="cal-nav"><button class="pg-btn">${ic('chevL')}</button><button class="pg-btn">${ic('chevR')}</button></div>
+      <div class="cal-nav"><button class="pg-btn" onclick="showToast('เดือนก่อนหน้า (เดโม)')">${ic('chevL')}</button><button class="pg-btn" onclick="showToast('เดือนถัดไป (เดโม)')">${ic('chevR')}</button></div>
     </div>
     <div class="cal-grid">
       ${["อา","จ","อ","พ","พฤ","ศ","ส"].map(d=>`<div class="cal-dow">${d}</div>`).join("")}
@@ -709,21 +914,24 @@ const pagePmPlanning = `
   </div>
 </div>
 `;
+const PM_EVENTS = [
+  { day:5, t:"PM Feeder", c:"blue" },
+  { day:9, t:"PM Transformer", c:"amber" },
+  { day:17, t:"PM LBS", c:"green" },
+  { day:24, t:"PM Transformer", c:"amber" },
+  { day:24, t:"อื่นๆ", c:"gray" },
+  { day:28, t:"PM Feeder", c:"blue" },
+];
 function buildCalendar(){
   // Sept, generic 5-week layout starting Monday as day 1 for demo purposes
   const startOffset = 1; // 1 = grid starts sun blank, mon=1
   const daysInMonth = 30;
-  const events = {
-    5:[{t:"PM Feeder",c:"blue"}],
-    9:[{t:"PM Transformer",c:"amber"}],
-    17:[{t:"PM LBS",c:"green"}],
-    24:[{t:"PM Transformer",c:"amber"},{t:"อื่นๆ",c:"gray"}],
-    28:[{t:"PM Feeder",c:"blue"}],
-  };
+  const byDay = {};
+  PM_EVENTS.forEach(e => { (byDay[e.day] = byDay[e.day] || []).push(e); });
   let html = "";
   for(let i=0;i<startOffset;i++) html += `<div class="cal-cell muted"></div>`;
   for(let d=1; d<=daysInMonth; d++){
-    const evs = events[d] || [];
+    const evs = byDay[d] || [];
     html += `<div class="cal-cell"><div class="d">${d}</div>${evs.map(e=>`<div class="cal-ev ${e.c}">${e.t}</div>`).join("")}</div>`;
   }
   const total = startOffset + daysInMonth;
@@ -731,105 +939,136 @@ function buildCalendar(){
   for(let i=0;i<rem;i++) html += `<div class="cal-cell muted"></div>`;
   return html;
 }
+window.showPmListView = function(){
+  const items = PM_EVENTS.map(e => `<div class="mini-stat-row"><span class="dot" style="background:${e.c==="blue"?"var(--brand)":e.c==="amber"?"var(--amber)":e.c==="green"?"var(--green)":"#7c879c"}"></span><span class="lbl">${e.t}</span><span class="val" style="font-size:11.5px; color:var(--text-faint); font-weight:600;">${e.day} ก.ย. 68</span></div>`).join("");
+  openModal("มุมมองรายการ — งาน PM เดือนกันยายน 2568", `<div class="mini-stat-list">${items}</div>`, `<button class="btn" onclick="closeModal()">ปิด</button>`);
+};
+window.openCreatePmModal = function(){
+  openModal("สร้างงาน PM ใหม่", `
+    <div class="insp-header-grid">
+      <div class="insp-field"><label>อุปกรณ์</label><input type="text" id="pm-equip" placeholder="เช่น Feeder 115 kV"></div>
+      <div class="insp-field"><label>วันที่กำหนด</label><input type="text" id="pm-date" placeholder="วว/ดด/ปปปป"></div>
+      <div class="insp-field"><label>ผู้รับผิดชอบ</label><input type="text" id="pm-owner"></div>
+    </div>`,
+    `<button class="btn" onclick="closeModal()">ยกเลิก</button><button class="btn primary" onclick="submitCreatePm()">สร้างงาน</button>`);
+};
+window.submitCreatePm = function(){
+  const equip = (document.getElementById("pm-equip")||{}).value || "อุปกรณ์ใหม่";
+  closeModal();
+  showToast(`สร้างงาน PM สำหรับ "${equip}" เรียบร้อยแล้ว`);
+};
 
 /* ===================== PAGE: ASSET LISTS ===================== */
 function assetPage(cfg){
+  const statusOpts = (cfg.statusOptions || ["ใช้งาน","ซ่อมบำรุง","หยุดใช้งาน"]).map(s=>`<option value="${s}">${s}</option>`).join("");
   return `
   <div class="page-head">
     <div><h1>${cfg.title}</h1><p>${cfg.sub}</p></div>
-    <div class="head-actions"><button class="btn primary">${ic('plus')} ${cfg.addLabel}</button></div>
+    <div class="head-actions"><button class="btn primary" onclick="openAddAssetModal('${cfg.tableId}')">${ic('plus')} ${cfg.addLabel}</button></div>
   </div>
   <div class="grid kpis">
-    <div class="card kpi"><div class="kpi-icon blue">${ic(cfg.icon)}</div><div class="kpi-body"><div class="kpi-label">กำหนด</div><div class="kpi-value num">${cfg.stats[0]}</div></div></div>
+    <div class="card kpi"><div class="kpi-icon blue">${ic(cfg.icon)}</div><div class="kpi-body"><div class="kpi-label">กำหนด</div><div class="kpi-value num" id="${cfg.tableId}-kpi-total">${cfg.stats[0]}</div></div></div>
     <div class="card kpi"><div class="kpi-icon green">${ic('chart')}</div><div class="kpi-body"><div class="kpi-label">ใช้งาน</div><div class="kpi-value num">${cfg.stats[1]}</div></div></div>
     <div class="card kpi"><div class="kpi-icon amber">${ic('calendar')}</div><div class="kpi-body"><div class="kpi-label">ซ่อมบำรุง</div><div class="kpi-value num">${cfg.stats[2]}</div></div></div>
     <div class="card kpi"><div class="kpi-icon red">${ic('zap')}</div><div class="kpi-body"><div class="kpi-label">หยุดใช้งาน</div><div class="kpi-value num">${cfg.stats[3]}</div></div></div>
   </div>
   <div class="card">
     <div class="table-toolbar">
-      <div class="search-sm">${ic('search')}<input placeholder="${cfg.searchPh}"></div>
-      <select class="select-sm"><option>ทุกสถานะ</option><option>ใช้งาน</option><option>ซ่อมบำรุง</option><option>หยุดใช้งาน</option></select>
+      <div class="search-sm">${ic('search')}<input placeholder="${cfg.searchPh}" oninput="setTableSearch('${cfg.tableId}', this.value)"></div>
+      <select class="select-sm" onchange="setTableStatus('${cfg.tableId}', this.value)"><option value="">ทุกสถานะ</option>${statusOpts}</select>
     </div>
-    ${assetTable(cfg.cols, cfg.rows, {countTxt:cfg.countTxt, pages:cfg.pages, page:1})}
+    <div id="${cfg.tableId}-table-wrap" class="table-wrap"></div>
+    <div class="table-foot"><div class="count" id="${cfg.tableId}-count"></div><div class="pager" id="${cfg.tableId}-pager"></div></div>
   </div>`;
 }
 
 const feederCfg = {
-  title:"สายป้อน (Feeder)", sub:"ข้อมูลสายป้อนทั้งหมดในความรับผิดชอบ", icon:"zap", addLabel:"เพิ่มสายป้อน",
-  searchPh:"ค้นหาสายป้อน / สถานที่...", stats:["120","112","6","2"], countTxt:"แสดง 1-4 จาก 120 รายการ", pages:30,
-  cols:["รหัสสายป้อน","ชื่อสายป้อน","ระดับแรงดัน (kV)","สถานี","สถานะ","จัดการ"],
-  rows:[
-    ["FE-0123","บางพลี",115,"สมุทรปราการ","ใช้งาน"],
-    ["FE-0456","สำโรง",22,"สมุทรปราการ","ใช้งาน"],
-    ["FE-0789","พระสมุทรเจดีย์",22,"สมุทรปราการ","ซ่อมบำรุง"],
-    ["FE-0910","บางเสาธง",115,"สมุทรปราการ","ใช้งาน"],
-  ]
+  tableId:"feeder", title:"สายป้อน (Feeder)", sub:"ข้อมูลสายป้อนทั้งหมดในความรับผิดชอบ", icon:"zap", addLabel:"เพิ่มสายป้อน",
+  searchPh:"ค้นหาสายป้อน / สถานที่...", stats:["120","112","6","2"],
+  columns:[ {key:"code",label:"รหัสสายป้อน"}, {key:"name",label:"ชื่อสายป้อน"}, {key:"kv",label:"ระดับแรงดัน (kV)"}, {key:"station",label:"สถานี"} ],
 };
 const transformerCfg = {
-  title:"หม้อแปลงจำหน่าย (Transformer)", sub:"ข้อมูลหม้อแปลงจำหน่ายทั้งหมด", icon:"box", addLabel:"เพิ่มหม้อแปลง",
-  searchPh:"ค้นหารหัส / สถานที่...", stats:["356","342","10","4"], countTxt:"แสดง 1-4 จาก 356 รายการ", pages:89,
-  cols:["รหัสหม้อแปลง","ขนาด (kVA)","แบบ","สถานที่","สถานะ","จัดการ"],
-  rows:[
-    ["TR-0067","1,000","ONAN","บางพลี","ใช้งาน"],
-    ["TR-0078","1,600","ONAN","บางเสาธง","ซ่อมบำรุง"],
-    ["TR-0091","500","ONAN","สำโรง","ใช้งาน"],
-    ["TR-0102","800","ONAN","พระสมุทรเจดีย์","ใช้งาน"],
-  ]
+  tableId:"transformer", title:"หม้อแปลงจำหน่าย (Transformer)", sub:"ข้อมูลหม้อแปลงจำหน่ายทั้งหมด", icon:"box", addLabel:"เพิ่มหม้อแปลง",
+  searchPh:"ค้นหารหัส / สถานที่...", stats:["356","342","10","4"],
+  columns:[ {key:"code",label:"รหัสหม้อแปลง"}, {key:"size",label:"ขนาด (kVA)"}, {key:"type",label:"แบบ"}, {key:"place",label:"สถานที่"} ],
 };
 const lbsCfg = {
-  title:"สวิตช์ตัดตอน (LBS)", sub:"ข้อมูลสวิตช์ตัดตอน (Load Break Switch)", icon:"branch", addLabel:"เพิ่ม LBS",
-  searchPh:"ค้นหารหัส / สถานที่...", stats:["198","187","8","3"], countTxt:"แสดง 1-4 จาก 198 รายการ", pages:50,
-  cols:["รหัส LBS","ประเภท","สถานที่","สถานะ","จัดการ"],
-  rows:[
-    ["LBS-0345","แบบเสา","บางพลี","ใช้งาน"],
-    ["LBS-0210","แบบตู้","สำโรง","ซ่อมบำรุง"],
-    ["LBS-0678","แบบเสา","บางเสาธง","ใช้งาน"],
-    ["LBS-0889","แบบตู้","พระสมุทรเจดีย์","หยุดใช้งาน"],
-  ]
+  tableId:"lbs", title:"สวิตช์ตัดตอน (LBS)", sub:"ข้อมูลสวิตช์ตัดตอน (Load Break Switch)", icon:"branch", addLabel:"เพิ่ม LBS",
+  searchPh:"ค้นหารหัส / สถานที่...", stats:["198","187","8","3"],
+  columns:[ {key:"code",label:"รหัส LBS"}, {key:"type",label:"ประเภท"}, {key:"place",label:"สถานที่"} ],
 };
 const substationCfg = {
-  title:"สถานีย่อย (Unit Substation)", sub:"ข้อมูลสถานีไฟฟ้าย่อยทั้งหมด", icon:"server", addLabel:"เพิ่มสถานีย่อย",
-  searchPh:"ค้นหารหัส / ชื่อ / สถานที่...", stats:["48","47","1","0"], countTxt:"แสดง 1-4 จาก 48 รายการ", pages:12,
-  cols:["รหัสสถานีย่อย","ชื่อสถานีย่อย","แรงดัน (kV)","สถานที่","สถานะ","จัดการ"],
-  rows:[
-    ["US-001","บางพลี",115,"สมุทรปราการ","ใช้งาน"],
-    ["US-002","สำโรง",22,"สมุทรปราการ","ใช้งาน"],
-    ["US-003","บางเสาธง",22,"สมุทรปราการ","ซ่อมบำรุง"],
-    ["US-004","พระสมุทรเจดีย์",22,"สมุทรปราการ","ใช้งาน"],
-  ]
+  tableId:"substation", title:"สถานีย่อย (Unit Substation)", sub:"ข้อมูลสถานีไฟฟ้าย่อยทั้งหมด", icon:"server", addLabel:"เพิ่มสถานีย่อย",
+  searchPh:"ค้นหารหัส / ชื่อ / สถานที่...", stats:["48","47","1","0"],
+  columns:[ {key:"code",label:"รหัสสถานีย่อย"}, {key:"name",label:"ชื่อสถานีย่อย"}, {key:"kv",label:"แรงดัน (kV)"}, {key:"place",label:"สถานที่"} ],
 };
 
+/* ---- generated demo datasets: sized to match the totals shown in the KPI cards above,
+   so search / filter / pagination all operate on real (if synthetic) data ---- */
+function padNum(n, len){ return String(n).padStart(len, "0"); }
+function statusSequence(counts){
+  const arr = [];
+  Object.entries(counts).forEach(([status, n]) => { for (let i=0; i<n; i++) arr.push(status); });
+  return arr;
+}
+function makeFeederRows(){
+  const names = ["บางพลี","สำโรง","บางเสาธง","พระสมุทรเจดีย์","เมืองสมุทรปราการ","บางบ่อ","บางพลีน้อย","ตำหรุ"];
+  const kvs = [115, 22];
+  const seq = statusSequence({ "ใช้งาน":112, "ซ่อมบำรุง":6, "หยุดใช้งาน":2 });
+  const rows = [];
+  for (let i=0; i<120; i++) rows.push({ id:"feeder-"+i, code:"FE-"+padNum(100+i*3,4), name:names[i%names.length], kv:kvs[i%kvs.length], station:"สมุทรปราการ", status:seq[i] });
+  return rows;
+}
+function makeTransformerRows(){
+  const places = ["บางพลี","บางเสาธง","สำโรง","พระสมุทรเจดีย์","เมืองสมุทรปราการ","บางบ่อ"];
+  const sizes = [500, 800, 1000, 1600];
+  const seq = statusSequence({ "ใช้งาน":342, "ซ่อมบำรุง":10, "หยุดใช้งาน":4 });
+  const rows = [];
+  for (let i=0; i<356; i++) rows.push({ id:"tr-"+i, code:"TR-"+padNum(60+i*3,4), size:sizes[i%sizes.length].toLocaleString(), type:"ONAN", place:places[i%places.length], status:seq[i] });
+  return rows;
+}
+function makeLbsRows(){
+  const places = ["บางพลี","สำโรง","บางเสาธง","พระสมุทรเจดีย์","เมืองสมุทรปราการ"];
+  const types = ["แบบเสา","แบบตู้"];
+  const seq = statusSequence({ "ใช้งาน":187, "ซ่อมบำรุง":8, "หยุดใช้งาน":3 });
+  const rows = [];
+  for (let i=0; i<198; i++) rows.push({ id:"lbs-"+i, code:"LBS-"+padNum(200+i*3,4), type:types[i%2], place:places[i%places.length], status:seq[i] });
+  return rows;
+}
+function makeSubstationRows(){
+  const places = ["บางพลี","สำโรง","บางเสาธง","พระสมุทรเจดีย์"];
+  const seq = statusSequence({ "ใช้งาน":47, "ซ่อมบำรุง":1 });
+  const rows = [];
+  for (let i=0; i<48; i++) rows.push({ id:"us-"+i, code:"US-"+padNum(1+i,3), name:places[i%places.length], kv:(i%3===0?115:22), place:"สมุทรปราการ", status:seq[i] });
+  return rows;
+}
+function makeWorkOrderRows(){
+  const equip = ["Feeder 115 kV","Transformer TR-009","LBS-0345","Unit Substation","RMU-014","Sectionalizer SZ-021"];
+  const people = ["อนพล","อนันต์","วิชัย","กิตติ","สุชาติ","มานะ"];
+  const seq = statusSequence({ "รอดำเนินการ":15, "เกินกำหนด":3, "กำลังดำเนินการ":12, "เสร็จสิ้น":87, "ยกเลิก":3 });
+  const rows = [];
+  for (let i=0; i<120; i++) rows.push({ id:"wo-"+i, code:"PM-"+padNum(67+i,4), equip:equip[i%equip.length], date:((i%28)+1)+" ก.ย. 68", owner:people[i%people.length], status:seq[i] });
+  return rows;
+}
+
 /* ===================== PAGE: WORK ORDER ===================== */
+const workOrderCfg = {
+  tableId:"workorder",
+  statusOptions:["รอดำเนินการ","กำลังดำเนินการ","เสร็จสิ้น","เกินกำหนด","ยกเลิก"],
+  columns:[ {key:"code",label:"เลขที่ใบงาน"}, {key:"equip",label:"อุปกรณ์"}, {key:"date",label:"วันที่"}, {key:"owner",label:"ผู้รับผิดชอบ"} ],
+};
 const pageWorkOrder = `
 <div class="page-head">
   <div><h1>ใบงาน (Work Order)</h1><p>รายการใบงานบำรุงรักษาทั้งหมด</p></div>
-  <div class="head-actions"><button class="btn primary">${ic('plus')} สร้างใบงาน</button></div>
+  <div class="head-actions"><button class="btn primary" onclick="openAddAssetModal('workorder')">${ic('plus')} สร้างใบงาน</button></div>
 </div>
 <div class="card">
-  <div class="chip-row">
-    <div class="chip active">ทั้งหมด<span class="n">120</span></div>
-    <div class="chip">รอดำเนินการ<span class="n">18</span></div>
-    <div class="chip">กำลังดำเนินการ<span class="n">12</span></div>
-    <div class="chip">เสร็จสิ้น<span class="n">87</span></div>
-    <div class="chip">ยกเลิก<span class="n">3</span></div>
-  </div>
+  <div class="chip-row" id="workorder-chips"></div>
   <div class="table-toolbar">
-    <div class="search-sm">${ic('search')}<input placeholder="ค้นหาเลขที่ใบงาน / อุปกรณ์..."></div>
-    <select class="select-sm"><option>ทุกประเภท</option><option>PM</option><option>CM</option></select>
-    <select class="select-sm"><option>ทุกสถานะ</option></select>
+    <div class="search-sm">${ic('search')}<input placeholder="ค้นหาเลขที่ใบงาน / อุปกรณ์..." oninput="setTableSearch('workorder', this.value)"></div>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead><tr><th>เลขที่ใบงาน</th><th>อุปกรณ์</th><th>วันที่</th><th>สถานะ</th><th>ผู้รับผิดชอบ</th><th>จัดการ</th></tr></thead>
-      <tbody>
-        <tr><td class="num">PM-0067</td><td>Feeder 115 kV</td><td>23 ก.ย. 68</td><td>${statusBadge('รอดำเนินการ')}</td><td>อนพล</td><td>${rowActions()}</td></tr>
-        <tr><td class="num">PM-0068</td><td>Transformer TR-009</td><td>24 ก.ย. 68</td><td>${statusBadge('กำลังดำเนินการ')}</td><td>อนันต์</td><td>${rowActions()}</td></tr>
-        <tr><td class="num">PM-0069</td><td>LBS-0345</td><td>25 ก.ย. 68</td><td>${statusBadge('เกินกำหนด')}</td><td>วิชัย</td><td>${rowActions()}</td></tr>
-        <tr><td class="num">PM-0070</td><td>Unit Substation</td><td>26 ก.ย. 68</td><td>${statusBadge('เสร็จสิ้น')}</td><td>กิตติ</td><td>${rowActions()}</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="table-foot"><div class="count">แสดง 1-4 จาก 120 รายการ</div><div class="pager">${pager(30,1)}</div></div>
+  <div id="workorder-table-wrap" class="table-wrap"></div>
+  <div class="table-foot"><div class="count" id="workorder-count"></div><div class="pager" id="workorder-pager"></div></div>
 </div>
 `;
 
@@ -838,8 +1077,8 @@ const pageCost = `
 <div class="page-head">
   <div><h1>ต้นทุนบำรุงรักษา</h1><p>สรุปค่าใช้จ่ายด้านบำรุงรักษา ปีงบประมาณ 2568</p></div>
   <div class="head-actions">
-    <select class="select-sm"><option>ปี 2568</option><option>ปี 2567</option></select>
-    <select class="select-sm"><option>ทั้งปี</option><option>รายเดือน</option></select>
+    <select class="select-sm" onchange="showToast('กำลังโหลดข้อมูล '+this.value)"><option>ปี 2568</option><option>ปี 2567</option></select>
+    <select class="select-sm" onchange="showToast('เปลี่ยนมุมมองเป็น '+this.value)"><option>ทั้งปี</option><option>รายเดือน</option></select>
   </div>
 </div>
 <div class="grid cost-kpis" style="margin-bottom:16px;">
@@ -872,25 +1111,44 @@ const pageCost = `
 
 /* ===================== PAGE: REPORTS ===================== */
 const REPORTS = [
-  {t:"รายงานสรุปการดำเนินงาน PM", d:"สรุปการดำเนินงาน PM และสถานะการดำเนินงาน"},
-  {t:"รายงานความเชื่อถือได้ของอุปกรณ์ (Reliability)", d:"MTBF, MTTR, SAIDI, SAIFI"},
-  {t:"รายงานประวัติการบำรุงรักษา", d:"ประวัติงานบำรุงรักษารายอุปกรณ์"},
-  {t:"รายงานเหตุขัดข้อง", d:"สรุปเหตุขัดข้องแยกตามพื้นที่"},
-  {t:"รายงานการเบิกจ่ายงบประมาณ", d:"ใช้จ่ายเทียบงบประมาณรายปี"},
+  { t:"รายงานสรุปการดำเนินงาน PM", d:"สรุปการดำเนินงาน PM และสถานะการดำเนินงาน",
+    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">PM ทั้งหมด</span><span class="val">320</span></div><div class="mini-stat-row"><span class="lbl">ดำเนินการแล้ว</span><span class="val">292 (91%)</span></div><div class="mini-stat-row"><span class="lbl">รอดำเนินการ</span><span class="val">18 (5.6%)</span></div><div class="mini-stat-row"><span class="lbl">เกินกำหนด</span><span class="val">10 (3.1%)</span></div></div>` },
+  { t:"รายงานความเชื่อถือได้ของอุปกรณ์ (Reliability)", d:"MTBF, MTTR, SAIDI, SAIFI",
+    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">MTBF</span><span class="val">128 ชั่วโมง</span></div><div class="mini-stat-row"><span class="lbl">MTTR</span><span class="val">2.4 ชั่วโมง</span></div><div class="mini-stat-row"><span class="lbl">SAIDI</span><span class="val">12.6 นาที/ปี</span></div><div class="mini-stat-row"><span class="lbl">SAIFI</span><span class="val">0.85 ครั้ง/ปี</span></div></div>` },
+  { t:"รายงานประวัติการบำรุงรักษา", d:"ประวัติงานบำรุงรักษารายอุปกรณ์",
+    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">งานบำรุงรักษา (12 เดือนล่าสุด)</span><span class="val">356 งาน</span></div><div class="mini-stat-row"><span class="lbl">อุปกรณ์ที่บำรุงรักษาบ่อยที่สุด</span><span class="val">หม้อแปลงจำหน่าย</span></div></div>` },
+  { t:"รายงานเหตุขัดข้อง", d:"สรุปเหตุขัดข้องแยกตามพื้นที่",
+    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">เหตุขัดข้องทั้งหมด (เดือนนี้)</span><span class="val">7 ครั้ง</span></div><div class="mini-stat-row"><span class="lbl">พื้นที่ที่เกิดบ่อยที่สุด</span><span class="val">บางเสาธง</span></div></div>` },
+  { t:"รายงานการเบิกจ่ายงบประมาณ", d:"ใช้จ่ายเทียบงบประมาณรายปี",
+    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">งบประมาณ</span><span class="val">฿1,250,000</span></div><div class="mini-stat-row"><span class="lbl">ใช้ไปแล้ว</span><span class="val">฿2,680,000</span></div><div class="mini-stat-row"><span class="lbl">ส่วนต่าง</span><span class="val" style="color:var(--red);">เกินงบ ฿1,430,000</span></div></div>` },
 ];
-const pageReports = `
-<div class="page-head"><div><h1>รายงาน</h1><p>สร้างและดาวน์โหลดรายงานประเภทต่างๆ</p></div></div>
-<div class="rep-tabs">
-  <div class="rep-tab active">รายงานมาตรฐาน</div>
-  <div class="rep-tab">รายงานที่กำหนดเอง</div>
-</div>
-<div class="rep-list">
-  ${REPORTS.map(r=>`
-  <div class="card rep-card">
+function reportCardHtml(r, i){
+  return `<div class="card rep-card">
     <div class="rep-ic">${ic('file')}</div>
     <div class="rep-body"><div class="t">${r.t}</div><div class="d">${r.d}</div></div>
-    <button class="btn primary">${ic('download')} สร้างรายงาน</button>
-  </div>`).join("")}
+    <button class="btn primary" onclick="openReportModal(${i})">${ic('chart')} ดูรายงาน</button>
+  </div>`;
+}
+window.openReportModal = function(idx){
+  const r = REPORTS[idx]; if (!r) return;
+  openModal(r.t, r.body, `<button class="btn" onclick="closeModal()">ปิด</button>`);
+};
+window.switchReportTab = function(tab){
+  document.querySelectorAll(".rep-tab").forEach((el,i) => el.classList.toggle("active", (i===0 && tab==="std") || (i===1 && tab==="custom")));
+  const listEl = document.getElementById("rep-list");
+  if (!listEl) return;
+  listEl.innerHTML = tab === "std"
+    ? REPORTS.map((r,i) => reportCardHtml(r,i)).join("")
+    : `<div class="card" style="padding:40px; text-align:center; color:var(--text-faint);">ยังไม่มีรายงานที่กำหนดเอง<br><button class="btn primary" style="margin-top:12px;" onclick="showToast('ฟีเจอร์สร้างรายงานกำหนดเองจะเปิดให้ใช้งานเร็วๆ นี้')">${ic('plus')} สร้างรายงานใหม่</button></div>`;
+};
+const pageReports = `
+<div class="page-head"><div><h1>รายงาน</h1><p>ดูสรุปรายงานประเภทต่างๆ</p></div></div>
+<div class="rep-tabs">
+  <div class="rep-tab active" onclick="switchReportTab('std')">รายงานมาตรฐาน</div>
+  <div class="rep-tab" onclick="switchReportTab('custom')">รายงานที่กำหนดเอง</div>
+</div>
+<div class="rep-list" id="rep-list">
+  ${REPORTS.map((r,i)=>reportCardHtml(r,i)).join("")}
 </div>
 `;
 
@@ -1022,8 +1280,38 @@ function paperFooter(f){
     <div class="paper-doc-footer"><span>ปรับปรุงครั้งที่ 0 วันที่...</span><span>${f.code}</span></div>
     <div class="insp-actions" style="border:none; padding:14px 0 0;">
       <button class="btn" onclick="window.print()">${ic('download')} พิมพ์แบบฟอร์ม</button>
+      <button class="btn primary" onclick="saveInspectionForm('${f.code}')">${ic('plus')} บันทึกแบบตรวจสอบ</button>
     </div>
   `;
+}
+
+// Every input/textarea inside the currently open paper form is saved/restored by DOM order,
+// keyed to the form's code — a working "save" without needing a backend.
+function paperInputs(){
+  return Array.from(document.querySelectorAll(".paper-wrap input, .paper-wrap textarea"));
+}
+window.saveInspectionForm = function(code){
+  const inputs = paperInputs();
+  const data = inputs.map(el => el.type === "radio" ? (el.checked ? 1 : 0) : el.value);
+  try {
+    localStorage.setItem("insp-"+code, JSON.stringify(data));
+    showToast(`บันทึกแบบตรวจสอบ ${code} แล้ว`);
+  } catch(e){
+    showToast("ไม่สามารถบันทึกได้ในเบราว์เซอร์นี้");
+  }
+};
+function loadInspectionForm(code){
+  let raw;
+  try { raw = localStorage.getItem("insp-"+code); } catch(e){ return; }
+  if (!raw) return;
+  let data;
+  try { data = JSON.parse(raw); } catch(e){ return; }
+  const inputs = paperInputs();
+  inputs.forEach((el, i) => {
+    if (i >= data.length) return;
+    if (el.type === "radio") el.checked = !!data[i];
+    else el.value = data[i];
+  });
 }
 
 function renderChecklistForm(f){
@@ -1289,6 +1577,7 @@ window.openInspectionForm = function(idx, tab){
     </div>
     <div class="paper-sheet"><div class="paper-wrap">${body}</div></div>
   `;
+  if (tab === "form") loadInspectionForm(f.code);
   window.scrollTo({top:0, behavior:"instant"});
 };
 window.renderInspectionList = renderInspectionList;
@@ -1301,6 +1590,11 @@ const pageInspection = `
 `;
 
 /* ===================== PAGE: SETTINGS ===================== */
+const emailNotifOn = (() => { try { return localStorage.getItem("emailNotif") !== "0"; } catch(e){ return true; } })();
+window.toggleEmailNotif = function(el){
+  try { localStorage.setItem("emailNotif", el.checked ? "1" : "0"); } catch(e){}
+  showToast(el.checked ? "เปิดการแจ้งเตือนทางอีเมลแล้ว" : "ปิดการแจ้งเตือนทางอีเมลแล้ว");
+};
 const pageSettings = `
 <div class="page-head"><div><h1>ตั้งค่า</h1><p>ตั้งค่าบัญชีและการแจ้งเตือนของระบบ</p></div></div>
 <div class="card panel" style="max-width:560px;">
@@ -1309,7 +1603,7 @@ const pageSettings = `
     <div class="mini-stat-row"><span class="lbl">ชื่อ-นามสกุล</span><span class="val">สิริลักษณ์ วงศ์สุวรรณ</span></div>
     <div class="mini-stat-row"><span class="lbl">ตำแหน่ง</span><span class="val">Maintenance Engineer</span></div>
     <div class="mini-stat-row"><span class="lbl">หน่วยงาน</span><span class="val">การไฟฟ้านครหลวง เขตสมุทรปราการ</span></div>
-    <div class="mini-stat-row"><span class="lbl">การแจ้งเตือนทางอีเมล</span><span class="val">เปิดใช้งาน</span></div>
+    <div class="mini-stat-row"><span class="lbl">การแจ้งเตือนทางอีเมล</span><span class="val"><label class="switch"><input type="checkbox" ${emailNotifOn?"checked":""} onchange="toggleEmailNotif(this)"><span class="slider"></span></label></span></div>
   </div>
 </div>
 `;
@@ -1337,6 +1631,12 @@ pages.forEach((p,i)=>{
   content.appendChild(sec);
 });
 renderInspectionList();
+
+initAssetTable("feeder", { data: makeFeederRows(), columns: feederCfg.columns, searchKeys: ["code","name","station"], pageSize: 4 });
+initAssetTable("transformer", { data: makeTransformerRows(), columns: transformerCfg.columns, searchKeys: ["code","place"], pageSize: 4 });
+initAssetTable("lbs", { data: makeLbsRows(), columns: lbsCfg.columns, searchKeys: ["code","place"], pageSize: 4 });
+initAssetTable("substation", { data: makeSubstationRows(), columns: substationCfg.columns, searchKeys: ["code","name","place"], pageSize: 4 });
+initAssetTable("workorder", { data: makeWorkOrderRows(), columns: workOrderCfg.columns, searchKeys: ["code","equip","owner"], pageSize: 4, statusOptions: workOrderCfg.statusOptions });
 
 /* ===================== CHARTS (plain inline SVG — no library, no network) ===================== */
 // Every chart is hand-drawn as SVG in plain JS. This removes the whole class of
