@@ -459,6 +459,20 @@
   .rep-card .d { cursor: default; }
   .link-inline { color: var(--brand); cursor: pointer; font-weight: 600; text-decoration: none; }
   .link-inline:hover { text-decoration: underline; }
+
+  /* User guide */
+  .guide-toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .guide-toc a { padding: 7px 14px; border-radius: 9px; background: var(--surface); border: 1px solid var(--card-line); font-size: 12.5px; font-weight: 700; color: var(--text-soft); text-decoration: none; cursor: pointer; }
+  .guide-toc a:hover { background: var(--brand-soft); color: var(--brand); }
+  .guide-section { scroll-margin-top: 90px; padding: 20px 22px; border-bottom: 1px solid var(--card-line); }
+  .guide-section:last-child { border-bottom: none; }
+  .guide-section h3 { display: flex; align-items: center; gap: 10px; font-size: 14.5px; font-weight: 800; margin: 0 0 4px; }
+  .guide-section .ic { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; flex: none; }
+  .guide-section .ic svg { width: 16px; height: 16px; }
+  .guide-section p { margin: 4px 0 0; font-size: 13px; color: var(--text-soft); line-height: 1.7; }
+  .guide-list { margin: 10px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: var(--text-soft); }
+  .guide-list li { margin-bottom: 4px; }
+  .guide-list b { color: var(--text); }
 </style>
 </head>
 <body>
@@ -543,6 +557,7 @@ const ICONS = {
   thermo: `<path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>`,
   waves: `<path d="M2 12c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/><path d="M2 18c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/>`,
   droplet: `<path d="M12 2s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/>`,
+  help: `<circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.7 2.7 0 0 1 5.2.9c0 1.8-2.5 2.2-2.5 3.7"/><path d="M12 17.3h.01"/>`,
 };
 function ic(name, extra=""){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ${extra}>${ICONS[name]}</svg>`; }
 
@@ -558,6 +573,7 @@ const NAV = [
   {id:"inspection", label:"ใบตรวจสอบบำรุงรักษา", icon:"checklist"},
   {id:"cost", label:"ต้นทุนบำรุงรักษา", icon:"coin"},
   {id:"reports", label:"รายงาน", icon:"chart"},
+  {id:"guide", label:"คู่มือการใช้งาน", icon:"help"},
 ];
 const navList = document.getElementById("navList");
 NAV.forEach(n=>{
@@ -1680,6 +1696,105 @@ const pageSettings = `
 </div>
 `;
 
+/* ===================== PAGE: USER GUIDE ===================== */
+const pageGuide = `
+<div class="page-head"><div><h1>คู่มือการใช้งาน</h1><p>วิธีใช้งานแต่ละส่วนของระบบ CMMS · MEA โดยสรุป</p></div></div>
+<div class="guide-toc">
+  <a href="#guide-nav">เมนูหลัก</a>
+  <a href="#guide-dashboard">หน้าหลัก</a>
+  <a href="#guide-pm">วางแผน PM</a>
+  <a href="#guide-asset">สายป้อน / หม้อแปลง / LBS / สถานีย่อย</a>
+  <a href="#guide-workorder">ใบงาน</a>
+  <a href="#guide-inspection">ใบตรวจสอบบำรุงรักษา</a>
+  <a href="#guide-cost">ต้นทุนบำรุงรักษา</a>
+  <a href="#guide-reports">รายงาน</a>
+  <a href="#guide-link">การเชื่อมโยงข้อมูลข้ามหน้า</a>
+  <a href="#guide-settings">ตั้งค่า</a>
+</div>
+
+<div class="card">
+  <div class="guide-section" id="guide-nav">
+    <h3><span class="ic">${ic('dashboard')}</span>เมนูหลัก</h3>
+    <p>ใช้เมนูด้านซ้ายสลับไปยังแต่ละหน้าของระบบ บนมือถือให้กดไอคอน ☰ มุมซ้ายบนเพื่อเปิด-ปิดเมนู ช่องค้นหาบนแถบบนสุดใช้ค้นหาแบบคร่าวๆ และกระดิ่งแจ้งเตือนมุมขวาบนจะแสดงรายการแจ้งเตือนล่าสุดที่กดแล้วพาไปยังอุปกรณ์ที่เกี่ยวข้องได้ทันที</p>
+  </div>
+
+  <div class="guide-section" id="guide-dashboard">
+    <h3><span class="ic">${ic('dashboard')}</span>หน้าหลัก (Dashboard)</h3>
+    <p>สรุปภาพรวมงาน PM ทั้งหมด พร้อมกราฟ PM Compliance และสัดส่วนสถานะงาน</p>
+    <ul class="guide-list">
+      <li><b>งาน PM ใกล้ถึงกำหนด</b> — ดึงจากใบงานจริงที่ยังรอดำเนินการหรือเกินกำหนด กดที่แถวใดก็จะพาไปหน้าอุปกรณ์นั้นพร้อมค้นหาให้อัตโนมัติ</li>
+      <li><b>แจ้งเตือน / เหตุการณ์สำคัญ</b> — ใช้ข้อมูลชุดเดียวกับกระดิ่งแจ้งเตือนด้านบน กดแล้วพาไปอุปกรณ์ที่เกี่ยวข้อง</li>
+      <li><b>+ สร้างงาน PM</b> — เปิดฟอร์มสร้างงาน PM ใหม่แบบย่อ</li>
+    </ul>
+  </div>
+
+  <div class="guide-section" id="guide-pm">
+    <h3><span class="ic">${ic('calendar')}</span>วางแผน PM</h3>
+    <p>ปฏิทินแสดงแผนงาน PM ของเดือน แยกสีตามประเภทอุปกรณ์ตามคำอธิบายใต้ปฏิทิน</p>
+    <ul class="guide-list">
+      <li>กดที่ป้ายงานในปฏิทิน หรือรายการใน "มุมมองรายการ" เพื่อไปยังหน้าอุปกรณ์ประเภทนั้นโดยตรง</li>
+      <li>"+ สร้างงาน PM" เปิดฟอร์มกรอกอุปกรณ์ วันที่กำหนด และผู้รับผิดชอบ</li>
+    </ul>
+  </div>
+
+  <div class="guide-section" id="guide-asset">
+    <h3><span class="ic">${ic('zap')}</span>สายป้อน / หม้อแปลง / LBS / สถานีย่อย</h3>
+    <p>ทั้ง 4 หน้านี้ใช้รูปแบบเดียวกัน: การ์ด KPI ด้านบนแสดงจำนวนรวม/ใช้งาน/ซ่อมบำรุง/หยุดใช้งาน ตามด้วยตารางที่ค้นหาและกรองได้จริง</p>
+    <ul class="guide-list">
+      <li><b>ช่องค้นหา</b> และ <b>ตัวกรองสถานะ</b> ด้านบนตาราง กรองรายการที่แสดงได้ทันที</li>
+      <li><b>ปุ่มเลขหน้า</b> ด้านล่างตารางเปลี่ยนหน้าได้จริงตามข้อมูลทั้งหมด</li>
+      <li>ไอคอน 👁 <b>ดู</b> เปิดรายละเอียด และมีปุ่ม "ใบงานที่เกี่ยวข้อง" เชื่อมไปดูใบงานของอุปกรณ์ตัวนั้น</li>
+      <li>ไอคอน ✏️ <b>แก้ไข</b> เปิดฟอร์มแก้ไขข้อมูลแถวนั้น</li>
+      <li>ปุ่ม "+ เพิ่ม..." มุมขวาบน เพิ่มรายการใหม่เข้าตาราง</li>
+    </ul>
+  </div>
+
+  <div class="guide-section" id="guide-workorder">
+    <h3><span class="ic">${ic('clipboard')}</span>ใบงาน (Work Order)</h3>
+    <p>รายการใบงานทั้งหมด อ้างอิงอุปกรณ์จริงจากหน้าสายป้อน/หม้อแปลง/LBS/สถานีย่อย</p>
+    <ul class="guide-list">
+      <li>แถบชิปด้านบน (ทั้งหมด / รอดำเนินการ / กำลังดำเนินการ / เสร็จสิ้น / เกินกำหนด / ยกเลิก) กรองใบงานตามสถานะ</li>
+      <li>กดชื่ออุปกรณ์ในตาราง (ตัวหนังสือสีน้ำเงิน) เพื่อกระโดดไปหน้าอุปกรณ์นั้นทันที</li>
+      <li>"+ สร้างใบงาน" เพิ่มใบงานใหม่เข้าระบบ</li>
+    </ul>
+  </div>
+
+  <div class="guide-section" id="guide-inspection">
+    <h3><span class="ic">${ic('checklist')}</span>ใบตรวจสอบบำรุงรักษา</h3>
+    <p>รวมแบบตรวจสอบ (SF-07) และคู่มือการปฏิบัติงาน (SW-OH) ของอุปกรณ์ 11 ประเภท</p>
+    <ul class="guide-list">
+      <li>กดการ์ดแบบฟอร์มเพื่อเปิด แล้วสลับแท็บ <b>แบบตรวจสอบ (SF-07)</b> ↔ <b>คู่มือการปฏิบัติงาน (SW-OH)</b> ได้</li>
+      <li>กรอกข้อมูลแล้วกด <b>บันทึกแบบตรวจสอบ</b> ระบบจะจำค่าที่กรอกไว้ในเบราว์เซอร์นี้ เปิดใหม่ครั้งหน้าจะขึ้นค่าเดิมให้</li>
+      <li>ปุ่ม <b>พิมพ์แบบฟอร์ม / พิมพ์คู่มือ</b> จัดหน้าให้พร้อมพิมพ์ทันที (ซ่อนเมนูและปุ่มต่างๆ อัตโนมัติ)</li>
+      <li>การ์ดของหม้อแปลง / LBS / สถานีย่อย มีลิงก์ "ดูอุปกรณ์ในระบบ" เชื่อมไปหน้าตารางอุปกรณ์จริง</li>
+    </ul>
+  </div>
+
+  <div class="guide-section" id="guide-cost">
+    <h3><span class="ic">${ic('coin')}</span>ต้นทุนบำรุงรักษา</h3>
+    <p>สรุปงบประมาณและค่าใช้จ่ายรายเดือน พร้อมสัดส่วนค่าใช้จ่ายแยกตามประเภท เลือกปีหรือช่วงเวลาจากตัวเลือกด้านบนได้</p>
+  </div>
+
+  <div class="guide-section" id="guide-reports">
+    <h3><span class="ic">${ic('chart')}</span>รายงาน</h3>
+    <p>สลับแท็บ "รายงานมาตรฐาน" กับ "รายงานที่กำหนดเอง" ได้ กดปุ่ม <b>ดูรายงาน</b> ที่การ์ดแต่ละใบเพื่อดูสรุปตัวเลข</p>
+    <ul class="guide-list">
+      <li>รายงานสรุปการดำเนินงาน PM และรายงานประวัติการบำรุงรักษา คำนวณจากข้อมูลใบงาน/อุปกรณ์จริงในระบบสด — ถ้าเพิ่มหรือแก้ไขข้อมูล ตัวเลขในรายงานจะเปลี่ยนตามทันที</li>
+    </ul>
+  </div>
+
+  <div class="guide-section" id="guide-link">
+    <h3><span class="ic">${ic('branch')}</span>การเชื่อมโยงข้อมูลข้ามหน้า</h3>
+    <p>ทุกหน้าอ้างอิงข้อมูลชุดเดียวกัน ลองไล่ตามนี้ได้: หน้าแรก → กดแจ้งเตือน → พาไปหน้าอุปกรณ์ → กด "ใบงานที่เกี่ยวข้อง" → ไปหน้าใบงาน → กดชื่ออุปกรณ์ในตารางใบงาน → ย้อนกลับมาหน้าอุปกรณ์เดิม ทุกจุดเชื่อมถึงกันด้วยรหัสอุปกรณ์จริงชุดเดียวกันทั้งระบบ</p>
+  </div>
+
+  <div class="guide-section" id="guide-settings">
+    <h3><span class="ic">${ic('help')}</span>ตั้งค่า</h3>
+    <p>ดูข้อมูลบัญชีผู้ใช้ และเปิด/ปิดการแจ้งเตือนทางอีเมลด้วยสวิตช์ — ระบบจะจำการตั้งค่านี้ไว้ในเบราว์เซอร์</p>
+  </div>
+</div>
+`;
+
 /* ===================== MOUNT PAGES ===================== */
 const content = document.getElementById("content");
 const pages = [
@@ -1694,6 +1809,7 @@ const pages = [
   {id:"cost", html: pageCost},
   {id:"reports", html: pageReports},
   {id:"settings", html: pageSettings},
+  {id:"guide", html: pageGuide},
 ];
 pages.forEach((p,i)=>{
   const sec = document.createElement("section");
