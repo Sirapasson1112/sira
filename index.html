@@ -7,20 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
-<script>
-  // Load Chart.js from cdnjs; if that host is blocked on this network, retry via jsDelivr.
-  function loadScript(src){
-    return new Promise((resolve, reject) => {
-      const s = document.createElement("script");
-      s.src = src;
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-  window.chartJsReady = loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js")
-    .catch(() => loadScript("https://cdn.jsdelivr.net/npm/[email protected]/dist/chart.umd.min.js"));
-</script>
+
 <style>
   :root {
     --ink: #0c1324;
@@ -469,9 +456,7 @@ function goTo(id){
   window.scrollTo({top:0, behavior:"instant"});
   // Charts on a page that was hidden (display:none) at creation time render at 0x0.
   // Whenever a page becomes visible, (re)build its charts once real layout exists.
-  requestAnimationFrame(() => {
-    if (window.chartJsReady) window.chartJsReady.then(() => window.initChartsFor(id)).catch(() => {});
-  });
+  requestAnimationFrame(() => { if (window.initChartsFor) window.initChartsFor(id); });
 }
 
 /* ===================== helpers ===================== */
@@ -547,12 +532,12 @@ const pageDashboard = `
     <div class="panel">
       <div class="panel-head"><h3>PM Compliance รายเดือน</h3><span class="muted">เป้าหมาย 90%</span></div>
     </div>
-    <div style="height:220px; padding:0 20px 20px;"><canvas id="chartCompliance"></canvas></div>
+    <div style="height:220px; padding:0 20px 20px;"><div id="chartCompliance" style="width:100%; height:100%;"></div></div>
   </div>
   <div class="card">
     <div class="donut-wrap">
       <div class="panel-head" style="width:100%;"><h3>สถานะงาน PM</h3></div>
-      <div class="donut-canvas-box"><canvas id="chartDashDonut"></canvas>
+      <div class="donut-canvas-box"><div id="chartDashDonut" style="width:100%; height:100%;"></div>
         <div class="donut-center"><div class="big num">92%</div><div class="small">สำเร็จตามแผน</div></div>
       </div>
       <div class="legend">
@@ -630,7 +615,7 @@ const pagePmPlanning = `
     <div class="card">
       <div class="donut-wrap">
         <div class="panel-head" style="width:100%; padding-bottom:0;"><h3>สถานะการดำเนินงาน</h3></div>
-        <div class="donut-canvas-box"><canvas id="chartPmDonut"></canvas>
+        <div class="donut-canvas-box"><div id="chartPmDonut" style="width:100%; height:100%;"></div>
           <div class="donut-center"><div class="big num">71%</div><div class="small">เสร็จตามแผน</div></div>
         </div>
       </div>
@@ -780,12 +765,12 @@ const pageCost = `
 <div class="grid two-col">
   <div class="card">
     <div class="panel"><div class="panel-head"><h3>ค่าใช้จ่ายรายเดือน</h3></div></div>
-    <div class="bar-wrap"><canvas id="chartCostBar"></canvas></div>
+    <div class="bar-wrap" id="chartCostBar"></div>
   </div>
   <div class="card">
     <div class="donut-wrap">
       <div class="panel-head" style="width:100%; padding-bottom:0;"><h3>สัดส่วนค่าใช้จ่าย</h3></div>
-      <div class="donut-canvas-box"><canvas id="chartCostDonut"></canvas>
+      <div class="donut-canvas-box"><div id="chartCostDonut" style="width:100%; height:100%;"></div>
         <div class="donut-center"><div class="big num" style="font-size:16px;">฿ 4,820,000</div><div class="small">รวมทั้งหมด</div></div>
       </div>
       <div class="legend">
@@ -859,93 +844,121 @@ pages.forEach((p,i)=>{
   content.appendChild(sec);
 });
 
-/* ===================== CHARTS ===================== */
-// Charts are created lazily, page by page: a canvas inside a hidden (display:none)
-// page has zero size, and Chart.js bakes that zero size in at creation time — so
-// every page's charts are only built the first time that page is actually shown.
-function donut(id, values, colors, cutout="72%"){
+/* ===================== CHARTS (plain inline SVG — no library, no network) ===================== */
+// Every chart is hand-drawn as SVG in plain JS. This removes the whole class of
+// "chart library failed to load" problems (blocked CDN, offline, stale cache) —
+// there is nothing to fetch and nothing that can fail to load.
+const GRID = "#e4e8f0", MUTED = "#8992a3";
+
+function svgBarChart(id, labels, values, color){
   const el = document.getElementById(id);
   if (!el) return;
-  new Chart(el, {
-    type: "doughnut",
-    data: { datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
-    options: { responsive:true, maintainAspectRatio:false, cutout, plugins:{legend:{display:false}, tooltip:{enabled:true}} }
+  const w = el.clientWidth || 560, h = el.clientHeight || 220;
+  if (!w || !h) return;
+  const padL = 34, padR = 8, padT = 8, padB = 22;
+  const chartW = w - padL - padR, chartH = h - padT - padB;
+  const max = 100;
+  const n = values.length, gap = chartW / n, barW = gap * 0.5;
+  let grid = "", bars = "";
+  for (let s = 0; s <= 4; s++){
+    const val = max * s / 4;
+    const y = padT + chartH - (val / max) * chartH;
+    grid += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}" stroke="${GRID}" stroke-width="1"/>`;
+    grid += `<text x="${padL-6}" y="${(y+3).toFixed(1)}" font-size="10" fill="${MUTED}" text-anchor="end">${val}%</text>`;
+  }
+  values.forEach((v,i) => {
+    const bh = (v / max) * chartH;
+    const x = padL + i * gap + (gap - barW) / 2;
+    const y = padT + chartH - bh;
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" rx="4" fill="${color}"/>`;
   });
+  const xlabels = labels.map((l,i) => `<text x="${(padL+i*gap+gap/2).toFixed(1)}" y="${h-6}" font-size="10" fill="${MUTED}" text-anchor="middle">${l}</text>`).join("");
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${grid}${bars}${xlabels}</svg>`;
+}
+
+function svgDonut(id, values, colors){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const size = Math.min(el.clientWidth || 168, el.clientHeight || 168) || 168;
+  if (!size) return;
+  const cx = size/2, cy = size/2, r = size*0.36, sw = size*0.16;
+  const circ = 2 * Math.PI * r;
+  const total = values.reduce((a,b)=>a+b,0) || 1;
+  let offset = 0, segs = "";
+  values.forEach((v,i) => {
+    const dash = (v/total) * circ;
+    segs += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[i]}" stroke-width="${sw}" stroke-dasharray="${dash.toFixed(2)} ${(circ-dash).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    offset += dash;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${size} ${size}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${segs}</svg>`;
+}
+
+function svgStackedBar(id, labels, series){
+  const el = document.getElementById(id);
+  if (!el) return;
+  const w = el.clientWidth || 560, h = 190;
+  if (!w) return;
+  const padL = 40, padR = 8, padT = 8, padB = 20;
+  const chartW = w - padL - padR, chartH = h - padT - padB;
+  const n = labels.length;
+  const totals = labels.map((_,i) => series.reduce((a,s)=>a+s.data[i],0));
+  const max = Math.max(...totals) * 1.15;
+  const gap = chartW / n, barW = gap * 0.55;
+  let grid = "", bars = "";
+  for (let s = 0; s <= 4; s++){
+    const val = max * s / 4;
+    const y = padT + chartH - (val/max) * chartH;
+    grid += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}" stroke="${GRID}" stroke-width="1"/>`;
+    grid += `<text x="${padL-6}" y="${(y+3).toFixed(1)}" font-size="9.5" fill="${MUTED}" text-anchor="end">${Math.round(val)}k</text>`;
+  }
+  for (let i = 0; i < n; i++){
+    let yCursor = padT + chartH;
+    const x = padL + i*gap + (gap-barW)/2;
+    series.forEach(s => {
+      const bh = (s.data[i] / max) * chartH;
+      const y = yCursor - bh;
+      bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" fill="${s.color}"/>`;
+      yCursor = y;
+    });
+  }
+  const xlabels = labels.map((l,i) => `<text x="${(padL+i*gap+gap/2).toFixed(1)}" y="${h-4}" font-size="9.5" fill="${MUTED}" text-anchor="middle">${l}</text>`).join("");
+  const legend = `<div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:4px;">` +
+    series.map(s => `<span style="display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--text-soft);"><span style="width:8px; height:8px; border-radius:3px; background:${s.color}; display:inline-block;"></span>${s.name}</span>`).join("") +
+    `</div>`;
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" xmlns="http://www.w3.org/2000/svg">${grid}${bars}${xlabels}</svg>${legend}`;
 }
 
 function initDashboardCharts(){
-  const el = document.getElementById("chartCompliance");
-  if (!el) return;
-  new Chart(el, {
-    type: "bar",
-    data: {
-      labels: ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."],
-      datasets: [{
-        data: [78,82,85,80,88,91,89,94,92],
-        backgroundColor: "#2f6fed",
-        borderRadius: 5,
-        maxBarThickness: 26,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display:false } },
-      scales: {
-        y: { beginAtZero:true, max:100, grid:{color:"#e4e8f0"}, ticks:{callback:v=>v+"%"} },
-        x: { grid:{display:false} }
-      }
-    }
-  });
-  donut("chartDashDonut", [292,18,10], ["#17a261","#f0a323","#e5484d"]);
+  svgBarChart("chartCompliance", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."], [78,82,85,80,88,91,89,94,92], "#2f6fed");
+  svgDonut("chartDashDonut", [292,18,10], ["#17a261","#f0a323","#e5484d"]);
 }
-
 function initPmPlanningCharts(){
-  donut("chartPmDonut", [71,29], ["#2f6fed","#e4e8f0"]);
+  svgDonut("chartPmDonut", [71,29], ["#2f6fed","#e4e8f0"]);
 }
-
 function initCostCharts(){
-  donut("chartCostDonut", [26,56,13,5], ["#2f6fed","#f0a323","#17a261","#8992a3"]);
-  const el = document.getElementById("chartCostBar");
-  if (!el) return;
-  new Chart(el, {
-    type: "bar",
-    data: {
-      labels: ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],
-      datasets: [
-        { label:"อะไหล่", data:[40,42,38,45,50,48,55,60,58,52,47,44], backgroundColor:"#2f6fed", stack:"s" },
-        { label:"ผู้รับเหมา", data:[70,68,72,75,80,78,85,88,84,79,74,71], backgroundColor:"#f0a323", stack:"s" },
-        { label:"ค่าแรง", data:[18,17,19,20,22,21,23,25,24,22,20,19], backgroundColor:"#17a261", stack:"s" },
-        { label:"อื่นๆ", data:[8,7,9,8,10,9,11,12,10,9,8,7], backgroundColor:"#8992a3", stack:"s" },
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins: { legend: { position:"bottom", labels:{boxWidth:9, boxHeight:9, usePointStyle:true, pointStyle:"circle"} } },
-      scales: {
-        x: { stacked:true, grid:{display:false} },
-        y: { stacked:true, grid:{color:"#e4e8f0"}, ticks:{callback:v=>(v*1000).toLocaleString()} }
-      }
-    }
-  });
+  svgDonut("chartCostDonut", [26,56,13,5], ["#2f6fed","#f0a323","#17a261","#8992a3"]);
+  svgStackedBar("chartCostBar", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."], [
+    { name:"อะไหล่", color:"#2f6fed", data:[40,42,38,45,50,48,55,60,58,52,47,44] },
+    { name:"ผู้รับเหมา", color:"#f0a323", data:[70,68,72,75,80,78,85,88,84,79,74,71] },
+    { name:"ค่าแรง", color:"#17a261", data:[18,17,19,20,22,21,23,25,24,22,20,19] },
+    { name:"อื่นๆ", color:"#8992a3", data:[8,7,9,8,10,9,11,12,10,9,8,7] },
+  ]);
 }
 
-const chartInitDone = {};
 const chartInitFns = { dashboard: initDashboardCharts, pmplanning: initPmPlanningCharts, cost: initCostCharts };
 window.initChartsFor = function(pageId){
-  if (chartInitDone[pageId] || !chartInitFns[pageId] || typeof Chart === "undefined") return;
-  chartInitFns[pageId]();
-  chartInitDone[pageId] = true;
+  if (chartInitFns[pageId]) chartInitFns[pageId]();
 };
-
-window.chartJsReady.then(() => {
-  Chart.defaults.font.family = "'Noto Sans Thai','Inter',sans-serif";
-  Chart.defaults.color = "#8992a3";
-  // Dashboard is the page shown on load, so build its charts right away.
-  window.initChartsFor("dashboard");
-}).catch(() => {
-  document.querySelectorAll('canvas[id^="chart"]').forEach(c => {
-    c.parentElement.innerHTML = '<div class="chart-fallback">ไม่สามารถโหลดไลบรารีกราฟได้<br>ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วรีเฟรชหน้านี้</div>';
-  });
+// Dashboard is the page shown on load, so build its charts right away.
+window.initChartsFor("dashboard");
+// Redraw the visible page's charts on resize, since sizes are read straight from layout.
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const activePage = document.querySelector(".page.active");
+    if (activePage) window.initChartsFor(activePage.id.replace("page-",""));
+  }, 150);
 });
 </script>
 </body>
