@@ -584,17 +584,23 @@ function ic(name, extra=""){ return `<svg viewBox="0 0 24 24" fill="none" stroke
 
 /* ===================== NAV ===================== */
 const NAV = [
+  // 1) ภาพรวม
   {id:"dashboard", label:"หน้าหลัก", icon:"dashboard"},
+  // 2) วางแผนงาน
   {id:"pmplanning", label:"วางแผน PM", icon:"calendar"},
+  // 3) ออกใบงาน → 4) นำทางไปหน้างาน → 5) ตรวจสอบหน้างาน (ลำดับการทำงานจริงของช่างภาคสนาม)
+  {id:"workorder", label:"ใบงาน", icon:"clipboard"},
+  {id:"fieldnav", label:"นำทางตรวจภาคสนาม", icon:"mapPin"},
+  {id:"inspection", label:"ใบตรวจสอบบำรุงรักษา", icon:"checklist"},
+  // 6) ทะเบียนอุปกรณ์ (ข้อมูลอ้างอิง เปิดดู/แก้ไขได้ทุกเมื่อ ไม่ผูกกับลำดับงาน)
   {id:"feeder", label:"สายป้อน (Feeder)", icon:"zap"},
   {id:"transformer", label:"หม้อแปลงจำหน่าย", icon:"box"},
   {id:"lbs", label:"สวิตช์ตัดตอน (LBS)", icon:"branch"},
   {id:"substation", label:"สถานีย่อย", icon:"server"},
-  {id:"workorder", label:"ใบงาน", icon:"clipboard"},
-  {id:"fieldnav", label:"นำทางตรวจภาคสนาม", icon:"mapPin"},
-  {id:"inspection", label:"ใบตรวจสอบบำรุงรักษา", icon:"checklist"},
+  // 7) สรุปผล/ต้นทุนหลังงานเสร็จ
   {id:"cost", label:"ต้นทุนบำรุงรักษา", icon:"coin"},
   {id:"reports", label:"รายงาน", icon:"chart"},
+  // 8) ช่วยเหลือ
   {id:"guide", label:"คู่มือการใช้งาน", icon:"help"},
 ];
 const navList = document.getElementById("navList");
