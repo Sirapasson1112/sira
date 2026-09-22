@@ -453,6 +453,12 @@
   .switch input:checked + .slider { background: var(--brand); }
   .switch input:checked + .slider::before { transform: translateX(18px); }
   .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .cell-link { color: var(--brand); cursor: pointer; font-weight: 600; }
+  .cell-link:hover { text-decoration: underline; }
+  .cal-ev { cursor: pointer; }
+  .rep-card .d { cursor: default; }
+  .link-inline { color: var(--brand); cursor: pointer; font-weight: 600; text-decoration: none; }
+  .link-inline:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -627,12 +633,10 @@ window.toggleNotifications = function(e){
   const panel = document.createElement("div");
   panel.id = "notifPanel";
   panel.className = "notif-panel";
-  panel.innerHTML = `
-    <div class="notif-head">การแจ้งเตือนล่าสุด</div>
-    <div class="mini-stat-row"><span class="dot" style="background:var(--red)"></span><span class="lbl">LBS-0210 แถวเสาธงเกิดคลิกลัดวงจร</span></div>
-    <div class="mini-stat-row"><span class="dot" style="background:var(--amber)"></span><span class="lbl">TR-0078 อุณหภูมิสูงกว่าเกณฑ์</span></div>
-    <div class="mini-stat-row"><span class="dot" style="background:var(--green)"></span><span class="lbl">PM-0067 ดำเนินการเสร็จสิ้น</span></div>
-  `;
+  const items = (typeof DASH_ALERTS !== "undefined" && DASH_ALERTS.length)
+    ? DASH_ALERTS.map(a => `<div class="mini-stat-row" style="cursor:pointer;" onclick="document.getElementById('notifPanel').remove(); goToEquipment('${a.tableId}','${a.code}')"><span class="dot" style="background:${a.dot}"></span><span class="lbl">${a.label}</span></div>`).join("")
+    : `<div class="mini-stat-row"><span class="lbl">ไม่มีการแจ้งเตือนใหม่</span></div>`;
+  panel.innerHTML = `<div class="notif-head">การแจ้งเตือนล่าสุด</div>${items}`;
   document.getElementById("notifBellBtn").appendChild(panel);
   setTimeout(() => document.addEventListener("click", closeNotifOnOutside), 0);
 };
@@ -698,7 +702,12 @@ function renderTable(tableId){
   const cols = st.config.columns;
   const thead = cols.map(c => `<th>${c.label}</th>`).join("") + "<th>สถานะ</th><th>จัดการ</th>";
   const tbody = pageRows.map(r => {
-    const cells = cols.map(c => `<td>${r[c.key]}</td>`).join("");
+    const cells = cols.map(c => {
+      if (tableId === "workorder" && c.key === "equip" && r.assetTableId){
+        return `<td><span class="cell-link" onclick="goToEquipment('${r.assetTableId}','${r.assetCode}')">${r[c.key]}</span></td>`;
+      }
+      return `<td>${r[c.key]}</td>`;
+    }).join("");
     return `<tr>${cells}<td>${statusBadge(r.status)}</td><td>
       <button class="row-icon-btn" title="ดู" onclick="viewAssetRow('${tableId}','${r.id}')">${ic('eye')}</button>
       <button class="row-icon-btn" title="แก้ไข" onclick="editAssetRow('${tableId}','${r.id}')">${ic('edit')}</button>
@@ -743,7 +752,26 @@ window.viewAssetRow = function(tableId, rowId){
   const st = TableState[tableId]; const row = st.data.find(r => r.id === rowId); if (!row) return;
   const rowsHtml = st.config.columns.map(c => `<div class="mini-stat-row"><span class="lbl">${c.label}</span><span class="val">${row[c.key]}</span></div>`).join("")
     + `<div class="mini-stat-row"><span class="lbl">สถานะ</span><span class="val">${statusBadge(row.status)}</span></div>`;
-  openModal(`รายละเอียด — ${row.code || row.id}`, `<div class="mini-stat-list">${rowsHtml}</div>`, `<button class="btn" onclick="closeModal()">ปิด</button>`);
+  const relatedBtn = TableState["workorder"] ? `<button class="btn" onclick="showRelatedWorkOrders('${tableId}','${row.code}')">${ic('clipboard')} ใบงานที่เกี่ยวข้อง</button>` : "";
+  openModal(`รายละเอียด — ${row.code || row.id}`, `<div class="mini-stat-list">${rowsHtml}</div>`, `${relatedBtn}<button class="btn" onclick="closeModal()">ปิด</button>`);
+};
+// Cross-page navigation: jump to an asset's own table and pre-filter it to that one record.
+window.goToEquipment = function(tableId, code){
+  closeModal();
+  goTo(tableId);
+  const input = document.querySelector("#page-"+tableId+" .search-sm input");
+  if (input) input.value = code;
+  setTableSearch(tableId, code);
+  showToast("กำลังแสดง "+code);
+};
+// From an asset's detail view, show the work orders that were raised against it.
+window.showRelatedWorkOrders = function(assetTableId, code){
+  const wost = TableState["workorder"]; if (!wost) return;
+  const matches = wost.data.filter(r => r.assetTableId === assetTableId && r.assetCode === code);
+  const body = matches.length
+    ? `<div class="mini-stat-list">${matches.map(m => `<div class="mini-stat-row"><span class="lbl">${m.code} — ${m.date}</span><span class="val">${statusBadge(m.status)}</span></div>`).join("")}</div>`
+    : `<div style="text-align:center; color:var(--text-faint); padding:22px;">ยังไม่มีใบงานที่เกี่ยวข้องกับ ${code}</div>`;
+  openModal(`ใบงานที่เกี่ยวข้องกับ ${code}`, body, `<button class="btn" onclick="closeModal()">ปิด</button><button class="btn primary" onclick="goTo('workorder'); closeModal();">ไปที่หน้าใบงาน</button>`);
 };
 window.editAssetRow = function(tableId, rowId){
   openModal(`แก้ไขรายการ`, fieldFormHtml(tableId, TableState[tableId].data.find(r => r.id === rowId)),
@@ -768,6 +796,30 @@ window.saveNewAssetRow = function(tableId){
   st.page = 1;
   closeModal(); renderTable(tableId); showToast("เพิ่มรายการเรียบร้อยแล้ว");
 };
+
+// Built once ASSET_DATA/work orders exist; reused by both the dashboard alerts card and the
+// notification bell dropdown, so they always agree with each other and with the real records.
+let DASH_ALERTS = [];
+function renderDashboardWidgets(){
+  const wost = TableState["workorder"];
+  if (!wost) return;
+  const upcoming = wost.data.filter(r => r.status === "รอดำเนินการ" || r.status === "เกินกำหนด").slice(0, 3);
+  const tbody = document.getElementById("dash-upcoming-tbody");
+  if (tbody){
+    tbody.innerHTML = upcoming.map(r => `<tr style="cursor:pointer;" onclick="goToEquipment('${r.assetTableId}','${r.assetCode}')"><td>${r.date}</td><td class="num cell-link">${r.code}</td><td>${r.equip}</td><td>${statusBadge(r.status)}</td></tr>`).join("")
+      || `<tr><td colspan="4" style="text-align:center; color:var(--text-faint); padding:16px;">ไม่มีงานที่ใกล้ถึงกำหนด</td></tr>`;
+  }
+  const lbsIssue = ASSET_DATA.lbs.find(r => r.status === "ซ่อมบำรุง");
+  const trIssue = ASSET_DATA.transformer.find(r => r.status === "ซ่อมบำรุง");
+  const doneWo = wost.data.find(r => r.status === "เสร็จสิ้น");
+  DASH_ALERTS = [
+    lbsIssue ? { dot:"var(--red)", label:`${lbsIssue.code} อยู่ระหว่างซ่อมบำรุง`, date:"21 ก.ย. 68", tableId:"lbs", code:lbsIssue.code } : null,
+    trIssue ? { dot:"var(--amber)", label:`${trIssue.code} อยู่ระหว่างซ่อมบำรุง`, date:"21 ก.ย. 68", tableId:"transformer", code:trIssue.code } : null,
+    doneWo ? { dot:"var(--green)", label:`${doneWo.code} ดำเนินการเสร็จสิ้น`, date:"22 ก.ย. 68", tableId:"workorder", code:doneWo.code } : null,
+  ].filter(Boolean);
+  const listEl = document.getElementById("dash-alerts-list");
+  if (listEl) listEl.innerHTML = DASH_ALERTS.map(a => `<div class="mini-stat-row" style="cursor:pointer;" onclick="goToEquipment('${a.tableId}','${a.code}')"><span class="dot" style="background:${a.dot}"></span><span class="lbl">${a.label}</span><span class="val" style="font-size:11px; color:var(--text-faint); font-weight:600;">${a.date}</span></div>`).join("");
+}
 
 function renderWorkOrderChips(){
   const st = TableState["workorder"]; if (!st) return;
@@ -846,34 +898,26 @@ const pageDashboard = `
     <div class="table-wrap">
       <table>
         <thead><tr><th>วันที่</th><th>รหัสงาน</th><th>อุปกรณ์</th><th>สถานะ</th></tr></thead>
-        <tbody>
-          <tr><td>23 ก.ย. 68</td><td class="num">PM-0067</td><td>Feeder 115 kV</td><td>${statusBadge('รอดำเนินการ')}</td></tr>
-          <tr><td>24 ก.ย. 68</td><td class="num">PM-0058</td><td>Transformer TR-009</td><td>${statusBadge('รอดำเนินการ')}</td></tr>
-          <tr><td>25 ก.ย. 68</td><td class="num">PM-0069</td><td>LBS-0345</td><td>${statusBadge('เกินกำหนด')}</td></tr>
-        </tbody>
+        <tbody id="dash-upcoming-tbody"><tr><td colspan="4" style="text-align:center; color:var(--text-faint); padding:16px;">กำลังโหลด...</td></tr></tbody>
       </table>
     </div>
     <div style="height:14px"></div>
   </div>
   <div class="card">
     <div class="panel-head" style="padding:18px 20px 0;"><h3>แจ้งเตือน / เหตุการณ์สำคัญ</h3><span class="link-more" onclick="toggleNotifications()">ดูทั้งหมด</span></div>
-    <div class="mini-stat-list" style="padding:8px 0 6px;">
-      <div class="mini-stat-row"><span class="dot" style="background:var(--red)"></span><span class="lbl">LBS-0210 แถวเสาธงกิดคลิกลัดวงจร</span><span class="val" style="font-size:11px; color:var(--text-faint); font-weight:600;">21 ก.ย. 68</span></div>
-      <div class="mini-stat-row"><span class="dot" style="background:var(--amber)"></span><span class="lbl">TR-0078 อุณหภูมิสูงกว่าเกณฑ์</span><span class="val" style="font-size:11px; color:var(--text-faint); font-weight:600;">21 ก.ย. 68</span></div>
-      <div class="mini-stat-row"><span class="dot" style="background:var(--green)"></span><span class="lbl">PM-0067 ดำเนินการเสร็จสิ้น</span><span class="val" style="font-size:11px; color:var(--text-faint); font-weight:600;">22 ก.ย. 68</span></div>
-    </div>
+    <div class="mini-stat-list" style="padding:8px 0 6px;" id="dash-alerts-list"></div>
   </div>
 </div>
 `;
 
 /* ===================== PAGE: PM PLANNING ===================== */
 const PM_EVENTS = [
-  { day:5, t:"PM Feeder", c:"blue" },
-  { day:9, t:"PM Transformer", c:"amber" },
-  { day:17, t:"PM LBS", c:"green" },
-  { day:24, t:"PM Transformer", c:"amber" },
-  { day:24, t:"อื่นๆ", c:"gray" },
-  { day:28, t:"PM Feeder", c:"blue" },
+  { day:5, t:"PM Feeder", c:"blue", tableId:"feeder" },
+  { day:9, t:"PM Transformer", c:"amber", tableId:"transformer" },
+  { day:17, t:"PM LBS", c:"green", tableId:"lbs" },
+  { day:24, t:"PM Transformer", c:"amber", tableId:"transformer" },
+  { day:24, t:"อื่นๆ", c:"gray", tableId:null },
+  { day:28, t:"PM Feeder", c:"blue", tableId:"feeder" },
 ];
 const pagePmPlanning = `
 <div class="page-head">
@@ -932,7 +976,7 @@ function buildCalendar(){
   for(let i=0;i<startOffset;i++) html += `<div class="cal-cell muted"></div>`;
   for(let d=1; d<=daysInMonth; d++){
     const evs = byDay[d] || [];
-    html += `<div class="cal-cell"><div class="d">${d}</div>${evs.map(e=>`<div class="cal-ev ${e.c}">${e.t}</div>`).join("")}</div>`;
+    html += `<div class="cal-cell"><div class="d">${d}</div>${evs.map(e=>`<div class="cal-ev ${e.c}" ${e.tableId?`onclick="goTo('${e.tableId}')"`:""}>${e.t}</div>`).join("")}</div>`;
   }
   const total = startOffset + daysInMonth;
   const rem = (7 - (total % 7)) % 7;
@@ -940,7 +984,7 @@ function buildCalendar(){
   return html;
 }
 window.showPmListView = function(){
-  const items = PM_EVENTS.map(e => `<div class="mini-stat-row"><span class="dot" style="background:${e.c==="blue"?"var(--brand)":e.c==="amber"?"var(--amber)":e.c==="green"?"var(--green)":"#7c879c"}"></span><span class="lbl">${e.t}</span><span class="val" style="font-size:11.5px; color:var(--text-faint); font-weight:600;">${e.day} ก.ย. 68</span></div>`).join("");
+  const items = PM_EVENTS.map(e => `<div class="mini-stat-row" ${e.tableId?`style="cursor:pointer;" onclick="closeModal(); goTo('${e.tableId}')"`:""}><span class="dot" style="background:${e.c==="blue"?"var(--brand)":e.c==="amber"?"var(--amber)":e.c==="green"?"var(--green)":"#7c879c"}"></span><span class="lbl">${e.t}</span><span class="val" style="font-size:11.5px; color:var(--text-faint); font-weight:600;">${e.day} ก.ย. 68</span></div>`).join("");
   openModal("มุมมองรายการ — งาน PM เดือนกันยายน 2568", `<div class="mini-stat-list">${items}</div>`, `<button class="btn" onclick="closeModal()">ปิด</button>`);
 };
 window.openCreatePmModal = function(){
@@ -1042,12 +1086,21 @@ function makeSubstationRows(){
   for (let i=0; i<48; i++) rows.push({ id:"us-"+i, code:"US-"+padNum(1+i,3), name:places[i%places.length], kv:(i%3===0?115:22), place:"สมุทรปราการ", status:seq[i] });
   return rows;
 }
-function makeWorkOrderRows(){
-  const equip = ["Feeder 115 kV","Transformer TR-009","LBS-0345","Unit Substation","RMU-014","Sectionalizer SZ-021"];
+function makeWorkOrderRows(assetData){
+  // Pull the equipment straight from the asset tables so a work order always points at a real record —
+  // clicking it can jump to that exact row on the Feeder / Transformer / LBS / Substation page.
+  const pool = [];
+  assetData.feeder.slice(0,20).forEach(a => pool.push({ tableId:"feeder", label:"Feeder "+a.code, code:a.code }));
+  assetData.transformer.slice(0,20).forEach(a => pool.push({ tableId:"transformer", label:"Transformer "+a.code, code:a.code }));
+  assetData.lbs.slice(0,20).forEach(a => pool.push({ tableId:"lbs", label:"LBS "+a.code, code:a.code }));
+  assetData.substation.slice(0,10).forEach(a => pool.push({ tableId:"substation", label:"Unit Substation "+a.code, code:a.code }));
   const people = ["อนพล","อนันต์","วิชัย","กิตติ","สุชาติ","มานะ"];
   const seq = statusSequence({ "รอดำเนินการ":15, "เกินกำหนด":3, "กำลังดำเนินการ":12, "เสร็จสิ้น":87, "ยกเลิก":3 });
   const rows = [];
-  for (let i=0; i<120; i++) rows.push({ id:"wo-"+i, code:"PM-"+padNum(67+i,4), equip:equip[i%equip.length], date:((i%28)+1)+" ก.ย. 68", owner:people[i%people.length], status:seq[i] });
+  for (let i=0; i<120; i++){
+    const asset = pool[i % pool.length];
+    rows.push({ id:"wo-"+i, code:"PM-"+padNum(67+i,4), equip:asset.label, assetTableId:asset.tableId, assetCode:asset.code, date:((i%28)+1)+" ก.ย. 68", owner:people[i%people.length], status:seq[i] });
+  }
   return rows;
 }
 
@@ -1111,12 +1164,24 @@ const pageCost = `
 
 /* ===================== PAGE: REPORTS ===================== */
 const REPORTS = [
-  { t:"รายงานสรุปการดำเนินงาน PM", d:"สรุปการดำเนินงาน PM และสถานะการดำเนินงาน",
-    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">PM ทั้งหมด</span><span class="val">320</span></div><div class="mini-stat-row"><span class="lbl">ดำเนินการแล้ว</span><span class="val">292 (91%)</span></div><div class="mini-stat-row"><span class="lbl">รอดำเนินการ</span><span class="val">18 (5.6%)</span></div><div class="mini-stat-row"><span class="lbl">เกินกำหนด</span><span class="val">10 (3.1%)</span></div></div>` },
+  { t:"รายงานสรุปการดำเนินงาน PM", d:"สรุปการดำเนินงาน PM และสถานะการดำเนินงาน — คำนวณจากข้อมูลใบงานจริงในระบบ",
+    bodyFn: () => {
+      const data = TableState["workorder"] ? TableState["workorder"].data : [];
+      const total = data.length || 1;
+      const done = data.filter(r=>r.status==="เสร็จสิ้น").length;
+      const pending = data.filter(r=>r.status==="รอดำเนินการ").length;
+      const overdue = data.filter(r=>r.status==="เกินกำหนด").length;
+      const pct = n => (n/total*100).toFixed(1);
+      return `<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">ใบงานทั้งหมด</span><span class="val">${total}</span></div><div class="mini-stat-row"><span class="lbl">ดำเนินการแล้ว</span><span class="val">${done} (${pct(done)}%)</span></div><div class="mini-stat-row"><span class="lbl">รอดำเนินการ</span><span class="val">${pending} (${pct(pending)}%)</span></div><div class="mini-stat-row"><span class="lbl">เกินกำหนด</span><span class="val">${overdue} (${pct(overdue)}%)</span></div></div>`;
+    } },
   { t:"รายงานความเชื่อถือได้ของอุปกรณ์ (Reliability)", d:"MTBF, MTTR, SAIDI, SAIFI",
     body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">MTBF</span><span class="val">128 ชั่วโมง</span></div><div class="mini-stat-row"><span class="lbl">MTTR</span><span class="val">2.4 ชั่วโมง</span></div><div class="mini-stat-row"><span class="lbl">SAIDI</span><span class="val">12.6 นาที/ปี</span></div><div class="mini-stat-row"><span class="lbl">SAIFI</span><span class="val">0.85 ครั้ง/ปี</span></div></div>` },
-  { t:"รายงานประวัติการบำรุงรักษา", d:"ประวัติงานบำรุงรักษารายอุปกรณ์",
-    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">งานบำรุงรักษา (12 เดือนล่าสุด)</span><span class="val">356 งาน</span></div><div class="mini-stat-row"><span class="lbl">อุปกรณ์ที่บำรุงรักษาบ่อยที่สุด</span><span class="val">หม้อแปลงจำหน่าย</span></div></div>` },
+  { t:"รายงานประวัติการบำรุงรักษา", d:"ประวัติงานบำรุงรักษารายอุปกรณ์ — นับจากจำนวนอุปกรณ์จริงในระบบ",
+    bodyFn: () => {
+      const counts = { "หม้อแปลงจำหน่าย": ASSET_DATA.transformer.length, "สายป้อน": ASSET_DATA.feeder.length, "LBS": ASSET_DATA.lbs.length, "สถานีย่อย": ASSET_DATA.substation.length };
+      const top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+      return `<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">อุปกรณ์ทั้งหมดในระบบ</span><span class="val">${ASSET_DATA.transformer.length+ASSET_DATA.feeder.length+ASSET_DATA.lbs.length+ASSET_DATA.substation.length} รายการ</span></div><div class="mini-stat-row"><span class="lbl">ประเภทที่มีมากที่สุด</span><span class="val">${top[0]} (${top[1]} รายการ)</span></div></div>`;
+    } },
   { t:"รายงานเหตุขัดข้อง", d:"สรุปเหตุขัดข้องแยกตามพื้นที่",
     body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">เหตุขัดข้องทั้งหมด (เดือนนี้)</span><span class="val">7 ครั้ง</span></div><div class="mini-stat-row"><span class="lbl">พื้นที่ที่เกิดบ่อยที่สุด</span><span class="val">บางเสาธง</span></div></div>` },
   { t:"รายงานการเบิกจ่ายงบประมาณ", d:"ใช้จ่ายเทียบงบประมาณรายปี",
@@ -1131,7 +1196,7 @@ function reportCardHtml(r, i){
 }
 window.openReportModal = function(idx){
   const r = REPORTS[idx]; if (!r) return;
-  openModal(r.t, r.body, `<button class="btn" onclick="closeModal()">ปิด</button>`);
+  openModal(r.t, r.bodyFn ? r.bodyFn() : r.body, `<button class="btn" onclick="closeModal()">ปิด</button>`);
 };
 window.switchReportTab = function(tab){
   document.querySelectorAll(".rep-tab").forEach((el,i) => el.classList.toggle("active", (i===0 && tab==="std") || (i===1 && tab==="custom")));
@@ -1551,16 +1616,23 @@ function renderInspectionDetail(f){
   return renderChecklistForm(f);
 }
 
+// Only 3 of the 11 inspection forms have a matching live asset table on this system.
+const INSPECTION_ASSET_LINK = { 0:"transformer", 1:"lbs", 4:"substation" };
 function renderInspectionList(){
   const root = document.getElementById("inspectionRoot");
   if (!root) return;
-  root.innerHTML = `<div class="insp-grid">` + INSPECTION_FORMS.map((f,i) => `
+  root.innerHTML = `<div class="insp-grid">` + INSPECTION_FORMS.map((f,i) => {
+    const linkTableId = INSPECTION_ASSET_LINK[i];
+    const assetLink = linkTableId ? `<div class="link-inline" style="font-size:11px; margin-top:6px;" onclick="event.stopPropagation(); goTo('${linkTableId}')">ดูอุปกรณ์ในระบบ →</div>` : "";
+    return `
     <div class="card insp-card" onclick="openInspectionForm(${i})">
       <div class="ic">${ic(f.icon || "checklist")}</div>
       <div class="code">${f.code}</div>
       <div class="t">${f.title}</div>
       <div class="d">${f.equip}</div>
-    </div>`).join("") + `</div>`;
+      ${assetLink}
+    </div>`;
+  }).join("") + `</div>`;
 }
 window.openInspectionForm = function(idx, tab){
   tab = tab || "form";
@@ -1632,11 +1704,22 @@ pages.forEach((p,i)=>{
 });
 renderInspectionList();
 
-initAssetTable("feeder", { data: makeFeederRows(), columns: feederCfg.columns, searchKeys: ["code","name","station"], pageSize: 4 });
-initAssetTable("transformer", { data: makeTransformerRows(), columns: transformerCfg.columns, searchKeys: ["code","place"], pageSize: 4 });
-initAssetTable("lbs", { data: makeLbsRows(), columns: lbsCfg.columns, searchKeys: ["code","place"], pageSize: 4 });
-initAssetTable("substation", { data: makeSubstationRows(), columns: substationCfg.columns, searchKeys: ["code","name","place"], pageSize: 4 });
-initAssetTable("workorder", { data: makeWorkOrderRows(), columns: workOrderCfg.columns, searchKeys: ["code","equip","owner"], pageSize: 4, statusOptions: workOrderCfg.statusOptions });
+// Build the master asset dataset once and share the exact same arrays everywhere they're
+// referenced — the work orders, the dashboard widgets and the notification panel all point
+// at these same records, so every page stays consistent with every other page.
+const ASSET_DATA = {
+  feeder: makeFeederRows(),
+  transformer: makeTransformerRows(),
+  lbs: makeLbsRows(),
+  substation: makeSubstationRows(),
+};
+initAssetTable("feeder", { data: ASSET_DATA.feeder, columns: feederCfg.columns, searchKeys: ["code","name","station"], pageSize: 4 });
+initAssetTable("transformer", { data: ASSET_DATA.transformer, columns: transformerCfg.columns, searchKeys: ["code","place"], pageSize: 4 });
+initAssetTable("lbs", { data: ASSET_DATA.lbs, columns: lbsCfg.columns, searchKeys: ["code","place"], pageSize: 4 });
+initAssetTable("substation", { data: ASSET_DATA.substation, columns: substationCfg.columns, searchKeys: ["code","name","place"], pageSize: 4 });
+initAssetTable("workorder", { data: makeWorkOrderRows(ASSET_DATA), columns: workOrderCfg.columns, searchKeys: ["code","equip","owner"], pageSize: 4, statusOptions: workOrderCfg.statusOptions });
+
+renderDashboardWidgets();
 
 /* ===================== CHARTS (plain inline SVG — no library, no network) ===================== */
 // Every chart is hand-drawn as SVG in plain JS. This removes the whole class of
