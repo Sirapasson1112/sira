@@ -323,6 +323,40 @@
   .rep-body .t { font-weight: 700; font-size: 13.5px; margin-bottom: 2px; }
   .rep-body .d { font-size: 12px; color: var(--text-faint); }
 
+  /* Inspection forms */
+  .insp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .insp-card { padding: 16px 17px; cursor: pointer; transition: border-color .15s ease; }
+  .insp-card:hover { border-color: var(--brand); }
+  .insp-card .code { font-size: 11px; font-weight: 700; color: var(--brand); font-family: "Inter","Noto Sans Thai",sans-serif; margin-bottom: 6px; }
+  .insp-card .ic { width: 38px; height: 38px; border-radius: 10px; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .insp-card .ic svg { width: 17px; height: 17px; }
+  .insp-card .t { font-size: 13.5px; font-weight: 700; line-height: 1.4; margin-bottom: 4px; }
+  .insp-card .d { font-size: 11.5px; color: var(--text-faint); }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; margin-bottom: 14px; }
+  .back-link svg { width: 14px; height: 14px; }
+  .insp-detail-head { padding: 20px 22px 16px; border-bottom: 1px solid var(--card-line); }
+  .insp-detail-head .code { font-size: 11.5px; font-weight: 700; color: var(--brand); margin-bottom: 4px; font-family: "Inter","Noto Sans Thai",sans-serif; }
+  .insp-detail-head h2 { font-size: 17px; font-weight: 800; margin: 0; }
+  .insp-header-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 16px; padding: 18px 22px; }
+  .insp-field label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-soft); margin-bottom: 5px; }
+  .insp-field input { width: 100%; border: 1px solid var(--card-line); background: var(--surface); border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 12.8px; color: var(--text); }
+  .insp-section-title { padding: 14px 22px 6px; font-size: 12.5px; font-weight: 800; color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+  .insp-item-row { display: grid; grid-template-columns: 1.7fr repeat(3, 60px) 1.4fr; gap: 10px; align-items: center; padding: 9px 22px; border-bottom: 1px solid var(--card-line); }
+  .insp-item-row .lbl { font-size: 12.5px; color: var(--text); }
+  .insp-radio { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: var(--text-faint); font-weight: 600; cursor: pointer; }
+  .insp-radio input { width: 15px; height: 15px; accent-color: var(--brand); cursor: pointer; }
+  .insp-item-row input[type="text"] { border: 1px solid var(--card-line); background: var(--surface); border-radius: 7px; padding: 6px 9px; font: inherit; font-size: 12px; width: 100%; color: var(--text); }
+  .insp-footer { padding: 18px 22px 22px; }
+  .insp-footer label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-soft); margin-bottom: 6px; }
+  .insp-footer textarea { width: 100%; min-height: 64px; border: 1px solid var(--card-line); background: var(--surface); border-radius: 9px; padding: 10px 12px; font: inherit; font-size: 12.8px; color: var(--text); resize: vertical; }
+  .insp-sign-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+  .insp-actions { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 22px; border-top: 1px solid var(--card-line); }
+  .insp-oil-table { width: 100%; border-collapse: collapse; margin: 8px 22px 4px; width: calc(100% - 44px); }
+  .insp-oil-table th, .insp-oil-table td { border: 1px solid var(--card-line); padding: 8px 10px; font-size: 12px; text-align: center; }
+  .insp-oil-table th { background: var(--surface); color: var(--text-soft); font-weight: 700; }
+  .insp-oil-table td input { width: 64px; border: 1px solid var(--card-line); border-radius: 6px; padding: 5px; text-align: center; font: inherit; font-size: 12px; }
+  .insp-photo-box { border: 1.5px dashed var(--card-line); border-radius: 12px; height: 140px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-size: 12px; background: var(--surface); }
+
   /* Cost page */
   .cost-kpis { grid-template-columns: repeat(4, 1fr); }
   .cost-kpi { padding: 16px 18px; }
@@ -424,6 +458,11 @@ const ICONS = {
   chevR: `<path d="m9 18 6-6-6-6"/>`,
   download: `<path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/>`,
   file: `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/>`,
+  checklist: `<rect x="3.5" y="3" width="17" height="18" rx="2"/><path d="m7.5 8 1.3 1.3L11 7"/><path d="M13 8h5.2"/><path d="m7.5 14 1.3 1.3L11 13"/><path d="M13 14h5.2"/>`,
+  arrowLeft: `<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>`,
+  thermo: `<path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>`,
+  waves: `<path d="M2 12c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/><path d="M2 18c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/>`,
+  droplet: `<path d="M12 2s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/>`,
 };
 function ic(name, extra=""){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ${extra}>${ICONS[name]}</svg>`; }
 
@@ -436,6 +475,7 @@ const NAV = [
   {id:"lbs", label:"สวิตช์ตัดตอน (LBS)", icon:"branch"},
   {id:"substation", label:"สถานีย่อย", icon:"server"},
   {id:"workorder", label:"ใบงาน", icon:"clipboard"},
+  {id:"inspection", label:"ใบตรวจสอบบำรุงรักษา", icon:"checklist"},
   {id:"cost", label:"ต้นทุนบำรุงรักษา", icon:"coin"},
   {id:"reports", label:"รายงาน", icon:"chart"},
 ];
@@ -808,6 +848,249 @@ const pageReports = `
 </div>
 `;
 
+/* ===================== INSPECTION / MAINTENANCE CHECKLIST FORMS ===================== */
+const DEFAULT_RESULT_OPTS = ["ปกติ","ชำรุด","ไม่มี"];
+
+const INSPECTION_FORMS = [
+  { code:"SF-07-0-015", title:"แบบตรวจสอบบำรุงรักษาหม้อแปลงจำหน่าย", equip:"หม้อแปลงจำหน่าย", icon:"box", kind:"checklist",
+    header:["Station ID","สถานที่","GIS Lat.","GIS Long.","MEA No.1","MEA No.2","MEA No.3","ยี่ห้อ","ชนิด","จำนวนเฟส"],
+    sections:[{title:null, items:["Drop Fuse","Station Post Type Insulator","สายเข้า-ออก Drop Fuse","คอนสาย","อุปกรณ์ป้องกันสัตว์","กับดักฟ้าผ่า (L/A)","Bushing HV-LV","Cover (Bushing, L/A, Term. kit)","ตัวถังหม้อแปลง","TLM","LV Ground","HV Ground","CT-TLM Meter (ถ้ามี)"]}]
+  },
+  { code:"SF-07-0-016", title:"แบบตรวจสอบบำรุงรักษา Load Break Switch", equip:"Load Break Switch (LBS)", icon:"branch", kind:"checklist",
+    header:["Station ID","สถานที่","GIS","Lat.","Long.","ยี่ห้อ LBS","LBS MEA No.","Switch No.","ยี่ห้อ VT","VT MEA No.","ตู้ OFDF No."],
+    sections:[
+      {title:null, items:["ตัวถัง LBS / สลักล็อคการปลดสับ","สถานะก๊าซ SF6","Bushing","กับดักฟ้าผ่า","VT","Drop Fuse ลง VT","คอนสาย","สายควบคุม LBS","อุปกรณ์ป้องกันสัตว์"]},
+      {title:"ตู้ Control / FRTU / Ground", items:["ไฟสถานะหน้าตู้","แหล่งจ่ายไฟฟ้า และสายควบคุม","สภาพแบตเตอรี่หรือ Capacitor","Ground HV (L/A, LBS)","Ground LV (ตู้ Control)"]},
+      {title:"ทดสอบ ปลด/สับ", items:["ทดสอบ ทาง Remote","ทดสอบ ทาง Local"]},
+      {title:"ทดสอบระบบ ATS (ถ้ามี)", items:["แรงดันไฟฟ้าเลี้ยงอุปกรณ์","การทดสอบ ATS"]},
+    ]
+  },
+  { code:"SF-07-0-017", title:"แบบตรวจสอบบำรุงรักษา Sectionalizer", equip:"Sectionalizer (SZ)", icon:"branch", kind:"checklist",
+    header:["Station ID","สถานที่","GIS","Lat.","Long.","ยี่ห้อ SZ","SZ MEA No.","Switch No."],
+    sections:[
+      {title:"สภาพ SZ และอุปกรณ์ประกอบ", items:["ตัวถัง SZ / สลักล็อคการปลดสับ","สถานะก๊าซ SF6","Bushing","กับดักฟ้าผ่า","คอนสาย","สายควบคุม SZ","อุปกรณ์ป้องกันสัตว์"]},
+      {title:"ตู้ Control / Ground", items:["ไฟสถานะหน้าตู้","แหล่งจ่ายไฟฟ้า และสายควบคุม","สภาพแบตเตอรี่หรือ Capacitor","Ground HV (L/A, SZ)","Ground LV (ตู้ Control)"]},
+      {title:"ทดสอบ ปลด/สับ", items:["ทดสอบ ทาง Local"]},
+    ]
+  },
+  { code:"SF-07-0-018", title:"แบบตรวจสอบบำรุงรักษา Ring Main Unit (RMU)", equip:"Ring Main Unit (RMU)", icon:"server", kind:"checklist",
+    header:["Station ID","สถานที่","GIS","Lat.","Long.","ยี่ห้อ RMU","RMU MEA No."],
+    sections:[
+      {title:"ตู้ครอบ RMU (กรณีติดตั้งนอกอาคาร)", items:["สภาพภายนอก","ประตู","ฐานตู้"]},
+      {title:"RMU", items:["สภาพ RMU / ห้อง","ก๊าซ SF6","ตัวแสดงสถานะสวิทซ์","กุญแจล็อคป้องกันการปลด-สับ","คันสับ","ตัวตรวจสอบแรงดัน","ตัวตรวจสอบการลัดวงจร","แรงดันไฟฟ้าเลี้ยงอุปกรณ์","สภาพแบตเตอรี่หรือ UPS (ถ้ามี)","FRTU (ถ้ามี)","อุปกรณ์ควบคุมอื่นๆ"]},
+      {title:"การทดสอบการปลด-สับ", items:["ระบบการปลด-สับด้วยไฟฟ้า (ถ้ามี)","การปลด-สับด้วย REMOTE (ถ้ามี)","การปลด-สับด้วย LOCAL กดปุ่ม (ถ้ามี)","การปลด-สับด้วยคันสับ"]},
+      {title:"ระบบ ATF ที่ RMU (ถ้ามี)", items:["แรงดันไฟฟ้าเลี้ยงอุปกรณ์","การทดสอบ ATF"]},
+    ]
+  },
+  { code:"SF-07-0-019", title:"แบบตรวจสอบบำรุงรักษา Unit Substation", equip:"Unit Substation", icon:"server", kind:"checklist",
+    header:["Station ID","สถานที่","GIS","Lat.","Long.","ยี่ห้อ TR","TR MEA No.","ยี่ห้อ RMU","RMU MEA No."],
+    sections:[
+      {title:null, items:["สภาพภายนอก","ประตู","ฐานตู้ / นั่งร้าน"]},
+      {title:"ตู้ครอบ Encloser / สภาพ RMU", items:["สภาพ RMU","ก๊าซ SF6","ตัวแสดงสถานะสวิตช์"]},
+      {title:"การปลด-สับ (REMOTE / LOCAL / คันสับ)", items:["การปลด-สับด้วย REMOTE (ถ้ามี)","การปลด-สับด้วย LOCAL กดปุ่ม (ถ้ามี)","การปลด-สับด้วยคันสับ","กุญแจล็อคป้องกันการปลด-สับ","คันสับ"]},
+      {title:"อุปกรณ์ควบคุม RMU", items:["ตัวตรวจสอบแรงดัน","ตัวตรวจสอบการลัดวงจร","แรงดันไฟฟ้าเลี้ยงอุปกรณ์ (RMU)","สภาพแบตเตอรี่หรือ UPS (ถ้ามี)","FRTU (ถ้ามี)","อุปกรณ์ควบคุมอื่นๆ"]},
+      {title:"ระบบ ATF", items:["ระบบการปลด-สับด้วยไฟฟ้า (ถ้ามี)","ระบบ ATF ที่ RMU (ถ้ามี)","การทดสอบ ATF"]},
+      {title:"หม้อแปลง", items:["ตัวถังหม้อแปลง","Bushing HV-LV","สายหน้าหม้อแปลง HV-LV","LV Ground","HV Ground","แรงดันไฟฟ้าเลี้ยงอุปกรณ์"]},
+      {title:"อุปกรณ์ด้านแรงต่ำ", items:["สภาพทั่วไป CB หรือ FUSE","สายไฟฟ้า","บัสบาร์","เครื่องวัดไฟฟ้า","CT-TLM Meter (ถ้ามี)","จุดร้อนแดงส่องด้วยกล้องเทอร์โมวิชั่น"]},
+    ]
+  },
+  { code:"SF-07-0-020", title:"แบบตรวจสอบบำรุงรักษา Capacitor Bank 12-24 kV ในสายป้อน", equip:"Capacitor Bank 12-24 kV", icon:"zap", kind:"checklist",
+    header:["Station ID","สถานที่","สายป้อน","GIS","Lat.","Long.","MEA No.","ยี่ห้อ","ชนิด CONTROL","ชนิด Switch"],
+    sections:[
+      {title:"อุปกรณ์ประกอบ", items:["Drop Fuse","Station Post Type Insulator","สายเข้า-ออก Drop Fuse","คอนสาย","อุปกรณ์ป้องกันสัตว์","กับดักฟ้าผ่า (L/A)","Cover (Bushing, L/A)","HV Ground","Vacuum CB"]},
+      {title:"อุปกรณ์ควบคุม (สถานี Switching Capacitor Bank)", items:["Supply","Fuse Control ภายในตู้","หลอดไฟแสดงสถานะในตู้","หน้าจอ Digital Control","เสียงนาฬิกาเดิน","อุปกรณ์ทั่วไปภายในตู้"]},
+      {title:"Capacitor Cell", items:["ตัวถังคาปาซิเตอร์","Bushing","Fuse ภายใน","ค่าคาปาซิแตนท์ที่วัดได้"]},
+    ]
+  },
+  { code:"SF-07-0-021", title:"แบบตรวจสอบบำรุงรักษาเครื่องป้องกันหม้อแปลงวงจรตาข่าย", equip:"เครื่องป้องกันหม้อแปลงวงจรตาข่าย", icon:"checklist", kind:"checklist",
+    header:["สถานที่ (STATION)","FIX ID","ACB NO.","MEA NO.","RELAY NO.","WLN"], resultOptions:["ปกติ","ไม่ปกติ"],
+    sections:[
+      {title:"สภาพภายนอก", items:["สถานะ MV.SW. (เกณฑ์: CLOSE)","สถานะ NP (เกณฑ์: CLOSE)","เบอร์ตู้ / สีตู้ ชัดเจน ไม่ลอก","ระบบกราวด์ มีทั้งกราวด์ N และ G","อุปกรณ์ป้องกันแรงดันเกินภายนอก มีทั้งด้าน N และ T ไม่ชำรุด","ตัวถัง รอยต่อหม้อแปลง ไม่เสียหาย / ไม่มีน้ำมันรั่วซึม","ฝาตู้ ปิดแน่นสนิท","มีการแขวนป้ายแดงห้ามปลด-สับ"]},
+      {title:"การทดสอบโดยปลด-สับ MV.SW.", items:["ปลด MV.SW. ครั้งที่ 1 (เกณฑ์: NP OPEN)","สับ MV.SW. ครั้งที่ 1 (เกณฑ์: NP CLOSE)","ปลด MV.SW. ครั้งที่ 2 (เกณฑ์: NP OPEN)"]},
+      {title:"สภาพภายใน", items:["อุปกรณ์ภายใน ไม่มีน้ำหรือหยดน้ำเกาะ","รีเลย์ อยู่ในสถานะถูกต้อง (เกณฑ์: NP CLOSE)"]},
+      {title:"อุปกรณ์ส่งข้อมูลระยะไกล", items:["ตู้อุปกรณ์ ไม่ชำรุดเสียหาย","ไฟเลี้ยง / CB & FUSE มีไฟเลี้ยง / CB&FUSE สับอยู่","อินเตอร์เน็ตสวิตช์ ไม่ชำรุดเสียหาย"]},
+    ]
+  },
+  { code:"SF-07-0-022", title:"แบบตรวจสอบบำรุงรักษาหม้อแปลงวงจรตาข่ายและสวิตช์แรงกลาง", equip:"หม้อแปลงวงจรตาข่าย / สวิตช์แรงกลาง", icon:"box", kind:"checklist",
+    header:["สถานที่ (STATION)","FIX ID","TR.MEA NO.","SW.MEA NO.","WLN"], resultOptions:["ปกติ","ไม่ปกติ"],
+    sections:[
+      {title:"สวิทซ์แรงกลาง", items:["สภาพภายนอก (เกณฑ์: ไม่มีรอยแตก ปลด-สับได้)","ก๊าซ SF6 (เกณฑ์: อยู่ในโซนที่กำหนด)","หัวต่อสาย / สายไฟฟ้า ไม่มีรอยบิ่น ไหม้ หรือแตกร้าว","ระบบกราวด์ มีกราวด์ทั้งแรงสูง แรงต่ำ"]},
+      {title:"หม้อแปลง", items:["ตัวถัง ไม่มีรอยแตก บุบ ฉีกขาด","น้ำมัน ไม่รั่วไหล อยู่ในระดับที่กำหนด","ฟิวส์ 12 kV","อุณหภูมิสูงสุด (เกณฑ์: ไม่เกิน 90°C)","อุณหภูมิจริง (เกณฑ์: ไม่เกิน 90°C)"]},
+      {title:"ด้านแรงต่ำ", items:["สายไฟฟ้า ไม่มีจุดชำรุดเสียหาย","คาปาซิเตอร์แรงต่ำ ไม่มีจุดชำรุดเสียหาย"]},
+    ]
+  },
+  { code:"SF-07-0-023", title:"แบบตรวจสอบบำรุงรักษา ทดสอบและกรองน้ำมันหม้อแปลงวงจรตาข่าย", equip:"น้ำมันหม้อแปลงวงจรตาข่าย", icon:"droplet", kind:"oil",
+    header:["สถานที่","STATION ID","SW.ยี่ห้อ","TR.MEA No."]
+  },
+  { code:"SF-07-0-024", title:"รายงานผลการตรวจสอบจุดร้อนแดง (Hot Spot)", equip:"ตรวจสอบด้วยกล้องเทอร์โมวิชั่น", icon:"thermo", kind:"hotspot",
+    header:["Station ID","สถานที่","GIS","Lat.","Long.","อุปกรณ์ MEA No.","สายป้อน","วันที่ตรวจ","Emissivity"]
+  },
+  { code:"SF-07-0-025", title:"รายงานผลการตรวจสอบการคายประจุไฟฟ้าบางส่วน (Partial Discharge)", equip:"ตรวจสอบด้วยกล้อง Acoustic Camera", icon:"waves", kind:"pd",
+    header:["Station ID","สถานที่","GIS","Lat.","Long.","อุปกรณ์ MEA No.","สายป้อน","วันที่ตรวจ","ระดับความเข้มเสียง (dB)"]
+  },
+];
+
+function inspHeaderGrid(fields){
+  return `<div class="insp-header-grid">` + fields.map(h=>`<div class="insp-field"><label>${h}</label><input type="text"></div>`).join("") + `</div>`;
+}
+function inspFooterHtml(){
+  return `
+  <div class="insp-footer">
+    <label>สิ่งที่ต้องปรับปรุงหรือข้อมูลเพิ่มเติม</label>
+    <textarea placeholder="ระบุรายละเอียด..."></textarea>
+    <div class="insp-sign-grid">
+      <div class="insp-field"><label>ผู้ตรวจ</label><input type="text"></div>
+      <div class="insp-field"><label>ตำแหน่ง</label><input type="text"></div>
+      <div class="insp-field"><label>วันที่</label><input type="text" placeholder="วว/ดด/ปปปป"></div>
+      <div class="insp-field"><label>ผู้ตรวจสอบ</label><input type="text"></div>
+      <div class="insp-field"><label>ตำแหน่ง</label><input type="text"></div>
+      <div class="insp-field"><label>วันที่</label><input type="text" placeholder="วว/ดด/ปปปป"></div>
+    </div>
+  </div>
+  <div class="insp-actions">
+    <button class="btn" onclick="window.print()">${ic('download')} พิมพ์แบบฟอร์ม</button>
+    <button class="btn primary">${ic('plus')} บันทึกแบบตรวจสอบ</button>
+  </div>`;
+}
+
+function renderChecklistForm(f){
+  const opts = f.resultOptions || DEFAULT_RESULT_OPTS;
+  const pad = 3 - opts.length;
+  const padCells = "<div></div>".repeat(pad);
+  const colHead = `<div class="insp-item-row" style="font-weight:700; color:var(--text-soft); font-size:11.5px; border-bottom:2px solid var(--card-line);"><div>รายการ</div>${opts.map(o=>`<div style="text-align:center;">${o}</div>`).join("")}${padCells}<div>ข้อบกพร่อง / หมายเหตุ</div></div>`;
+  let seq = 0;
+  const sectionsHtml = f.sections.map(sec => {
+    const title = sec.title ? `<div class="insp-section-title">${sec.title}</div>` : "";
+    const rows = sec.items.map(item => {
+      seq++;
+      const name = `${f.code}-r${seq}`;
+      const radios = opts.map(o => `<label class="insp-radio"><input type="radio" name="${name}"><span>${o}</span></label>`).join("");
+      return `<div class="insp-item-row"><div class="lbl">${item}</div>${radios}${padCells}<input type="text" placeholder="ระบุข้อบกพร่อง"></div>`;
+    }).join("");
+    return title + rows;
+  }).join("");
+  return `
+    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
+    ${inspHeaderGrid(f.header)}
+    ${colHead}
+    ${sectionsHtml}
+    ${inspFooterHtml()}
+  `;
+}
+
+function renderOilForm(f){
+  const rounds = [
+    "1. ทดสอบน้ำมันหม้อแปลงด้วยเครื่องทดสอบ โดยทดสอบ 5 ครั้ง ห่างครั้งละ 5 นาที",
+    "2. กรองน้ำมันครั้งที่ 1 แล้วดำเนินการทดสอบใหม่",
+    "3. กรองน้ำมันครั้งที่ 2 แล้วดำเนินการทดสอบใหม่",
+  ].map(label => `
+    <div class="insp-section-title">${label}</div>
+    <table class="insp-oil-table">
+      <thead><tr><th>ครั้งที่</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>ค่าเฉลี่ย</th></tr></thead>
+      <tbody><tr><td>Breakdown Voltage (kV)</td>${"<td><input type=\"text\"></td>".repeat(5)}<td><input type="text"></td></tr></tbody>
+    </table>
+    <div style="padding:2px 22px 14px; font-size:11.5px; color:var(--text-faint);">*ทดสอบครั้งที่ 1 ถ้าต่ำกว่า 26 kV ดำเนินการกรองน้ำมัน หากเกิน 26 kV ให้ทดสอบครบ 5 ครั้งแล้วหาค่าเฉลี่ย</div>
+  `).join("");
+  return `
+    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
+    ${inspHeaderGrid(f.header)}
+    ${rounds}
+    ${inspFooterHtml()}
+  `;
+}
+
+function renderHotspotForm(f){
+  const priorities = [["1","อุปกรณ์ปกติ"],["2","แก้ไขในการบำรุงรักษาครั้งต่อไป"],["3","ควรแก้ไขภายใน 1 เดือน"],["4","ควรได้รับการแก้ไขเร่งด่วน"]];
+  const deltaRanges = ["0 - 10°C","สูงกว่า 10 - 20°C","สูงกว่า 20 - 40°C","สูงกว่า 40°C"];
+  return `
+    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
+    ${inspHeaderGrid(f.header)}
+    <div class="insp-section-title">1. ข้อมูลภาพถ่าย</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:6px 22px 16px;">
+      <div class="insp-photo-box">ภาพถ่ายจริง</div>
+      <div class="insp-photo-box">ภาพถ่ายความร้อน</div>
+    </div>
+    <div class="insp-section-title">2. อุณหภูมิเปรียบเทียบที่จุดวัดฯ (Delta T)</div>
+    <div style="padding:6px 22px 4px; display:flex; flex-wrap:wrap; gap:16px;">
+      ${deltaRanges.map(d => `<label class="insp-radio" style="flex-direction:row; gap:6px;"><input type="radio" name="deltaRange"><span>${d}</span></label>`).join("")}
+    </div>
+    ${inspHeaderGrid(["อุณหภูมิสูงสุดที่จุดวัดฯ (°C)","Delta T ที่วัดได้ (°C)"])}
+    <div class="insp-section-title">3. รายละเอียดการตรวจสอบ — ลำดับความสำคัญ</div>
+    <div style="padding:6px 22px 4px; display:flex; flex-wrap:wrap; gap:16px;">
+      ${priorities.map(p => `<label class="insp-radio" style="flex-direction:row; gap:6px;"><input type="radio" name="priority"><span>${p[0]}. ${p[1]}</span></label>`).join("")}
+    </div>
+    <div class="insp-footer" style="padding-bottom:0;">
+      <label>ข้อแนะนำการดำเนินการ</label>
+      <textarea placeholder="ระบุรายละเอียดการตรวจสอบและข้อแนะนำการแก้ไข..."></textarea>
+    </div>
+    <div class="insp-section-title">4. การส่งต่อดำเนินการแก้ไข</div>
+    ${inspHeaderGrid(["ส่งต่อให้กลุ่มงาน","วันที่"])}
+    <div class="insp-section-title">5. การดำเนินการปรับปรุง</div>
+    ${inspHeaderGrid(["ดำเนินการแก้ไขเมื่อวันที่","ตำแหน่งผู้ดำเนินการ"])}
+    ${inspFooterHtml()}
+  `;
+}
+
+function renderPdForm(f){
+  const severities = ["สูงมาก","สูง","ปานกลาง","ต่ำ"];
+  return `
+    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
+    ${inspHeaderGrid(f.header)}
+    <div class="insp-section-title">1. ข้อมูลภาพถ่าย</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:6px 22px 16px;">
+      <div class="insp-photo-box">ภาพถ่ายจากกล้องปกติ</div>
+      <div class="insp-photo-box">ภาพถ่ายจาก Acoustic Camera</div>
+    </div>
+    ${inspHeaderGrid(["จุดที่ผิดปกติ"])}
+    <div class="insp-section-title">ระดับความรุนแรง</div>
+    <div style="padding:6px 22px 4px; display:flex; flex-wrap:wrap; gap:16px;">
+      ${severities.map(s => `<label class="insp-radio" style="flex-direction:row; gap:6px;"><input type="radio" name="severity"><span>${s}</span></label>`).join("")}
+    </div>
+    <div class="insp-section-title">2. การส่งต่อดำเนินการแก้ไข</div>
+    ${inspHeaderGrid(["ส่งต่อให้กลุ่มงาน","วันที่"])}
+    <div class="insp-section-title">3. การดำเนินการปรับปรุง</div>
+    ${inspHeaderGrid(["ดำเนินการแก้ไขเมื่อวันที่","ตำแหน่งผู้ดำเนินการ"])}
+    ${inspFooterHtml()}
+  `;
+}
+
+function renderInspectionDetail(f){
+  if (f.kind === "oil") return renderOilForm(f);
+  if (f.kind === "hotspot") return renderHotspotForm(f);
+  if (f.kind === "pd") return renderPdForm(f);
+  return renderChecklistForm(f);
+}
+
+function renderInspectionList(){
+  const root = document.getElementById("inspectionRoot");
+  if (!root) return;
+  root.innerHTML = `<div class="insp-grid">` + INSPECTION_FORMS.map((f,i) => `
+    <div class="card insp-card" onclick="openInspectionForm(${i})">
+      <div class="ic">${ic(f.icon || "checklist")}</div>
+      <div class="code">${f.code}</div>
+      <div class="t">${f.title}</div>
+      <div class="d">${f.equip}</div>
+    </div>`).join("") + `</div>`;
+}
+window.openInspectionForm = function(idx){
+  const f = INSPECTION_FORMS[idx];
+  const root = document.getElementById("inspectionRoot");
+  if (!root || !f) return;
+  root.innerHTML = `
+    <div class="back-link" onclick="renderInspectionList()">${ic('arrowLeft')} กลับไปยังรายการแบบฟอร์ม</div>
+    <div class="card">${renderInspectionDetail(f)}</div>
+  `;
+  window.scrollTo({top:0, behavior:"instant"});
+};
+window.renderInspectionList = renderInspectionList;
+
+const pageInspection = `
+<div class="page-head">
+  <div><h1>ใบตรวจสอบบำรุงรักษา</h1><p>แบบฟอร์มตรวจสอบบำรุงรักษาอุปกรณ์ในระบบไฟฟ้า ทั้งหมด ${INSPECTION_FORMS.length} แบบฟอร์ม (SF-07-0-015 ถึง SF-07-0-025)</p></div>
+</div>
+<div id="inspectionRoot"></div>
+`;
+
 /* ===================== PAGE: SETTINGS ===================== */
 const pageSettings = `
 <div class="page-head"><div><h1>ตั้งค่า</h1><p>ตั้งค่าบัญชีและการแจ้งเตือนของระบบ</p></div></div>
@@ -832,6 +1115,7 @@ const pages = [
   {id:"lbs", html: assetPage(lbsCfg)},
   {id:"substation", html: assetPage(substationCfg)},
   {id:"workorder", html: pageWorkOrder},
+  {id:"inspection", html: pageInspection},
   {id:"cost", html: pageCost},
   {id:"reports", html: pageReports},
   {id:"settings", html: pageSettings},
@@ -843,6 +1127,7 @@ pages.forEach((p,i)=>{
   sec.innerHTML = p.html;
   content.appendChild(sec);
 });
+renderInspectionList();
 
 /* ===================== CHARTS (plain inline SVG — no library, no network) ===================== */
 // Every chart is hand-drawn as SVG in plain JS. This removes the whole class of
