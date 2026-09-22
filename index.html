@@ -379,6 +379,125 @@
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important; animation:none !important;}
   }
+
+  /* ===== Pages ===== */
+  .page{display:none;}
+  .page.active{display:block;}
+  .page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+  .page-header h2{font-size:22px;margin:0 0 4px;font-weight:800;color:var(--ink-900);}
+  .page-header p{font-size:13px;color:var(--ink-500);margin:0;font-weight:500;}
+  .page-cta{
+    background:linear-gradient(100deg,var(--blue-600),#5a8cf5);color:#fff;border:none;
+    padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;
+    box-shadow:0 6px 16px rgba(47,111,237,.3);
+  }
+  .page-cta svg{width:14px;height:14px;}
+
+  .tab-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab-btn{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12.5px;font-weight:700;color:var(--ink-700);}
+  .tab-btn.active{background:var(--navy-900);color:#fff;border-color:var(--navy-900);}
+
+  .table-wrap{overflow-x:auto;}
+  .data-table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px;}
+  .data-table th{text-align:left;font-size:11px;color:var(--ink-400);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  .data-table td{padding:13px 14px;border-bottom:1px solid var(--line);color:var(--ink-700);font-weight:500;white-space:nowrap;}
+  .data-table tr:last-child td{border-bottom:none;}
+  .data-table tbody tr:hover td{background:#f9fafc;}
+  .pill{font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.2px;display:inline-block;}
+  .pill-open{background:#e8f0fe;color:var(--blue-600);}
+  .pill-progress{background:#fef2e2;color:var(--amber-600);}
+  .pill-done{background:#e7f8ee;color:#16a34a;}
+  .pill-overdue{background:#fdeaea;color:var(--rose-500);}
+  .pill-ok{background:#e7f8ee;color:#16a34a;}
+  .pill-warn{background:#fef2e2;color:var(--amber-600);}
+  .pill-bad{background:#fdeaea;color:var(--rose-500);}
+
+  .grid-2-1{display:grid;grid-template-columns:1.4fr .95fr;gap:16px;}
+  @media(max-width:1100px){.grid-2-1{grid-template-columns:1fr;}}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px;}
+  @media(max-width:520px){.form-grid{grid-template-columns:1fr;}}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1/-1;}
+  .field label{font-size:12px;font-weight:700;color:var(--ink-700);}
+  .field select,.field input[type=text],.field input[type=date],.field textarea{
+    padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:13px;
+    font-family:inherit;color:var(--ink-900);background:#fff;
+  }
+  .field textarea{resize:vertical;min-height:70px;}
+  .checklist{padding:4px 18px 6px;}
+  .checklist-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);gap:12px;flex-wrap:wrap;}
+  .checklist-item:last-child{border-bottom:none;}
+  .checklist-item .ci-name{font-size:13px;font-weight:600;color:var(--ink-900);}
+  .radio-group{display:flex;gap:14px;}
+  .radio-opt{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink-700);cursor:pointer;}
+  .radio-opt input{accent-color:var(--blue-600);width:15px;height:15px;}
+  .upload-btn{
+    display:inline-flex;align-items:center;gap:8px;background:#f1f3f8;border:1px dashed var(--ink-400);
+    padding:10px 14px;border-radius:9px;font-size:12.5px;font-weight:700;color:var(--ink-700);width:fit-content;
+  }
+  .upload-btn svg{width:14px;height:14px;}
+  .submit-row{display:flex;justify-content:flex-end;gap:10px;padding:14px 18px 18px;}
+  .btn-secondary{background:#fff;border:1px solid var(--line);color:var(--ink-700);padding:11px 18px;border-radius:10px;font-size:13px;font-weight:700;}
+  .btn-primary{background:linear-gradient(100deg,var(--blue-600),#5a8cf5);color:#fff;border:none;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:700;box-shadow:0 6px 16px rgba(47,111,237,.3);}
+
+  .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:860px){.kanban{grid-template-columns:1fr;}}
+  .kanban-col{background:#eef1f7;border-radius:16px;padding:14px;min-height:120px;}
+  .kanban-col h4{font-size:13px;margin:0 0 12px;display:flex;align-items:center;justify-content:space-between;font-weight:800;color:var(--ink-700);}
+  .kanban-col h4 .count{background:#fff;border-radius:999px;padding:2px 9px;font-size:11px;color:var(--ink-500);}
+  .kanban-card{
+    background:#fff;border-radius:12px;padding:13px;margin-bottom:10px;border:1px solid var(--line);
+    box-shadow:var(--shadow-card);cursor:grab;
+  }
+  .kanban-card.dragging{opacity:.4;}
+  .kanban-col.drag-over{background:#e3ecff;}
+  .kanban-card .kc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+  .kanban-card .kc-id{font-size:10.5px;color:var(--ink-400);font-weight:700;}
+  .kanban-card .kc-title{font-size:13px;font-weight:700;color:var(--ink-900);margin:3px 0 8px;line-height:1.35;}
+  .kanban-card .kc-foot{display:flex;align-items:center;justify-content:space-between;}
+  .kc-avatar{width:24px;height:24px;border-radius:50%;background:var(--navy-800);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .kc-due{font-size:10.5px;color:var(--ink-500);font-weight:600;}
+
+  .res-row{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--line);}
+  .res-row:last-child{border-bottom:none;}
+  .res-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#4a8bfd,#2f6fed);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .res-info{flex:1;min-width:0;}
+  .res-name{font-size:13.5px;font-weight:700;color:var(--ink-900);}
+  .res-role{font-size:11.5px;color:var(--ink-500);font-weight:600;}
+  .res-task{font-size:11.5px;color:var(--ink-500);margin-top:2px;}
+  .res-bar-wrap{width:120px;flex-shrink:0;}
+  .res-bar-label{font-size:10.5px;color:var(--ink-500);font-weight:700;margin-bottom:4px;display:flex;justify-content:space-between;}
+  .res-bar{height:6px;border-radius:999px;background:#eef1f6;overflow:hidden;}
+  .res-bar span{display:block;height:100%;background:var(--blue-600);border-radius:999px;}
+
+  .report-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:900px){.report-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.report-grid{grid-template-columns:1fr;}}
+  .report-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px;box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:12px;}
+  .report-ic{width:38px;height:38px;border-radius:10px;background:#e8f0fe;color:var(--blue-600);display:flex;align-items:center;justify-content:center;}
+  .report-ic svg{width:18px;height:18px;}
+  .report-card h4{font-size:14px;margin:0;font-weight:700;}
+  .report-card p{font-size:12px;color:var(--ink-500);margin:0;line-height:1.5;}
+  .report-meta{font-size:10.5px;color:var(--ink-400);font-weight:600;}
+  .report-dl{margin-top:auto;background:#f1f3f8;border:none;color:var(--ink-900);font-size:12.5px;font-weight:700;padding:9px 12px;border-radius:9px;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .report-dl svg{width:13px;height:13px;}
+
+  .settings-block{margin-bottom:8px;}
+  .settings-block h4{font-size:13.5px;font-weight:800;color:var(--ink-900);margin:0 0 2px;padding:16px 18px 0;}
+  .settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);gap:14px;}
+  .settings-row:last-child{border-bottom:none;}
+  .settings-row .s-title{font-size:13px;font-weight:700;color:var(--ink-900);}
+  .settings-row .s-desc{font-size:11.5px;color:var(--ink-500);margin-top:2px;}
+  .switch{width:40px;height:22px;border-radius:999px;background:#e2e6ee;position:relative;cursor:pointer;flex-shrink:0;transition:background .15s;}
+  .switch.on{background:var(--blue-600);}
+  .switch .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .switch.on .knob{left:20px;}
+  .user-row-name{display:flex;align-items:center;gap:10px;}
+  .user-mini-avatar{width:30px;height:30px;border-radius:50%;background:var(--navy-800);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+  .stat-mini-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
+  @media(max-width:760px){.stat-mini-row{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
@@ -397,15 +516,15 @@
     </div>
 
     <nav class="navlist" id="navlist">
-      <button class="nav-item active" data-target="section-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span class="side-label">หน้าหลัก</span></button>
-      <button class="nav-item" data-target="section-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="side-label">ตรวจสอบอุปกรณ์</span></button>
-      <button class="nav-item" data-target="section-wo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg><span class="side-label">Work Order</span></button>
-      <button class="nav-item" data-target="section-cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="side-label">แผนบำรุงรักษา (PM)</span></button>
-      <button class="nav-item" data-target="section-wo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="side-label">ติดตามงาน</span></button>
-      <button class="nav-item" data-target="section-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span class="side-label">ทรัพยากร/แรงงาน</span></button>
-      <button class="nav-item" data-target="section-kpi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg><span class="side-label">วิเคราะห์ข้อมูล</span></button>
-      <button class="nav-item" data-target="section-kpi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="side-label">รายงาน</span></button>
-      <button class="nav-item" data-target="section-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg><span class="side-label">จัดการระบบ</span></button>
+      <button class="nav-item active" data-page="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg><span class="side-label">หน้าหลัก</span></button>
+      <button class="nav-item" data-page="inspection"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="side-label">ตรวจสอบอุปกรณ์</span></button>
+      <button class="nav-item" data-page="workorder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg><span class="side-label">Work Order</span></button>
+      <button class="nav-item" data-page="pm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="side-label">แผนบำรุงรักษา (PM)</span></button>
+      <button class="nav-item" data-page="tracking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="side-label">ติดตามงาน</span></button>
+      <button class="nav-item" data-page="resources"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span class="side-label">ทรัพยากร/แรงงาน</span></button>
+      <button class="nav-item" data-page="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg><span class="side-label">วิเคราะห์ข้อมูล</span></button>
+      <button class="nav-item" data-page="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="side-label">รายงาน</span></button>
+      <button class="nav-item" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg><span class="side-label">จัดการระบบ</span></button>
     </nav>
 
     <div class="side-foot">
@@ -448,6 +567,7 @@
 
     <div class="content">
 
+    <div class="page active" id="page-home">
       <!-- HERO + quick actions -->
       <section class="hero-grid" id="section-home">
         <div class="hero">
@@ -463,22 +583,22 @@
         </div>
 
         <div class="action-grid">
-          <div class="action-card" data-toast="เปิดหน้าบันทึกการตรวจสอบอุปกรณ์">
+          <div class="action-card" data-page="inspection">
             <div class="action-icon icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
             <div><div class="a-title">บันทึกการตรวจสอบ<br>อุปกรณ์</div></div>
             <div class="action-foot"><span class="a-sub">Asset Inspection</span><span class="a-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span></div>
           </div>
-          <div class="action-card" data-toast="เปิดหน้าจัดเก็บและติดตาม Work Order">
+          <div class="action-card" data-page="workorder">
             <div class="action-icon icon-teal"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l1 3h4v3H4V6h4z"/><path d="M6 9v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9"/><path d="M9 13h6"/></svg></div>
             <div><div class="a-title">จัดเก็บและติดตาม<br>Work Order</div></div>
             <div class="action-foot"><span class="a-sub">ระบบ / สถานะ / ประวัติ</span><span class="a-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span></div>
           </div>
-          <div class="action-card" data-toast="เปิดหน้าวางแผนบำรุงรักษา (PM)">
+          <div class="action-card" data-page="pm">
             <div class="action-icon icon-amber"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.7 6.3 3 3L8 19H5v-3z"/><path d="m13 8 3-3 3 3-3 3"/></svg></div>
             <div><div class="a-title">วางแผน<br>บำรุงรักษา (PM)</div></div>
             <div class="action-foot"><span class="a-sub">PM Schedule</span><span class="a-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span></div>
           </div>
-          <div class="action-card" data-toast="เปิดหน้าบันทึกเวลาและทรัพยากร">
+          <div class="action-card" data-page="resources">
             <div class="action-icon icon-violet"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.4 2.7-5.5 5.5-5.5S14.5 16.6 14.5 20"/><circle cx="17.5" cy="8.5" r="2.3"/><path d="M15.8 14.4c2 .3 3.7 2 3.7 5.1"/></svg></div>
             <div><div class="a-title">บันทึกเวลาและ<br>ทรัพยากร</div></div>
             <div class="action-foot"><span class="a-sub">Labor Tracking</span><span class="a-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span></div>
@@ -656,15 +776,15 @@
             <button class="panel-link">ดูทั้งหมด <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
           </div>
           <div class="quick-grid">
-            <div class="quick-item" data-toast="เปิดรายงานการตรวจสอบ">
+            <div class="quick-item" data-page="reports">
               <div class="q-ic" style="background:#e7f8ee;color:#16a34a;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
               <div class="q-label">รายงาน<br>การตรวจสอบ</div>
             </div>
-            <div class="quick-item" data-toast="เปิดรายงาน PM">
+            <div class="quick-item" data-page="pm">
               <div class="q-ic" style="background:#e8f0fe;color:var(--blue-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg></div>
               <div class="q-label">รายงาน<br>PM</div>
             </div>
-            <div class="quick-item" data-toast="เปิดวิเคราะห์ต้นทุน">
+            <div class="quick-item" data-page="analytics">
               <div class="q-ic" style="background:#fef2e2;color:var(--amber-600);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10h4.5a1.5 1.5 0 0 1 0 3H10a1.5 1.5 0 0 0 0 3h4.5"/></svg></div>
               <div class="q-label">วิเคราะห์<br>ต้นทุน</div>
             </div>
@@ -675,6 +795,150 @@
           </div>
         </div>
       </section>
+    </div><!-- /page-home -->
+
+    <!-- ============ PAGE: ตรวจสอบอุปกรณ์ ============ -->
+    <div class="page" id="page-inspection">
+      <div class="page-header">
+        <div><h2>บันทึกการตรวจสอบอุปกรณ์</h2><p>กรอกแบบฟอร์มตรวจสอบสภาพอุปกรณ์ประจำวัน</p></div>
+      </div>
+      <div class="grid-2-1">
+        <div class="panel">
+          <div class="panel-head"><h3>แบบฟอร์มตรวจสอบ</h3></div>
+          <div class="form-grid">
+            <div class="field"><label>เลือกอุปกรณ์</label>
+              <select><option>TR-01 หม้อแปลงไฟฟ้า — สถานีเพลินจิต</option><option>TR-02 หม้อแปลงไฟฟ้า — สถานีชิดลม</option><option>SW-14 สวิตช์เกียร์ — สถานีราชดำริ</option><option>CB-07 เซอร์กิตเบรกเกอร์ — สถานีเพลินจิต</option></select>
+            </div>
+            <div class="field"><label>ประเภทงาน</label>
+              <select><option>PM — บำรุงรักษาเชิงป้องกัน</option><option>CM — ซ่อมบำรุงเมื่อเสีย</option><option>INS — ตรวจสอบทั่วไป</option></select>
+            </div>
+            <div class="field"><label>ผู้ตรวจสอบ</label><input type="text" value="Panissara — Field Inspector"></div>
+            <div class="field"><label>วันที่ตรวจสอบ</label><input type="date" id="inspDate"></div>
+          </div>
+          <div class="checklist" id="checklistBox"></div>
+          <div class="form-grid" style="padding-top:4px;">
+            <div class="field full"><label>บันทึกเพิ่มเติม</label><textarea placeholder="รายละเอียดเพิ่มเติม เช่น อาการผิดปกติที่พบ..."></textarea></div>
+            <div class="field full">
+              <label>แนบรูปภาพหน้างาน</label>
+              <button class="upload-btn" id="uploadBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><span id="uploadLabel">เลือกไฟล์ภาพ</span></button>
+            </div>
+          </div>
+          <div class="submit-row">
+            <button class="btn-secondary" id="draftBtn">บันทึกร่าง</button>
+            <button class="btn-primary" id="submitInspBtn">บันทึกผลตรวจสอบ</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>ประวัติการตรวจสอบล่าสุด</h3></div>
+          <div class="notice-list" id="inspHistory"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PAGE: Work Order ============ -->
+    <div class="page" id="page-workorder">
+      <div class="page-header">
+        <div><h2>จัดเก็บและติดตาม Work Order</h2><p>ระบบ / สถานะ / ประวัติ ของงานทั้งหมด</p></div>
+        <button class="page-cta" data-toast="เปิดฟอร์มสร้าง Work Order ใหม่"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>สร้าง Work Order ใหม่</button>
+      </div>
+      <div class="tab-row" id="woTabs"></div>
+      <div class="panel"><div class="table-wrap"><table class="data-table" id="woTable"></table></div></div>
+    </div>
+
+    <!-- ============ PAGE: แผนบำรุงรักษา (PM) ============ -->
+    <div class="page" id="page-pm">
+      <div class="page-header">
+        <div><h2>วางแผนบำรุงรักษา (PM)</h2><p>แผน PM ตามความถี่ของแต่ละอุปกรณ์</p></div>
+        <button class="page-cta" data-toast="เปิดฟอร์มสร้างแผน PM ใหม่"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>สร้างแผน PM</button>
+      </div>
+      <div class="stat-mini-row">
+        <div class="stat-card"><div class="stat-ic blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg></div><div><div class="stat-label">แผน PM ทั้งหมด</div><div class="stat-value">96</div></div></div>
+        <div class="stat-card"><div class="stat-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 6-11 11-5-5"/></svg></div><div><div class="stat-label">ตามแผน</div><div class="stat-value">87%</div></div></div>
+        <div class="stat-card"><div class="stat-ic amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><div class="stat-label">ใกล้ถึงกำหนด</div><div class="stat-value">9</div></div></div>
+        <div class="stat-card"><div class="stat-ic rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div><div><div class="stat-label">เลยกำหนด</div><div class="stat-value">4</div></div></div>
+      </div>
+      <div class="panel"><div class="table-wrap"><table class="data-table" id="pmTable"></table></div></div>
+    </div>
+
+    <!-- ============ PAGE: ติดตามงาน ============ -->
+    <div class="page" id="page-tracking">
+      <div class="page-header">
+        <div><h2>ติดตามงาน</h2><p>ลากการ์ดเพื่อเปลี่ยนสถานะงาน</p></div>
+      </div>
+      <div class="kanban" id="kanbanBoard"></div>
+    </div>
+
+    <!-- ============ PAGE: ทรัพยากร/แรงงาน ============ -->
+    <div class="page" id="page-resources">
+      <div class="page-header">
+        <div><h2>ทรัพยากรและแรงงาน</h2><p>Labor Tracking — ทีมช่างและอุปกรณ์สนับสนุน</p></div>
+      </div>
+      <div class="grid-2-1">
+        <div class="panel">
+          <div class="panel-head"><h3>ทีมช่างวันนี้</h3></div>
+          <div id="resTeam" style="padding:4px 16px;"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>ยานพาหนะ / อุปกรณ์</h3></div>
+          <div id="resEquip" style="padding:4px 16px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PAGE: วิเคราะห์ข้อมูล ============ -->
+    <div class="page" id="page-analytics">
+      <div class="page-header">
+        <div><h2>วิเคราะห์ข้อมูล</h2><p>ภาพรวมแนวโน้มงานบำรุงรักษาและต้นทุน</p></div>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-head"><h3>แนวโน้มงานตรวจสอบที่เสร็จสิ้น</h3></div>
+        <div class="chart-box" style="height:240px;padding:14px 18px;"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div class="bottom-row" style="grid-template-columns:1fr 1fr;">
+        <div class="panel">
+          <div class="panel-head"><h3>ต้นทุนบำรุงรักษาแยกตามประเภท</h3></div>
+          <div class="chart-box" style="height:220px;padding:14px 18px;"><canvas id="costTypeChart"></canvas></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>สัดส่วนประเภทงาน</h3></div>
+          <div class="chart-box" style="height:220px;padding:14px 18px;"><canvas id="typeShareChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PAGE: รายงาน ============ -->
+    <div class="page" id="page-reports">
+      <div class="page-header">
+        <div><h2>รายงาน</h2><p>ดาวน์โหลดรายงานสรุปในรูปแบบไฟล์</p></div>
+      </div>
+      <div class="report-grid" id="reportGrid"></div>
+    </div>
+
+    <!-- ============ PAGE: จัดการระบบ ============ -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div><h2>จัดการระบบ</h2><p>ผู้ใช้งาน สิทธิ์การเข้าถึง และการตั้งค่าทั่วไป</p></div>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <h4 class="settings-block" style="padding:16px 18px 0;margin:0;font-size:13.5px;font-weight:800;">ผู้ใช้งานและสิทธิ์</h4>
+        <div class="table-wrap"><table class="data-table" id="userTable"></table></div>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <h4 class="settings-block" style="padding:16px 18px 0;margin:0;font-size:13.5px;font-weight:800;">การแจ้งเตือน</h4>
+        <div id="notifSettings"></div>
+      </div>
+      <div class="panel">
+        <h4 class="settings-block" style="padding:16px 18px 0;margin:0;font-size:13.5px;font-weight:800;">ข้อมูลองค์กร</h4>
+        <div class="form-grid">
+          <div class="field"><label>ชื่อหน่วยงาน</label><input type="text" value="การไฟฟ้านครหลวง (MEA)"></div>
+          <div class="field"><label>เขตพื้นที่รับผิดชอบ</label><input type="text" value="กรุงเทพมหานคร นนทบุรี สมุทรปราการ"></div>
+          <div class="field"><label>ผู้ดูแลระบบ</label><input type="text" value="Panissara — Field Inspector"></div>
+          <div class="field"><label>เวอร์ชันระบบ</label><input type="text" value="v1.0" disabled></div>
+        </div>
+        <div class="submit-row"><button class="btn-primary" data-toast="บันทึกการตั้งค่าเรียบร้อย">บันทึกการตั้งค่า</button></div>
+      </div>
+    </div>
 
     </div>
 
@@ -699,22 +963,30 @@
     toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
   }
 
-  // ---------- nav ----------
-  document.querySelectorAll('.nav-item').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const t = document.getElementById(btn.dataset.target);
-      if(t) t.scrollIntoView({behavior:'smooth', block:'start'});
-    });
+  // ---------- page switching ----------
+  const contentEl = document.querySelector('.content');
+  function showPage(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const target = document.getElementById('page-'+id);
+    if(target) target.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.page===id));
+    contentEl.scrollIntoView({behavior:'smooth', block:'start'});
+    if(id==='analytics') initAnalyticsCharts();
+  }
+
+  document.querySelectorAll('.nav-item[data-page]').forEach(btn=>{
+    btn.addEventListener('click', ()=> showPage(btn.dataset.page));
   });
 
   document.getElementById('startInspectBtn').addEventListener('click', ()=>{
-    showToast('เริ่มการตรวจสอบอุปกรณ์ใหม่');
+    showPage('inspection');
   });
 
-  document.querySelectorAll('.action-card, .quick-item').forEach(el=>{
-    el.addEventListener('click', ()=> showToast(el.dataset.toast || 'เปิดหน้าที่เลือก'));
+  document.querySelectorAll('.action-card, .quick-item, .page-cta').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      if(el.dataset.page){ showPage(el.dataset.page); }
+      else { showToast(el.dataset.toast || 'เปิดหน้าที่เลือก'); }
+    });
   });
 
   // ---------- work order list ----------
@@ -881,6 +1153,331 @@
     });
   }
   if(window.Chart){ initCharts(); } else { window.addEventListener('load', initCharts); }
+
+  // =========================================================
+  // ================  ตรวจสอบอุปกรณ์ (inspection) ===========
+  // =========================================================
+  const checklistItems = ['สภาพภายนอกตัวเครื่อง','ระดับน้ำมันหม้อแปลง','อุณหภูมิใช้งาน','เสียงผิดปกติขณะทำงาน','การรั่วซึมของน้ำมัน/สารหล่อเย็น','ป้ายเตือนและอุปกรณ์ความปลอดภัย'];
+  const checklistBox = document.getElementById('checklistBox');
+  checklistItems.forEach((name,i)=>{
+    const row = document.createElement('div');
+    row.className = 'checklist-item';
+    row.innerHTML = `
+      <span class="ci-name">${name}</span>
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="chk${i}" checked>ปกติ</label>
+        <label class="radio-opt"><input type="radio" name="chk${i}">ผิดปกติ</label>
+      </div>`;
+    checklistBox.appendChild(row);
+  });
+  const inspDateEl = document.getElementById('inspDate');
+  if(inspDateEl){ inspDateEl.value = new Date().toISOString().slice(0,10); }
+
+  let inspHistoryData = [
+    {asset:'TR-01 หม้อแปลงไฟฟ้า', by:'Panissara', time:'วันนี้ 09:10', ok:true},
+    {asset:'SW-14 สวิตช์เกียร์', by:'สมชาย ใจดี', time:'เมื่อวาน 16:40', ok:true},
+    {asset:'TR-02 หม้อแปลงไฟฟ้า', by:'วิภา สุขใจ', time:'เมื่อวาน 11:05', ok:false},
+    {asset:'CB-07 เซอร์กิตเบรกเกอร์', by:'อนุชา พรหมมา', time:'2 วันที่แล้ว', ok:true},
+  ];
+  function renderInspHistory(){
+    const box = document.getElementById('inspHistory');
+    box.innerHTML = '';
+    inspHistoryData.forEach(h=>{
+      const row = document.createElement('div');
+      row.className = 'notice-row';
+      row.innerHTML = `
+        <div class="n-ic ${h.ok?'blue':'red'}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${h.ok? '<path d="m20 6-11 11-5-5"/>' : '<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>'}</svg>
+        </div>
+        <div><div class="n-text">${h.asset} — ${h.ok?'ผลตรวจ ปกติ':'พบความผิดปกติ'}</div><div class="n-time">${h.by} · ${h.time}</div></div>`;
+      box.appendChild(row);
+    });
+  }
+  renderInspHistory();
+
+  document.getElementById('uploadBtn').addEventListener('click', ()=>{
+    document.getElementById('uploadLabel').textContent = 'field_photo_' + Math.floor(Math.random()*900+100) + '.jpg';
+    showToast('แนบไฟล์ภาพเรียบร้อย');
+  });
+  document.getElementById('draftBtn').addEventListener('click', ()=> showToast('บันทึกร่างแบบฟอร์มแล้ว'));
+  document.getElementById('submitInspBtn').addEventListener('click', ()=>{
+    const assetName = document.querySelector('#page-inspection select').value.split(' — ')[0];
+    inspHistoryData.unshift({asset:assetName, by:'Panissara', time:'เมื่อครู่นี้', ok:true});
+    inspHistoryData = inspHistoryData.slice(0,6);
+    renderInspHistory();
+    showToast('บันทึกผลตรวจสอบเรียบร้อยแล้ว');
+  });
+
+  // =========================================================
+  // ======================  Work Order  ======================
+  // =========================================================
+  const woFull = [
+    {id:'WO-001', title:'ตรวจสอบหม้อแปลง TR-01', type:'PM', station:'เพลินจิต', owner:'Panissara', due:'22 ก.ย. 2569', status:'progress'},
+    {id:'WO-002', title:'ตรวจสอบระบบระบายความร้อน', type:'CM', station:'ชิดลม', owner:'สมชาย ใจดี', due:'22 ก.ย. 2569', status:'open'},
+    {id:'WO-003', title:'ตรวจสอบ Oil Level & Leakage', type:'PM', station:'เพลินจิต', owner:'Panissara', due:'20 ก.ย. 2569', status:'overdue'},
+    {id:'WO-004', title:'ตรวจสอบอุปกรณ์ Protection', type:'INS', station:'ชิดลม', owner:'วิภา สุขใจ', due:'23 ก.ย. 2569', status:'open'},
+    {id:'WO-005', title:'ตรวจสอบสภาพทั่วไป', type:'PM', station:'ราชดำริ', owner:'อนุชา พรหมมา', due:'24 ก.ย. 2569', status:'open'},
+    {id:'WO-006', title:'เปลี่ยนถ่ายน้ำมันหม้อแปลง', type:'PM', station:'สยาม', owner:'ธนกร ศรีสุข', due:'18 ก.ย. 2569', status:'done'},
+    {id:'WO-007', title:'ซ่อมสายเมนไฟฟ้าขาด', type:'CM', station:'อโศก', owner:'สมชาย ใจดี', due:'19 ก.ย. 2569', status:'done'},
+    {id:'WO-008', title:'ตรวจวัดค่าความเป็นฉนวน', type:'INS', station:'ราชดำริ', owner:'วิภา สุขใจ', due:'25 ก.ย. 2569', status:'progress'},
+    {id:'WO-009', title:'ทำความสะอาดลูกถ้วยฉนวน', type:'PM', station:'สยาม', owner:'อนุชา พรหมมา', due:'17 ก.ย. 2569', status:'overdue'},
+    {id:'WO-010', title:'ตรวจสอบระบบกราวด์', type:'INS', station:'อโศก', owner:'ธนกร ศรีสุข', due:'26 ก.ย. 2569', status:'open'},
+  ];
+  const statusMeta = {
+    open:{label:'รอดำเนินการ', pill:'pill-open'},
+    progress:{label:'กำลังดำเนินการ', pill:'pill-progress'},
+    done:{label:'เสร็จสิ้น', pill:'pill-done'},
+    overdue:{label:'ค้างดำเนินการ', pill:'pill-overdue'},
+  };
+  const woTabsData = [{k:'all', l:'ทั้งหมด'},{k:'open', l:'รอดำเนินการ'},{k:'progress', l:'กำลังดำเนินการ'},{k:'done', l:'เสร็จสิ้น'},{k:'overdue', l:'ค้างดำเนินการ'}];
+  let woActiveTab = 'all';
+  const woTabsEl = document.getElementById('woTabs');
+  woTabsData.forEach(t=>{
+    const b = document.createElement('button');
+    b.className = 'tab-btn' + (t.k==='all' ? ' active':'');
+    b.textContent = t.l;
+    b.dataset.k = t.k;
+    b.addEventListener('click', ()=>{
+      woActiveTab = t.k;
+      woTabsEl.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderWoTable();
+    });
+    woTabsEl.appendChild(b);
+  });
+  function renderWoTable(){
+    const rows = woFull.filter(w=> woActiveTab==='all' || w.status===woActiveTab);
+    const table = document.getElementById('woTable');
+    table.innerHTML = `
+      <thead><tr><th>WO ID</th><th>รายละเอียดงาน</th><th>ประเภท</th><th>สถานี</th><th>ผู้รับผิดชอบ</th><th>กำหนดเสร็จ</th><th>สถานะ</th></tr></thead>
+      <tbody>${rows.map(w=>`
+        <tr>
+          <td style="font-weight:700;color:var(--ink-900);">${w.id}</td>
+          <td>${w.title}</td>
+          <td><span class="wo-badge ${w.type==='PM'?'b-pm':w.type==='CM'?'b-cm':'b-ins'}">${w.type}</span></td>
+          <td>${w.station}</td>
+          <td>${w.owner}</td>
+          <td>${w.due}</td>
+          <td><span class="pill ${statusMeta[w.status].pill}">${statusMeta[w.status].label}</span></td>
+        </tr>`).join('')}</tbody>`;
+  }
+  renderWoTable();
+
+  // =========================================================
+  // ==========================  PM  ==========================
+  // =========================================================
+  const pmPlans = [
+    {asset:'TR-01 หม้อแปลงไฟฟ้า', freq:'รายเดือน', last:'22 ส.ค. 2569', next:'22 ก.ย. 2569', owner:'Panissara', status:'ok'},
+    {asset:'TR-02 หม้อแปลงไฟฟ้า', freq:'รายเดือน', last:'18 ส.ค. 2569', next:'18 ก.ย. 2569', owner:'วิภา สุขใจ', status:'bad'},
+    {asset:'SW-14 สวิตช์เกียร์', freq:'รายไตรมาส', last:'1 ก.ค. 2569', next:'1 ต.ค. 2569', owner:'สมชาย ใจดี', status:'ok'},
+    {asset:'CB-07 เซอร์กิตเบรกเกอร์', freq:'รายไตรมาส', last:'15 ก.ค. 2569', next:'28 ก.ย. 2569', owner:'อนุชา พรหมมา', status:'warn'},
+    {asset:'สายส่งไฟฟ้าแรงสูง โซน A', freq:'รายปี', last:'5 ม.ค. 2569', next:'5 ม.ค. 2570', owner:'ธนกร ศรีสุข', status:'ok'},
+    {asset:'ระบบกราวด์สถานีอโศก', freq:'รายไตรมาส', last:'2 ก.ค. 2569', next:'2 ต.ค. 2569', owner:'ธนกร ศรีสุข', status:'ok'},
+  ];
+  const pmStatusMeta = {ok:{l:'ตามแผน', c:'pill-ok'}, warn:{l:'ใกล้ถึงกำหนด', c:'pill-warn'}, bad:{l:'เลยกำหนด', c:'pill-bad'}};
+  document.getElementById('pmTable').innerHTML = `
+    <thead><tr><th>อุปกรณ์</th><th>ความถี่</th><th>PM ล่าสุด</th><th>PM ครั้งถัดไป</th><th>ผู้รับผิดชอบ</th><th>สถานะ</th></tr></thead>
+    <tbody>${pmPlans.map(p=>`
+      <tr>
+        <td style="font-weight:700;color:var(--ink-900);">${p.asset}</td>
+        <td>${p.freq}</td>
+        <td>${p.last}</td>
+        <td>${p.next}</td>
+        <td>${p.owner}</td>
+        <td><span class="pill ${pmStatusMeta[p.status].c}">${pmStatusMeta[p.status].l}</span></td>
+      </tr>`).join('')}</tbody>`;
+
+  // =========================================================
+  // ========================  Kanban  =========================
+  // =========================================================
+  const kanbanCols = [
+    {k:'todo', label:'รอดำเนินการ', color:'#2f6fed'},
+    {k:'progress', label:'กำลังดำเนินการ', color:'#ea7c1e'},
+    {k:'done', label:'เสร็จสิ้น', color:'#16a34a'},
+  ];
+  let kanbanCards = [
+    {id:'WO-004', title:'ตรวจสอบอุปกรณ์ Protection', who:'วส', due:'23 ก.ย.', col:'todo'},
+    {id:'WO-005', title:'ตรวจสอบสภาพทั่วไป', who:'อพ', due:'24 ก.ย.', col:'todo'},
+    {id:'WO-010', title:'ตรวจสอบระบบกราวด์', who:'ธศ', due:'26 ก.ย.', col:'todo'},
+    {id:'WO-001', title:'ตรวจสอบหม้อแปลง TR-01', who:'PS', due:'22 ก.ย.', col:'progress'},
+    {id:'WO-008', title:'ตรวจวัดค่าความเป็นฉนวน', who:'วส', due:'25 ก.ย.', col:'progress'},
+    {id:'WO-002', title:'ตรวจสอบระบบระบายความร้อน', who:'สจ', due:'22 ก.ย.', col:'progress'},
+    {id:'WO-006', title:'เปลี่ยนถ่ายน้ำมันหม้อแปลง', who:'ธศ', due:'18 ก.ย.', col:'done'},
+    {id:'WO-007', title:'ซ่อมสายเมนไฟฟ้าขาด', who:'สจ', due:'19 ก.ย.', col:'done'},
+  ];
+  function renderKanban(){
+    const board = document.getElementById('kanbanBoard');
+    board.innerHTML = '';
+    kanbanCols.forEach(col=>{
+      const items = kanbanCards.filter(c=>c.col===col.k);
+      const colEl = document.createElement('div');
+      colEl.className = 'kanban-col';
+      colEl.dataset.col = col.k;
+      colEl.innerHTML = `<h4><span>${col.label}</span><span class="count">${items.length}</span></h4>`;
+      items.forEach(c=>{
+        const card = document.createElement('div');
+        card.className = 'kanban-card';
+        card.draggable = true;
+        card.dataset.id = c.id;
+        card.innerHTML = `
+          <div class="kc-top"><span class="kc-id">${c.id}</span></div>
+          <div class="kc-title">${c.title}</div>
+          <div class="kc-foot"><span class="kc-avatar">${c.who}</span><span class="kc-due">${c.due}</span></div>`;
+        card.addEventListener('dragstart', ()=> card.classList.add('dragging'));
+        card.addEventListener('dragend', ()=> card.classList.remove('dragging'));
+        colEl.appendChild(card);
+      });
+      colEl.addEventListener('dragover', e=>{ e.preventDefault(); colEl.classList.add('drag-over'); });
+      colEl.addEventListener('dragleave', ()=> colEl.classList.remove('drag-over'));
+      colEl.addEventListener('drop', e=>{
+        e.preventDefault();
+        colEl.classList.remove('drag-over');
+        const dragging = board.querySelector('.dragging');
+        if(!dragging) return;
+        const id = dragging.dataset.id;
+        const item = kanbanCards.find(c=>c.id===id);
+        if(item){ item.col = col.k; renderKanban(); showToast(id + ' ย้ายไปที่ "' + col.label + '"'); }
+      });
+      board.appendChild(colEl);
+    });
+  }
+  renderKanban();
+
+  // =========================================================
+  // ======================  Resources  ========================
+  // =========================================================
+  const teamData = [
+    {name:'Panissara', role:'Field Inspector', task:'ตรวจสอบหม้อแปลง TR-01', hrs:34, initials:'PS'},
+    {name:'สมชาย ใจดี', role:'ช่างไฟฟ้าอาวุโส', task:'ซ่อมระบบระบายความร้อน', hrs:38, initials:'สจ'},
+    {name:'วิภา สุขใจ', role:'ช่างเทคนิค', task:'ตรวจวัดค่าความเป็นฉนวน', hrs:29, initials:'วส'},
+    {name:'อนุชา พรหมมา', role:'ช่างเทคนิค', task:'ตรวจสอบสภาพทั่วไป', hrs:31, initials:'อพ'},
+    {name:'ธนกร ศรีสุข', role:'ช่างไฟฟ้า', task:'ตรวจสอบระบบกราวด์', hrs:40, initials:'ธศ'},
+  ];
+  document.getElementById('resTeam').innerHTML = teamData.map(t=>`
+    <div class="res-row">
+      <div class="res-avatar">${t.initials}</div>
+      <div class="res-info">
+        <div class="res-name">${t.name}</div>
+        <div class="res-role">${t.role}</div>
+        <div class="res-task">งานวันนี้: ${t.task}</div>
+      </div>
+      <div class="res-bar-wrap">
+        <div class="res-bar-label"><span>${t.hrs} ชม.</span><span>/40</span></div>
+        <div class="res-bar"><span style="width:${Math.min(100, t.hrs/40*100)}%"></span></div>
+      </div>
+    </div>`).join('');
+
+  const equipData = [
+    {name:'รถกระเช้าไฟฟ้า A-12', status:'ok'}, {name:'รถตรวจสอบสาย B-04', status:'progress'},
+    {name:'ชุดทดสอบฉนวนไฟฟ้า', status:'ok'}, {name:'กล้องถ่ายภาพความร้อน (Thermal)', status:'ok'},
+    {name:'ปั๊มถ่ายน้ำมันหม้อแปลง', status:'bad'}, {name:'ชุดเครื่องมือช่างทั่วไป #3', status:'ok'},
+  ];
+  const equipStatusMeta = {ok:{l:'พร้อมใช้งาน', c:'pill-ok'}, progress:{l:'ใช้งานอยู่', c:'pill-warn'}, bad:{l:'ซ่อมบำรุง', c:'pill-bad'}};
+  document.getElementById('resEquip').innerHTML = equipData.map(e=>`
+    <div class="res-row">
+      <div class="res-avatar" style="background:#eef1f6;color:var(--ink-500);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg></div>
+      <div class="res-info"><div class="res-name">${e.name}</div></div>
+      <span class="pill ${equipStatusMeta[e.status].c}">${equipStatusMeta[e.status].l}</span>
+    </div>`).join('');
+
+  // =========================================================
+  // =======================  Analytics  ========================
+  // =========================================================
+  let analyticsInited = false;
+  function initAnalyticsCharts(){
+    if(analyticsInited) return;
+    analyticsInited = true;
+    new Chart(document.getElementById('trendChart'), {
+      type:'line',
+      data:{
+        labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'],
+        datasets:[{
+          label:'งานตรวจสอบที่เสร็จสิ้น', data:[210,225,240,238,255,270,290,310,305],
+          borderColor:'#2f6fed', backgroundColor:'rgba(47,111,237,.12)', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:'#2f6fed'
+        }]
+      },
+      options:{maintainAspectRatio:false, plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false}, ticks:{font:{size:11}, color:'#98a2b3'}}, y:{grid:{color:'#f1f3f8'}, ticks:{font:{size:10}, color:'#98a2b3'}}}}
+    });
+    new Chart(document.getElementById('costTypeChart'), {
+      type:'bar',
+      data:{
+        labels:['ค่าแรง','อะไหล่','ผู้รับเหมา','อื่นๆ'],
+        datasets:[{data:[62,48,35,15], backgroundColor:['#2f6fed','#14b8a6','#f59e0b','#8b5cf6'], borderRadius:6, maxBarThickness:36}]
+      },
+      options:{maintainAspectRatio:false, plugins:{legend:{display:false}}, indexAxis:'y',
+        scales:{x:{grid:{color:'#f1f3f8'}, ticks:{font:{size:10}, color:'#98a2b3', callback:v=>v+'k'}}, y:{grid:{display:false}, ticks:{font:{size:11.5, family:"'Noto Sans Thai'"}, color:'#344054'}}}}
+    });
+    new Chart(document.getElementById('typeShareChart'), {
+      type:'doughnut',
+      data:{labels:['PM','CM','INS'], datasets:[{data:[58,24,18], backgroundColor:['#2f6fed','#ea7c1e','#7c3aed'], borderWidth:3, borderColor:'#fff'}]},
+      options:{maintainAspectRatio:false, cutout:'62%', plugins:{legend:{position:'bottom', labels:{font:{size:11.5, family:"'Noto Sans Thai'"}, boxWidth:10, padding:14}}}}
+    });
+  }
+
+  // =========================================================
+  // ========================  Reports  =========================
+  // =========================================================
+  const reportsData = [
+    {title:'รายงานการตรวจสอบอุปกรณ์รายเดือน', desc:'สรุปผลตรวจสอบอุปกรณ์ทั้งหมดในรอบเดือน', meta:'อัปเดตล่าสุด 20 ก.ย. 2569'},
+    {title:'รายงานสรุป Work Order', desc:'สถานะและระยะเวลาดำเนินการของ Work Order', meta:'อัปเดตล่าสุด 21 ก.ย. 2569'},
+    {title:'รายงาน KPI งานบำรุงรักษา', desc:'PM Compliance, Wrench Time และตัวชี้วัดอื่นๆ', meta:'อัปเดตล่าสุด 21 ก.ย. 2569'},
+    {title:'รายงานต้นทุน PM', desc:'เปรียบเทียบต้นทุนแผนกับต้นทุนจริงรายเดือน', meta:'อัปเดตล่าสุด 19 ก.ย. 2569'},
+    {title:'รายงานสถานะอุปกรณ์', desc:'สัดส่วนอุปกรณ์ ปกติ / เฝ้าระวัง / พบปัญหา', meta:'อัปเดตล่าสุด 22 ก.ย. 2569'},
+    {title:'รายงานประวัติ CM', desc:'ประวัติการซ่อมบำรุงเมื่อเกิดเหตุขัดข้อง', meta:'อัปเดตล่าสุด 18 ก.ย. 2569'},
+  ];
+  document.getElementById('reportGrid').innerHTML = reportsData.map(r=>`
+    <div class="report-card">
+      <div class="report-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></div>
+      <h4>${r.title}</h4>
+      <p>${r.desc}</p>
+      <div class="report-meta">${r.meta}</div>
+      <button class="report-dl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>ดาวน์โหลด PDF</button>
+    </div>`).join('');
+  document.getElementById('reportGrid').addEventListener('click', e=>{
+    const btn = e.target.closest('.report-dl');
+    if(btn) showToast('กำลังสร้างไฟล์รายงาน...');
+  });
+
+  // =========================================================
+  // ========================  Settings  ========================
+  // =========================================================
+  const usersData = [
+    {name:'Panissara', role:'Field Inspector', dept:'ปฏิบัติการภาคสนาม', active:true},
+    {name:'สมชาย ใจดี', role:'ช่างไฟฟ้าอาวุโส', dept:'ซ่อมบำรุง', active:true},
+    {name:'วิภา สุขใจ', role:'ช่างเทคนิค', dept:'ซ่อมบำรุง', active:true},
+    {name:'อนุชา พรหมมา', role:'หัวหน้าทีม PM', dept:'วางแผนบำรุงรักษา', active:false},
+  ];
+  document.getElementById('userTable').innerHTML = `
+    <thead><tr><th>ผู้ใช้งาน</th><th>บทบาท</th><th>หน่วยงาน</th><th>สถานะ</th></tr></thead>
+    <tbody>${usersData.map((u,i)=>`
+      <tr>
+        <td><div class="user-row-name"><span class="user-mini-avatar">${u.name.slice(0,2)}</span>${u.name}</div></td>
+        <td>${u.role}</td>
+        <td>${u.dept}</td>
+        <td><div class="switch ${u.active?'on':''}" data-i="${i}"><span class="knob"></span></div></td>
+      </tr>`).join('')}</tbody>`;
+  document.getElementById('userTable').addEventListener('click', e=>{
+    const sw = e.target.closest('.switch');
+    if(sw){ sw.classList.toggle('on'); }
+  });
+
+  const notifData = [
+    {title:'แจ้งเตือนงานเลยกำหนด', desc:'แจ้งเตือนเมื่อ Work Order เลยกำหนดเวลา', on:true},
+    {title:'แจ้งเตือนอุปกรณ์ผิดปกติ', desc:'แจ้งเตือนทันทีเมื่อพบอุปกรณ์อยู่ในสถานะผิดปกติ', on:true},
+    {title:'สรุปรายสัปดาห์ทางอีเมล', desc:'ส่งสรุปผลงานบำรุงรักษาทุกวันจันทร์', on:false},
+    {title:'แจ้งเตือนผ่าน LINE', desc:'ส่งการแจ้งเตือนไปยังกลุ่ม LINE ของทีม', on:true},
+  ];
+  document.getElementById('notifSettings').innerHTML = notifData.map((n,i)=>`
+    <div class="settings-row">
+      <div><div class="s-title">${n.title}</div><div class="s-desc">${n.desc}</div></div>
+      <div class="switch ${n.on?'on':''}" data-i="${i}"><span class="knob"></span></div>
+    </div>`).join('');
+  document.getElementById('notifSettings').addEventListener('click', e=>{
+    const sw = e.target.closest('.switch');
+    if(sw){ sw.classList.toggle('on'); }
+  });
+
 })();
 </script>
 
