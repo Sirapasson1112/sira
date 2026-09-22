@@ -734,6 +734,34 @@ body{background:#F6F8F8!important}
 <style id="real-route-map-style">
 .route-layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;min-height:640px}.route-side,.route-map-card{background:#fff;border:1px solid #E2ECEC;border-radius:16px;overflow:hidden}.route-side{display:flex;flex-direction:column}.route-side-head{padding:15px;border-bottom:1px solid #E8EFEF}.route-side-head h3{margin:0 0 4px;font-size:15px;color:#173A40}.route-side-head p{margin:0;color:#7A8D90;font-size:10px;line-height:1.5}.route-tools{display:flex;gap:7px;margin-top:11px}.route-btn{border:1px solid #CFE2E2;background:#fff;color:#31575C;border-radius:9px;padding:8px 10px;font:700 10px inherit;cursor:pointer}.route-btn.primary{background:#43B8C4;color:#fff;border-color:#43B8C4}.route-btn:hover{border-color:#43B8C4}.route-summary{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:10px 15px;background:#F8FBFB;border-bottom:1px solid #E8EFEF}.route-metric{padding:9px;border-radius:10px;background:#fff;border:1px solid #E5EEEE}.route-metric span{display:block;font-size:9px;color:#829497}.route-metric b{display:block;margin-top:2px;color:#254A4F;font-size:14px}.route-stops{padding:7px 10px 14px;overflow:auto}.route-stop{display:grid;grid-template-columns:30px 1fr auto;gap:9px;align-items:start;padding:10px 7px;border-bottom:1px solid #EEF3F3}.route-stop:last-child{border-bottom:0}.route-no{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:#E8F8F9;color:#267E88;font-size:10px;font-weight:900}.route-stop.active .route-no{background:#43B8C4;color:#fff}.route-stop.done .route-no{background:#5FAE7B;color:#fff}.route-stop b{display:block;font-size:11px;color:#2A4549}.route-stop small{display:block;margin-top:3px;color:#839497;font-size:9px;line-height:1.4}.route-nav{border:0;background:#F0F8F8;color:#267E88;border-radius:8px;padding:6px 8px;font-size:9px;font-weight:800;cursor:pointer}.route-map-card{position:relative}.route-map-toolbar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;border-bottom:1px solid #E8EFEF}.route-map-toolbar strong{font-size:12px;color:#294A4F}.route-live{display:flex;align-items:center;gap:6px;font-size:9px;color:#6F8588}.route-live:before{content:"";width:7px;height:7px;border-radius:50%;background:#54B87B;box-shadow:0 0 0 4px rgba(84,184,123,.12)}#inspectionRouteMap{height:588px;width:100%;background:#EAF1F1}.route-legend{position:absolute;z-index:500;right:12px;bottom:12px;background:rgba(255,255,255,.94);border:1px solid #DCE8E8;border-radius:10px;padding:8px 10px;font-size:9px;color:#61777B;box-shadow:0 5px 18px rgba(30,65,70,.12)}.route-legend div{display:flex;align-items:center;gap:6px;margin:3px 0}.legend-dot{width:8px;height:8px;border-radius:50%;background:#43B8C4}.legend-dot.me{background:#2778D4}.route-note{margin-top:10px;padding:10px 12px;background:#F7FBFB;border:1px solid #E1ECEC;border-radius:11px;color:#71878A;font-size:9px;line-height:1.5}.leaflet-popup-content{font-family:inherit}.leaflet-control-attribution{font-size:8px!important}@media(max-width:1000px){.route-layout{grid-template-columns:1fr}.route-side{max-height:none}#inspectionRouteMap{height:520px}}
 </style>
+
+<style id="layout-gap-fix-v3">
+/* FIX: shell already reserves sidebar width; do not add a second margin on .main */
+.shell{grid-template-columns:216px minmax(0,1fr)!important;width:100%!important;}
+.sidebar{width:auto!important;min-width:0!important;}
+.main{margin-left:0!important;width:auto!important;min-width:0!important;}
+.content{width:100%!important;max-width:none!important;margin:0!important;padding:20px 24px 34px!important;}
+.topbar{width:100%!important;}
+/* Route: make the map the visual focus */
+#page-route .route-layout{grid-template-columns:minmax(300px,35%) minmax(0,65%)!important;gap:16px!important;}
+#page-route .route-map-card{min-width:0!important;}
+#routeMap{width:100%!important;min-height:640px!important;}
+@media(max-width:1100px){
+ .shell{grid-template-columns:78px minmax(0,1fr)!important;}
+ .sidebar{width:auto!important;}
+ .main{margin-left:0!important;}
+ .content{padding:18px!important;}
+ #page-route .route-layout{grid-template-columns:1fr!important;}
+ #routeMap{min-height:520px!important;}
+}
+@media(max-width:700px){
+ .shell{grid-template-columns:1fr!important;}
+ .sidebar{position:relative!important;width:100%!important;height:auto!important;}
+ .main{margin-left:0!important;}
+ .content{padding:14px!important;}
+ #routeMap{min-height:430px!important;}
+}
+</style>
 </head>
 <body>
 
