@@ -867,6 +867,14 @@ const pageDashboard = `
 `;
 
 /* ===================== PAGE: PM PLANNING ===================== */
+const PM_EVENTS = [
+  { day:5, t:"PM Feeder", c:"blue" },
+  { day:9, t:"PM Transformer", c:"amber" },
+  { day:17, t:"PM LBS", c:"green" },
+  { day:24, t:"PM Transformer", c:"amber" },
+  { day:24, t:"อื่นๆ", c:"gray" },
+  { day:28, t:"PM Feeder", c:"blue" },
+];
 const pagePmPlanning = `
 <div class="page-head">
   <div><h1>วางแผนงานบำรุงรักษาเชิงป้องกัน (PM)</h1><p>วางแผนงาน PM ประจำเดือนกันยายน 2568</p></div>
@@ -914,14 +922,6 @@ const pagePmPlanning = `
   </div>
 </div>
 `;
-const PM_EVENTS = [
-  { day:5, t:"PM Feeder", c:"blue" },
-  { day:9, t:"PM Transformer", c:"amber" },
-  { day:17, t:"PM LBS", c:"green" },
-  { day:24, t:"PM Transformer", c:"amber" },
-  { day:24, t:"อื่นๆ", c:"gray" },
-  { day:28, t:"PM Feeder", c:"blue" },
-];
 function buildCalendar(){
   // Sept, generic 5-week layout starting Monday as day 1 for demo purposes
   const startOffset = 1; // 1 = grid starts sun blank, mon=1
