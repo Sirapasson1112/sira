@@ -357,6 +357,35 @@
   .insp-oil-table td input { width: 64px; border: 1px solid var(--card-line); border-radius: 6px; padding: 5px; text-align: center; font: inherit; font-size: 12px; }
   .insp-photo-box { border: 1.5px dashed var(--card-line); border-radius: 12px; height: 140px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-size: 12px; background: var(--surface); }
 
+  /* Paper-form replica: black-and-white bordered table layout, styled to read like the printed original */
+  .paper-sheet { max-width: 860px; margin: 0 auto; }
+  .paper-wrap { background: #ffffff; color: #111827; font-family: "Noto Sans Thai","Inter",sans-serif; padding: 26px 28px 22px; border: 1px solid var(--card-line); border-radius: 10px; box-shadow: var(--shadow-card); }
+  .paper-title { text-align: center; font-size: 15.5px; font-weight: 800; margin-bottom: 16px; }
+  .paper-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 12px; }
+  .paper-table th, .paper-table td { border: 1px solid #111827; padding: 6px 9px; vertical-align: middle; }
+  .paper-table th { background: #f3f4f6; font-weight: 700; font-size: 11.5px; }
+  .paper-table td.lbl { background: #f9fafb; font-weight: 600; white-space: nowrap; }
+  .paper-table td.blank { min-width: 80px; }
+  .paper-table input[type="text"] { width: 100%; border: none; background: transparent; font: inherit; font-size: 12px; color: #111827; outline: none; }
+  .paper-section-row td { background: #e5e7eb; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; font-size: 12px; }
+  .paper-check-cell { text-align: center; white-space: nowrap; }
+  .paper-check { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-size: 11.5px; padding: 2px 0; }
+  .paper-check-cell input[type="radio"], .paper-check input[type="radio"] {
+    width: 14px; height: 14px; margin: 0; cursor: pointer; flex: none;
+    appearance: none; -webkit-appearance: none; border: 1.5px solid #111827; border-radius: 2px; position: relative; background: #fff;
+  }
+  .paper-check-cell input[type="radio"]:checked::after, .paper-check input[type="radio"]:checked::after {
+    content: ""; position: absolute; inset: 2.5px; background: #111827;
+  }
+  .paper-sign-table td { text-align: center; padding-top: 26px; font-size: 12px; line-height: 2; }
+  .paper-doc-footer { display: flex; justify-content: space-between; font-size: 10.5px; color: #4b5563; padding-top: 6px; border-top: 1px solid #e5e7eb; }
+  @media print {
+    .sidebar, .topbar, .page-head, .back-link, .insp-actions { display: none !important; }
+    .content { padding: 0 !important; }
+    .paper-sheet { max-width: 100% !important; }
+    .paper-wrap { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+  }
+
   /* Cost page */
   .cost-kpis { grid-template-columns: repeat(4, 1fr); }
   .cost-kpi { padding: 16px 18px; }
@@ -930,52 +959,58 @@ const INSPECTION_FORMS = [
   },
 ];
 
-function inspHeaderGrid(fields){
-  return `<div class="insp-header-grid">` + fields.map(h=>`<div class="insp-field"><label>${h}</label><input type="text"></div>`).join("") + `</div>`;
+// Header info laid out as label|blank pairs, two pairs per row — mirrors how the
+// paper forms box off "Station ID ____  GIS ____" style fields.
+function paperFieldRows(fields){
+  let rows = "";
+  for (let i = 0; i < fields.length; i += 2){
+    const f1 = fields[i], f2 = fields[i+1];
+    rows += `<tr><td class="lbl">${f1}</td><td class="blank"><input type="text"></td>`;
+    rows += f2 ? `<td class="lbl">${f2}</td><td class="blank"><input type="text"></td></tr>` : `<td class="lbl" colspan="2"></td></tr>`;
+  }
+  return `<table class="paper-table">${rows}</table>`;
 }
-function inspFooterHtml(){
+
+function paperChecklistTable(f){
+  const opts = f.resultOptions || DEFAULT_RESULT_OPTS;
+  let seq = 0;
+  let rows = `<tr><th rowspan="2" style="width:38%;">รายการ</th><th colspan="${opts.length}">ผลการตรวจสอบ</th><th rowspan="2" style="width:22%;">ข้อบกพร่อง</th></tr><tr>${opts.map(o=>`<th>${o}</th>`).join("")}</tr>`;
+  f.sections.forEach(sec => {
+    if (sec.title) rows += `<tr class="paper-section-row"><td colspan="${opts.length+2}">${sec.title}</td></tr>`;
+    sec.items.forEach(item => {
+      seq++;
+      const name = `${f.code}-r${seq}`;
+      const checks = opts.map(() => `<td class="paper-check-cell"><input type="radio" name="${name}"></td>`).join("");
+      rows += `<tr><td>${item}</td>${checks}<td><input type="text"></td></tr>`;
+    });
+  });
+  return `<table class="paper-table paper-checklist">${rows}</table>`;
+}
+
+function paperTitle(f){
+  return `<div class="paper-title">${f.title}</div>`;
+}
+
+function paperFooter(f){
   return `
-  <div class="insp-footer">
-    <label>สิ่งที่ต้องปรับปรุงหรือข้อมูลเพิ่มเติม</label>
-    <textarea placeholder="ระบุรายละเอียด..."></textarea>
-    <div class="insp-sign-grid">
-      <div class="insp-field"><label>ผู้ตรวจ</label><input type="text"></div>
-      <div class="insp-field"><label>ตำแหน่ง</label><input type="text"></div>
-      <div class="insp-field"><label>วันที่</label><input type="text" placeholder="วว/ดด/ปปปป"></div>
-      <div class="insp-field"><label>ผู้ตรวจสอบ</label><input type="text"></div>
-      <div class="insp-field"><label>ตำแหน่ง</label><input type="text"></div>
-      <div class="insp-field"><label>วันที่</label><input type="text" placeholder="วว/ดด/ปปปป"></div>
+    <table class="paper-table">
+      <tr><td class="lbl" style="width:22%;">สิ่งที่ต้องปรับปรุงหรือข้อมูลเพิ่มเติม</td><td><input type="text"></td></tr>
+      <tr><td class="lbl">การปรับปรุงข้อบกพร่อง</td><td><input type="text"></td></tr>
+    </table>
+    <table class="paper-table paper-sign-table">
+      <tr><td style="width:50%;">ผู้ตรวจ<br><br>_________________________</td><td>ผู้ตรวจสอบ<br><br>_________________________</td></tr>
+      <tr><td>ตำแหน่ง _________________________</td><td>ตำแหน่ง _________________________</td></tr>
+      <tr><td>วันที่ _________________________</td><td>วันที่ _________________________</td></tr>
+    </table>
+    <div class="paper-doc-footer"><span>ปรับปรุงครั้งที่ 0 วันที่...</span><span>${f.code}</span></div>
+    <div class="insp-actions" style="border:none; padding:14px 0 0;">
+      <button class="btn" onclick="window.print()">${ic('download')} พิมพ์แบบฟอร์ม</button>
     </div>
-  </div>
-  <div class="insp-actions">
-    <button class="btn" onclick="window.print()">${ic('download')} พิมพ์แบบฟอร์ม</button>
-    <button class="btn primary">${ic('plus')} บันทึกแบบตรวจสอบ</button>
-  </div>`;
+  `;
 }
 
 function renderChecklistForm(f){
-  const opts = f.resultOptions || DEFAULT_RESULT_OPTS;
-  const pad = 3 - opts.length;
-  const padCells = "<div></div>".repeat(pad);
-  const colHead = `<div class="insp-item-row" style="font-weight:700; color:var(--text-soft); font-size:11.5px; border-bottom:2px solid var(--card-line);"><div>รายการ</div>${opts.map(o=>`<div style="text-align:center;">${o}</div>`).join("")}${padCells}<div>ข้อบกพร่อง / หมายเหตุ</div></div>`;
-  let seq = 0;
-  const sectionsHtml = f.sections.map(sec => {
-    const title = sec.title ? `<div class="insp-section-title">${sec.title}</div>` : "";
-    const rows = sec.items.map(item => {
-      seq++;
-      const name = `${f.code}-r${seq}`;
-      const radios = opts.map(o => `<label class="insp-radio"><input type="radio" name="${name}"><span>${o}</span></label>`).join("");
-      return `<div class="insp-item-row"><div class="lbl">${item}</div>${radios}${padCells}<input type="text" placeholder="ระบุข้อบกพร่อง"></div>`;
-    }).join("");
-    return title + rows;
-  }).join("");
-  return `
-    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
-    ${inspHeaderGrid(f.header)}
-    ${colHead}
-    ${sectionsHtml}
-    ${inspFooterHtml()}
-  `;
+  return `${paperTitle(f)}${paperFieldRows(f.header)}${paperChecklistTable(f)}${paperFooter(f)}`;
 }
 
 function renderOilForm(f){
@@ -984,73 +1019,71 @@ function renderOilForm(f){
     "2. กรองน้ำมันครั้งที่ 1 แล้วดำเนินการทดสอบใหม่",
     "3. กรองน้ำมันครั้งที่ 2 แล้วดำเนินการทดสอบใหม่",
   ].map(label => `
-    <div class="insp-section-title">${label}</div>
-    <table class="insp-oil-table">
-      <thead><tr><th>ครั้งที่</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>ค่าเฉลี่ย</th></tr></thead>
-      <tbody><tr><td>Breakdown Voltage (kV)</td>${"<td><input type=\"text\"></td>".repeat(5)}<td><input type="text"></td></tr></tbody>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="7">${label}</td></tr>
+      <tr><th>ครั้งที่</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>ค่าเฉลี่ย</th></tr>
+      <tr><td class="lbl">Breakdown Voltage (kV)</td>${'<td><input type="text"></td>'.repeat(5)}<td><input type="text"></td></tr>
     </table>
-    <div style="padding:2px 22px 14px; font-size:11.5px; color:var(--text-faint);">*ทดสอบครั้งที่ 1 ถ้าต่ำกว่า 26 kV ดำเนินการกรองน้ำมัน หากเกิน 26 kV ให้ทดสอบครบ 5 ครั้งแล้วหาค่าเฉลี่ย</div>
+    <div style="font-size:10.5px; color:#4b5563; margin:-6px 0 12px;">*ทดสอบครั้งที่ 1 ถ้าต่ำกว่า 26 kV ดำเนินการกรองน้ำมัน หากเกิน 26 kV ให้ทดสอบครบ 5 ครั้งแล้วหาค่าเฉลี่ย</div>
   `).join("");
-  return `
-    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
-    ${inspHeaderGrid(f.header)}
-    ${rounds}
-    ${inspFooterHtml()}
-  `;
+  return `${paperTitle(f)}${paperFieldRows(f.header)}${rounds}${paperFooter(f)}`;
 }
 
 function renderHotspotForm(f){
   const priorities = [["1","อุปกรณ์ปกติ"],["2","แก้ไขในการบำรุงรักษาครั้งต่อไป"],["3","ควรแก้ไขภายใน 1 เดือน"],["4","ควรได้รับการแก้ไขเร่งด่วน"]];
   const deltaRanges = ["0 - 10°C","สูงกว่า 10 - 20°C","สูงกว่า 20 - 40°C","สูงกว่า 40°C"];
   return `
-    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
-    ${inspHeaderGrid(f.header)}
-    <div class="insp-section-title">1. ข้อมูลภาพถ่าย</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:6px 22px 16px;">
-      <div class="insp-photo-box">ภาพถ่ายจริง</div>
-      <div class="insp-photo-box">ภาพถ่ายความร้อน</div>
-    </div>
-    <div class="insp-section-title">2. อุณหภูมิเปรียบเทียบที่จุดวัดฯ (Delta T)</div>
-    <div style="padding:6px 22px 4px; display:flex; flex-wrap:wrap; gap:16px;">
-      ${deltaRanges.map(d => `<label class="insp-radio" style="flex-direction:row; gap:6px;"><input type="radio" name="deltaRange"><span>${d}</span></label>`).join("")}
-    </div>
-    ${inspHeaderGrid(["อุณหภูมิสูงสุดที่จุดวัดฯ (°C)","Delta T ที่วัดได้ (°C)"])}
-    <div class="insp-section-title">3. รายละเอียดการตรวจสอบ — ลำดับความสำคัญ</div>
-    <div style="padding:6px 22px 4px; display:flex; flex-wrap:wrap; gap:16px;">
-      ${priorities.map(p => `<label class="insp-radio" style="flex-direction:row; gap:6px;"><input type="radio" name="priority"><span>${p[0]}. ${p[1]}</span></label>`).join("")}
-    </div>
-    <div class="insp-footer" style="padding-bottom:0;">
-      <label>ข้อแนะนำการดำเนินการ</label>
-      <textarea placeholder="ระบุรายละเอียดการตรวจสอบและข้อแนะนำการแก้ไข..."></textarea>
-    </div>
-    <div class="insp-section-title">4. การส่งต่อดำเนินการแก้ไข</div>
-    ${inspHeaderGrid(["ส่งต่อให้กลุ่มงาน","วันที่"])}
-    <div class="insp-section-title">5. การดำเนินการปรับปรุง</div>
-    ${inspHeaderGrid(["ดำเนินการแก้ไขเมื่อวันที่","ตำแหน่งผู้ดำเนินการ"])}
-    ${inspFooterHtml()}
+    ${paperTitle(f)}
+    ${paperFieldRows(f.header)}
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="2">1. ข้อมูลภาพถ่าย</td></tr>
+      <tr><td style="text-align:center;"><div class="insp-photo-box">ภาพถ่ายจริง</div></td><td style="text-align:center;"><div class="insp-photo-box">ภาพถ่ายความร้อน</div></td></tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="4">2. อุณหภูมิเปรียบเทียบที่จุดวัดฯ (Delta T)</td></tr>
+      <tr>${deltaRanges.map(d=>`<td class="paper-check-cell"><label class="paper-check"><input type="radio" name="deltaRange">${d}</label></td>`).join("")}</tr>
+      <tr><td class="lbl">อุณหภูมิสูงสุดที่จุดวัดฯ (°C)</td><td><input type="text"></td><td class="lbl">Delta T ที่วัดได้ (°C)</td><td><input type="text"></td></tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="4">3. รายละเอียดการตรวจสอบ — ลำดับความสำคัญ</td></tr>
+      <tr>${priorities.map(p=>`<td class="paper-check-cell"><label class="paper-check"><input type="radio" name="priority">${p[0]}. ${p[1]}</label></td>`).join("")}</tr>
+      <tr><td colspan="4"><input type="text" placeholder="ข้อแนะนำการดำเนินการ / รายละเอียดการตรวจสอบ"></td></tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="2">4. การส่งต่อดำเนินการแก้ไข</td></tr>
+      <tr><td class="lbl">ส่งต่อให้กลุ่มงาน</td><td><input type="text"></td></tr>
+      <tr><td class="lbl">วันที่</td><td><input type="text"></td></tr>
+      <tr class="paper-section-row"><td colspan="2">5. การดำเนินการปรับปรุง</td></tr>
+      <tr><td class="lbl">ดำเนินการแก้ไขเมื่อวันที่</td><td><input type="text"></td></tr>
+      <tr><td class="lbl">ตำแหน่งผู้ดำเนินการ</td><td><input type="text"></td></tr>
+    </table>
+    ${paperFooter(f)}
   `;
 }
 
 function renderPdForm(f){
   const severities = ["สูงมาก","สูง","ปานกลาง","ต่ำ"];
   return `
-    <div class="insp-detail-head"><div class="code">${f.code}</div><h2>${f.title}</h2></div>
-    ${inspHeaderGrid(f.header)}
-    <div class="insp-section-title">1. ข้อมูลภาพถ่าย</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; padding:6px 22px 16px;">
-      <div class="insp-photo-box">ภาพถ่ายจากกล้องปกติ</div>
-      <div class="insp-photo-box">ภาพถ่ายจาก Acoustic Camera</div>
-    </div>
-    ${inspHeaderGrid(["จุดที่ผิดปกติ"])}
-    <div class="insp-section-title">ระดับความรุนแรง</div>
-    <div style="padding:6px 22px 4px; display:flex; flex-wrap:wrap; gap:16px;">
-      ${severities.map(s => `<label class="insp-radio" style="flex-direction:row; gap:6px;"><input type="radio" name="severity"><span>${s}</span></label>`).join("")}
-    </div>
-    <div class="insp-section-title">2. การส่งต่อดำเนินการแก้ไข</div>
-    ${inspHeaderGrid(["ส่งต่อให้กลุ่มงาน","วันที่"])}
-    <div class="insp-section-title">3. การดำเนินการปรับปรุง</div>
-    ${inspHeaderGrid(["ดำเนินการแก้ไขเมื่อวันที่","ตำแหน่งผู้ดำเนินการ"])}
-    ${inspFooterHtml()}
+    ${paperTitle(f)}
+    ${paperFieldRows(f.header)}
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="2">1. ข้อมูลภาพถ่าย</td></tr>
+      <tr><td style="text-align:center;"><div class="insp-photo-box">ภาพถ่ายจากกล้องปกติ</div></td><td style="text-align:center;"><div class="insp-photo-box">ภาพถ่ายจาก Acoustic Camera</div></td></tr>
+      <tr><td class="lbl">จุดที่ผิดปกติ</td><td><input type="text"></td></tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="4">ระดับความรุนแรง</td></tr>
+      <tr>${severities.map(s=>`<td class="paper-check-cell"><label class="paper-check"><input type="radio" name="severity">${s}</label></td>`).join("")}</tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="2">2. การส่งต่อดำเนินการแก้ไข</td></tr>
+      <tr><td class="lbl">ส่งต่อให้กลุ่มงาน</td><td><input type="text"></td></tr>
+      <tr><td class="lbl">วันที่</td><td><input type="text"></td></tr>
+      <tr class="paper-section-row"><td colspan="2">3. การดำเนินการปรับปรุง</td></tr>
+      <tr><td class="lbl">ดำเนินการแก้ไขเมื่อวันที่</td><td><input type="text"></td></tr>
+      <tr><td class="lbl">ตำแหน่งผู้ดำเนินการ</td><td><input type="text"></td></tr>
+    </table>
+    ${paperFooter(f)}
   `;
 }
 
@@ -1078,7 +1111,7 @@ window.openInspectionForm = function(idx){
   if (!root || !f) return;
   root.innerHTML = `
     <div class="back-link" onclick="renderInspectionList()">${ic('arrowLeft')} กลับไปยังรายการแบบฟอร์ม</div>
-    <div class="card">${renderInspectionDetail(f)}</div>
+    <div class="paper-sheet"><div class="paper-wrap">${renderInspectionDetail(f)}</div></div>
   `;
   window.scrollTo({top:0, behavior:"instant"});
 };
