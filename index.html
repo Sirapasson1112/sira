@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Asset Inspection — Smart Maintenance Workspace</title>
+<title>Asset Inspection — Workforce Development Workspace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
@@ -667,6 +667,13 @@ input[type=checkbox],input[type=radio]{accent-color:#3AAFB9!important}input:focu
 @media(max-width:900px){.topbar{padding:16px 18px!important}.content{padding:18px 14px 50px!important}.paper-stage{padding:10px!important}.paper-frame-wrap{width:min(100%,720px)!important}}
 </style>
 
+
+<style id="workforce-upgrade">
+/* Workforce Development upgrade */
+.wd-kicker{font-size:11px;font-weight:800;letter-spacing:.12em;color:#319AA5;text-transform:uppercase;margin-bottom:5px}
+.wd-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-bottom:16px}.wd-card{background:#fff;border:1px solid #E3ECEE;border-radius:18px;box-shadow:0 8px 24px rgba(25,64,72,.06);padding:18px}.wd-card h3{margin:0;color:#173A40;font-size:17px}.wd-muted{color:#72878B;font-size:12px}.skill-row{display:grid;grid-template-columns:155px 1fr 48px;align-items:center;gap:10px;margin:13px 0}.skill-name{font-size:12px;font-weight:700;color:#334E52}.skill-track{height:9px;background:#EAF4F5;border-radius:99px;overflow:hidden}.skill-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#319AA5,#70D1CB)}.skill-pct{font-size:11px;font-weight:800;color:#267E88;text-align:right}.wd-badges{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.wd-badge{padding:6px 9px;border-radius:99px;background:#EAF8F9;color:#267E88;font-size:10px;font-weight:800;border:1px solid #CDEBED}.dev-focus{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #EDF2F3}.dev-focus:last-child{border-bottom:0}.dev-num{width:31px;height:31px;border-radius:10px;background:#EAF8F9;color:#267E88;display:grid;place-items:center;font-weight:900;font-size:12px}.dev-title{font-weight:800;font-size:12px;color:#2E474B}.dev-sub{font-size:10px;color:#819296;margin-top:3px}.competency-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 18px}.comp-mini{background:#F8FBFB;border:1px solid #E3ECEE;border-radius:14px;padding:12px}.comp-mini b{display:block;font-size:21px;color:#173A40}.comp-mini span{font-size:10px;color:#819296}.learn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.learn-card{border:1px solid #E3ECEE;border-radius:15px;padding:14px;background:linear-gradient(180deg,#fff,#FAFDFD)}.learn-card .tag{display:inline-block;padding:4px 7px;border-radius:7px;background:#EAF8F9;color:#267E88;font-size:9px;font-weight:900}.learn-card h4{font-size:12px;margin:9px 0 5px;color:#29464A}.learn-card p{font-size:10px;color:#7A8E91;line-height:1.5;margin:0}.learn-card button,.wd-btn{border:0;background:#319AA5;color:#fff;border-radius:10px;padding:8px 11px;font-size:10px;font-weight:800;cursor:pointer;margin-top:10px}.learn-card button:hover,.wd-btn:hover{background:#267E88}.guide-box{background:#F2FAFA;border:1px solid #CFEAEC;border-radius:14px;padding:13px;margin-bottom:12px}.guide-box strong{font-size:12px;color:#23494E}.guide-box p{font-size:10px;color:#647D81;margin:5px 0 0;line-height:1.55}.level-dot{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#319AA5;color:white;font-size:9px;font-weight:900;margin-right:5px}.mentor-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:9px;background:#FFF8E8;color:#8B671B;font-size:10px;font-weight:800}.page-head-flex{display:flex;justify-content:space-between;align-items:end;margin-bottom:16px}.page-head-flex h2{margin:0;color:#173A40;font-size:23px}.page-head-flex p{margin:4px 0 0;color:#74898D;font-size:11px}
+@media(max-width:1000px){.wd-grid,.learn-grid{grid-template-columns:1fr}.competency-summary{grid-template-columns:repeat(2,1fr)}}
+</style>
 </head>
 <body>
 
@@ -682,6 +689,8 @@ input[type=checkbox],input[type=radio]{accent-color:#3AAFB9!important}input:focu
       <button class="nav-item" data-page="pm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="side-label">แผนบำรุงรักษา (PM)</span></button>
       <button class="nav-item" data-page="tracking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="side-label">ติดตามงาน</span></button>
       <button class="nav-item" data-page="resources"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span class="side-label">ทรัพยากร/แรงงาน</span></button>
+      <button class="nav-item" data-page="development"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/><path d="M3 19h20"/></svg><span class="side-label">My Development</span></button>
+      <button class="nav-item" data-page="knowledge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5a3 3 0 0 1 3-3h13v17H7a3 3 0 0 0-3 3z"/><path d="M4 5v17M9 6h7M9 10h7"/></svg><span class="side-label">Knowledge Center</span></button>
       <button class="nav-item" data-page="analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg><span class="side-label">วิเคราะห์ข้อมูล</span></button>
       <button class="nav-item" data-page="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="side-label">รายงาน</span></button>
       <button class="nav-item" data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg><span class="side-label">จัดการระบบ</span></button>
@@ -690,8 +699,8 @@ input[type=checkbox],input[type=radio]{accent-color:#3AAFB9!important}input:focu
     <div class="side-foot">
       <svg viewBox="0 0 24 24" fill="none" stroke="#4a9d7f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 9.5 17 9.5s1.5 5.5-3 8.5"/><path d="M11 20c0-6 4-8 6-8.5"/></svg>
       <div>
-        <div class="t1">Reliable Assets<br>Sustainable Future</div>
-        <div class="t2">for a Better Bangkok</div>
+        <div class="t1">Skilled People<br>Reliable Assets</div>
+        <div class="t2">Learn · Inspect · Improve</div>
       </div>
     </div>
   </aside>
@@ -702,7 +711,7 @@ input[type=checkbox],input[type=radio]{accent-color:#3AAFB9!important}input:focu
       <div class="topbar-row">
         <div class="topbar-left">
           <h1>Asset Inspection <span class="title-accent">Workspace</span></h1>
-          <div class="sub">Smart Inspection · Maintenance · Analytics</div>
+          <div class="sub">Smart Inspection · Knowledge · Workforce Development</div>
         </div>
         <div class="topbar-mid">
           "เก็บข้อมูลหน้างาน บริหารงานบำรุงรักษา<br>
@@ -787,6 +796,28 @@ input[type=checkbox],input[type=radio]{accent-color:#3AAFB9!important}input:focu
         <div class="stat-card">
           <div class="stat-ic rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg></div>
           <div><div class="stat-label">ค้างดำเนินการ</div><div class="stat-value">15</div><div class="stat-delta down">↓ 3%</div></div>
+        </div>
+      </section>
+
+
+      <!-- PEOPLE DEVELOPMENT -->
+      <section class="wd-grid">
+        <div class="wd-card">
+          <div class="wd-kicker">Workforce Development</div>
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:start"><div><h3>สมรรถนะของฉัน</h3><div class="wd-muted">ประสบการณ์จากงานตรวจถูกสะสมเป็น Skill Profile</div></div><button class="wd-btn" data-page="development">ดูแผนพัฒนา</button></div>
+          <div class="skill-row"><div class="skill-name">Transformer</div><div class="skill-track"><div class="skill-fill" style="width:90%"></div></div><div class="skill-pct">90%</div></div>
+          <div class="skill-row"><div class="skill-name">RMU</div><div class="skill-track"><div class="skill-fill" style="width:72%"></div></div><div class="skill-pct">72%</div></div>
+          <div class="skill-row"><div class="skill-name">Load Break Switch</div><div class="skill-track"><div class="skill-fill" style="width:80%"></div></div><div class="skill-pct">80%</div></div>
+          <div class="skill-row"><div class="skill-name">Hot Spot / IR</div><div class="skill-track"><div class="skill-fill" style="width:61%"></div></div><div class="skill-pct">61%</div></div>
+          <div class="skill-row"><div class="skill-name">Partial Discharge</div><div class="skill-track"><div class="skill-fill" style="width:42%"></div></div><div class="skill-pct">42%</div></div>
+          <div class="wd-badges"><span class="wd-badge">✓ Inspection 34 งาน</span><span class="wd-badge">✓ ทำเอง 21 งาน</span><span class="wd-badge">◉ มีพี่เลี้ยง 13 งาน</span></div>
+        </div>
+        <div class="wd-card">
+          <div class="wd-kicker">Development Focus</div><h3>สิ่งที่ควรพัฒนาต่อ</h3><div class="wd-muted">อ้างอิงจาก Skill Gap และงานที่ปฏิบัติ</div>
+          <div class="dev-focus"><div class="dev-num">01</div><div><div class="dev-title">Partial Discharge Diagnosis</div><div class="dev-sub">เพิ่มประสบการณ์การอ่าน Acoustic Camera และการประเมินระดับความรุนแรง</div></div></div>
+          <div class="dev-focus"><div class="dev-num">02</div><div><div class="dev-title">Hot Spot Interpretation</div><div class="dev-sub">ฝึกวิเคราะห์ Delta T และการตัดสินใจส่งต่อแก้ไข</div></div></div>
+          <div class="dev-focus"><div class="dev-num">03</div><div><div class="dev-title">RMU Advanced Inspection</div><div class="dev-sub">เก็บงานภายใต้พี่เลี้ยงอีก 3 งาน เพื่อยกระดับความชำนาญ</div></div></div>
+          <div style="margin-top:10px"><span class="mentor-chip">★ Development Plan · 3 เป้าหมาย</span></div>
         </div>
       </section>
 
@@ -1053,7 +1084,34 @@ input[type=checkbox],input[type=radio]{accent-color:#3AAFB9!important}input:focu
     </div>
 
     <!-- ============ PAGE: จัดการระบบ ============ -->
-    <div class="page" id="page-settings">
+    
+    <div class="page" id="page-development">
+      <div class="page-head-flex"><div><div class="wd-kicker">People Capability</div><h2>My Development</h2><p>ติดตามประสบการณ์ สมรรถนะ Skill Gap และแผนพัฒนารายบุคคล</p></div><button class="wd-btn" onclick="alert('บันทึกแผนพัฒนาเรียบร้อย')">บันทึกแผนพัฒนา</button></div>
+      <div class="competency-summary"><div class="comp-mini"><b>34</b><span>งานตรวจสะสม</span></div><div class="comp-mini"><b>5</b><span>ทักษะหลัก</span></div><div class="comp-mini"><b>69%</b><span>Competency Coverage</span></div><div class="comp-mini"><b>3</b><span>Skill Gap ที่กำลังพัฒนา</span></div></div>
+      <div class="wd-grid">
+        <div class="wd-card"><h3>Skill Matrix รายบุคคล</h3><div class="wd-muted">Level 1 เรียนรู้ · Level 2 ทำภายใต้การกำกับ · Level 3 ทำได้ด้วยตนเอง · Level 4 ถ่ายทอดผู้อื่น</div>
+          <div class="skill-row"><div class="skill-name">Transformer · L4</div><div class="skill-track"><div class="skill-fill" style="width:90%"></div></div><div class="skill-pct">90%</div></div>
+          <div class="skill-row"><div class="skill-name">LBS · L3</div><div class="skill-track"><div class="skill-fill" style="width:80%"></div></div><div class="skill-pct">80%</div></div>
+          <div class="skill-row"><div class="skill-name">RMU · L3</div><div class="skill-track"><div class="skill-fill" style="width:72%"></div></div><div class="skill-pct">72%</div></div>
+          <div class="skill-row"><div class="skill-name">Hot Spot · L2</div><div class="skill-track"><div class="skill-fill" style="width:61%"></div></div><div class="skill-pct">61%</div></div>
+          <div class="skill-row"><div class="skill-name">Partial Discharge · L2</div><div class="skill-track"><div class="skill-fill" style="width:42%"></div></div><div class="skill-pct">42%</div></div>
+        </div>
+        <div class="wd-card"><h3>เส้นทางการพัฒนา</h3><div class="dev-focus"><div class="dev-num">1</div><div><div class="dev-title">เรียนรู้เกณฑ์และวิธีตรวจ</div><div class="dev-sub">Knowledge + Guided Inspection</div></div></div><div class="dev-focus"><div class="dev-num">2</div><div><div class="dev-title">ปฏิบัติงานร่วมกับพี่เลี้ยง</div><div class="dev-sub">บันทึก Guided / Mentored Job</div></div></div><div class="dev-focus"><div class="dev-num">3</div><div><div class="dev-title">ประเมินจากงานจริง</div><div class="dev-sub">Quality + completeness + supervisor review</div></div></div><div class="dev-focus"><div class="dev-num">4</div><div><div class="dev-title">ยกระดับและถ่ายทอด</div><div class="dev-sub">Qualified → Coach / Knowledge Contributor</div></div></div></div>
+      </div>
+      <div class="wd-card"><div class="wd-kicker">Learning Path</div><h3>แนะนำการเรียนรู้จาก Skill Gap</h3><div class="learn-grid"><div class="learn-card"><span class="tag">PRIORITY</span><h4>Partial Discharge Fundamentals</h4><p>หลักการ PD, จุดผิดปกติ และการอ่านข้อมูลจาก Acoustic Camera</p><button onclick="alert('เริ่ม Learning Module: Partial Discharge')">เริ่มเรียน</button></div><div class="learn-card"><span class="tag">PRACTICE</span><h4>Infrared / Hot Spot</h4><p>ฝึกอ่าน Delta T และเชื่อมผลตรวจกับแนวทางดำเนินการ</p><button onclick="alert('เปิดแบบฝึก Hot Spot')">แบบฝึก</button></div><div class="learn-card"><span class="tag">MENTORED JOB</span><h4>RMU Field Practice</h4><p>งานภายใต้พี่เลี้ยง 3 ครั้ง พร้อม Supervisor Sign-off</p><button data-page="inspection">ไปที่งานตรวจ</button></div></div></div>
+    </div>
+
+    <div class="page" id="page-knowledge">
+      <div class="page-head-flex"><div><div class="wd-kicker">Knowledge Transfer</div><h2>Knowledge Center</h2><p>องค์ความรู้จากมาตรฐาน ใบตรวจ และประสบการณ์หน้างาน</p></div><button class="wd-btn" onclick="alert('เปิดแบบฟอร์มเพิ่มองค์ความรู้')">+ เพิ่มองค์ความรู้</button></div>
+      <div class="wd-grid"><div class="wd-card"><h3>Guided Inspection</h3><div class="wd-muted">กดดูคำแนะนำก่อนหรือระหว่างตรวจ โดยไม่เปลี่ยนรายละเอียดในใบตรวจต้นฉบับ</div>
+        <div class="guide-box"><strong><span class="level-dot">01</span>Transformer — Bushing HV-LV</strong><p>แสดงหัวข้อที่ต้องสังเกต เกณฑ์ตรวจ และช่องบันทึกสิ่งผิดปกติ เพื่อให้ผู้ปฏิบัติงานตรวจได้เป็นมาตรฐานเดียวกัน</p></div>
+        <div class="guide-box"><strong><span class="level-dot">02</span>RMU — SF6 / Switching</strong><p>เตรียม Checklist ความรู้ก่อนงาน พร้อมเชื่อมกลับไปยังใบตรวจ SF-07-0-018</p></div>
+        <div class="guide-box"><strong><span class="level-dot">03</span>Hot Spot — Delta T</strong><p>ใช้เกณฑ์จากใบตรวจเป็น Reference ระหว่างปฏิบัติงาน และเก็บกรณีศึกษาที่เคยพบ</p></div>
+      </div><div class="wd-card"><h3>ประสบการณ์จากหน้างาน</h3><div class="dev-focus"><div class="dev-num">12</div><div><div class="dev-title">Case Library</div><div class="dev-sub">กรณีตัวอย่างพร้อมภาพและแนวทางแก้ไข</div></div></div><div class="dev-focus"><div class="dev-num">08</div><div><div class="dev-title">Lessons Learned</div><div class="dev-sub">บทเรียนจากข้อบกพร่องที่พบซ้ำ</div></div></div><div class="dev-focus"><div class="dev-num">05</div><div><div class="dev-title">Expert Tips</div><div class="dev-sub">คำแนะนำจากผู้มีประสบการณ์</div></div></div><div class="dev-focus"><div class="dev-num">11</div><div><div class="dev-title">Inspection Forms</div><div class="dev-sub">เชื่อมใบตรวจที่ใช้งานจริงทั้งระบบ</div></div></div></div></div>
+      <div class="wd-card"><div class="wd-kicker">Capability Loop</div><h3>จากงานจริง → ความรู้ → การพัฒนา</h3><div class="learn-grid"><div class="learn-card"><span class="tag">1 · WORK</span><h4>ปฏิบัติงานตรวจ</h4><p>ใช้ใบตรวจจริงและ Guided Inspection ระหว่างงาน</p></div><div class="learn-card"><span class="tag">2 · LEARN</span><h4>สะสมประสบการณ์</h4><p>ผลตรวจ ข้อบกพร่อง และ Supervisor Review กลายเป็นหลักฐานสมรรถนะ</p></div><div class="learn-card"><span class="tag">3 · GROW</span><h4>ปิด Skill Gap</h4><p>ระบบเสนอ Learning Path และงานฝึกที่เหมาะกับช่องว่างของแต่ละคน</p></div></div></div>
+    </div>
+
+<div class="page" id="page-settings">
       <div class="page-header">
         <div><h2>จัดการระบบ</h2><p>ผู้ใช้งาน สิทธิ์การเข้าถึง และการตั้งค่าทั่วไป</p></div>
       </div>
