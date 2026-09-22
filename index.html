@@ -590,6 +590,20 @@ input:focus,select:focus,textarea:focus{border-color:#7a6df7!important;box-shado
 .page.active{animation:wowIn .28s ease both}
 @keyframes wowIn{from{opacity:.2;transform:translateY(7px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== COMPACT REALISTIC PAPER ===== */
+.paper-stage{padding:24px!important;background:linear-gradient(135deg,#d8dde3 0%,#eef1f4 52%,#d5dae0 100%)!important}
+.paper-frame-wrap{width:min(100%,780px)!important;background:#fdfcf8!important;border:1px solid #c9c6bd!important;border-radius:2px!important;box-shadow:0 2px 3px rgba(31,35,40,.10),0 14px 32px rgba(31,35,40,.16),0 34px 70px rgba(31,35,40,.09)!important;position:relative}
+.paper-frame-wrap:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.38;background-image:radial-gradient(circle at 18% 14%,rgba(120,105,75,.055) 0 1px,transparent 1.5px),radial-gradient(circle at 72% 41%,rgba(120,105,75,.04) 0 1px,transparent 1.3px),linear-gradient(90deg,rgba(255,255,255,.22),transparent 22%,rgba(120,105,75,.025) 55%,transparent 80%);background-size:17px 19px,23px 29px,100% 100%;mix-blend-mode:multiply}
+.paper-frame-wrap:after{content:"";position:absolute;left:1.5%;right:1.5%;bottom:-9px;height:13px;background:rgba(24,31,38,.16);filter:blur(9px);border-radius:50%;z-index:-1}
+.interactive-paper{position:relative;background:linear-gradient(100deg,#fffefa 0%,#fbfaf5 48%,#fffefb 100%)!important;padding:18px 22px 24px!important;color:#24231f!important;font-size:11.5px!important;line-height:1.35}
+.interactive-paper:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.24;background:repeating-linear-gradient(0deg,rgba(90,75,45,.018) 0,rgba(90,75,45,.018) 1px,transparent 1px,transparent 4px)}
+.ip-head{padding-bottom:9px!important;margin-bottom:11px!important;border-bottom:1.5px solid #34332f!important}.ip-head h3{font-size:15px!important;margin:4px 70px 3px!important}.ip-head p{font-size:9.5px!important;margin:2px 0!important}.ip-code{font-size:9px!important;padding:3px 5px!important;border-color:#77736b!important}
+.ip-meta{gap:6px!important;margin-bottom:10px!important}.ip-field label{font-size:9px!important}.ip-field input,.ip-field select{height:29px!important;font-size:10.5px!important;padding:4px 7px!important;background:rgba(255,255,255,.62)!important;border-color:#aaa69c!important;border-radius:2px!important}
+.ip-section-title{font-size:11px!important;margin:11px 0 5px!important;padding:5px 7px!important;background:#efeee8!important;border-left:3px solid #55524c!important}
+.ip-table{font-size:9.5px!important}.ip-table th,.ip-table td{padding:4px 4px!important;border-color:#77736b!important}.ip-table th{background:#ecebe5!important}.ip-result-btn,.result-btn{min-height:25px!important;padding:3px 5px!important;font-size:9px!important;border-radius:2px!important}.ip-note,.ip-table input,.ip-table textarea{font-size:9.5px!important;min-height:26px!important;border-radius:2px!important;background:rgba(255,255,255,.62)!important}
+.ip-measures{gap:6px!important}.ip-measure{padding:6px!important;border-radius:2px!important;background:#f7f6f1!important}.ip-bottom{gap:8px!important;margin-top:10px!important}.ip-bottom textarea{min-height:48px!important;font-size:10px!important;background:rgba(255,255,255,.62)!important;border-radius:2px!important}
+@media(max-width:900px){.paper-frame-wrap{width:min(100%,720px)!important}.interactive-paper{padding:14px 12px 18px!important}.ip-head h3{margin:28px 0 3px!important}}
 </style>
 </head>
 <body>
