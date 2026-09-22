@@ -7,7 +7,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+  // Load Chart.js from cdnjs; if that host is blocked on this network, retry via jsDelivr.
+  function loadScript(src){
+    return new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  window.chartJsReady = loadScript("https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js")
+    .catch(() => loadScript("https://cdn.jsdelivr.net/npm/[email protected]/dist/chart.umd.min.js"));
+</script>
 <style>
   :root {
     --ink: #0c1324;
@@ -329,6 +342,7 @@
   .cost-kpi .lbl { font-size: 11.5px; color: var(--text-faint); font-weight: 700; margin-bottom: 6px; }
   .cost-kpi .v { font-size: 19px; font-weight: 800; }
   .bar-wrap { height: 230px; padding: 4px 12px 16px; }
+  .chart-fallback { display:flex; align-items:center; justify-content:center; height:100%; width:100%; color:var(--text-faint); font-size:12.5px; text-align:center; padding:12px; line-height:1.6; }
 
   @media (max-width: 1180px) {
     .kpis, .cost-kpis { grid-template-columns: repeat(2, 1fr); }
@@ -455,7 +469,9 @@ function goTo(id){
   window.scrollTo({top:0, behavior:"instant"});
   // Charts on a page that was hidden (display:none) at creation time render at 0x0.
   // Whenever a page becomes visible, (re)build its charts once real layout exists.
-  requestAnimationFrame(() => { if (window.initChartsFor) window.initChartsFor(id); });
+  requestAnimationFrame(() => {
+    if (window.chartJsReady) window.chartJsReady.then(() => window.initChartsFor(id)).catch(() => {});
+  });
 }
 
 /* ===================== helpers ===================== */
@@ -847,9 +863,6 @@ pages.forEach((p,i)=>{
 // Charts are created lazily, page by page: a canvas inside a hidden (display:none)
 // page has zero size, and Chart.js bakes that zero size in at creation time — so
 // every page's charts are only built the first time that page is actually shown.
-Chart.defaults.font.family = "'Noto Sans Thai','Inter',sans-serif";
-Chart.defaults.color = "#8992a3";
-
 function donut(id, values, colors, cutout="72%"){
   const el = document.getElementById(id);
   if (!el) return;
@@ -919,12 +932,21 @@ function initCostCharts(){
 const chartInitDone = {};
 const chartInitFns = { dashboard: initDashboardCharts, pmplanning: initPmPlanningCharts, cost: initCostCharts };
 window.initChartsFor = function(pageId){
-  if (chartInitDone[pageId] || !chartInitFns[pageId]) return;
+  if (chartInitDone[pageId] || !chartInitFns[pageId] || typeof Chart === "undefined") return;
   chartInitFns[pageId]();
   chartInitDone[pageId] = true;
 };
-// Dashboard is the page shown on load, so build its charts right away.
-window.initChartsFor("dashboard");
+
+window.chartJsReady.then(() => {
+  Chart.defaults.font.family = "'Noto Sans Thai','Inter',sans-serif";
+  Chart.defaults.color = "#8992a3";
+  // Dashboard is the page shown on load, so build its charts right away.
+  window.initChartsFor("dashboard");
+}).catch(() => {
+  document.querySelectorAll('canvas[id^="chart"]').forEach(c => {
+    c.parentElement.innerHTML = '<div class="chart-fallback">ไม่สามารถโหลดไลบรารีกราฟได้<br>ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วรีเฟรชหน้านี้</div>';
+  });
+});
 </script>
 </body>
 </html>
