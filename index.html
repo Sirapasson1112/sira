@@ -473,6 +473,26 @@
   .guide-list { margin: 10px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: var(--text-soft); }
   .guide-list li { margin-bottom: 4px; }
   .guide-list b { color: var(--text); }
+
+  /* Field navigation map */
+  .field-map-toolbar { display: flex; gap: 14px; padding: 16px 20px 0; flex-wrap: wrap; }
+  .legend-inline { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-soft); font-weight: 600; }
+  .legend-inline .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .field-map-canvas { position: relative; width: calc(100% - 40px); margin: 14px 20px 20px; aspect-ratio: 8 / 5; overflow: hidden; border-radius: 12px; background: #eef3f8; border: 1px solid var(--card-line); }
+  .field-map-svg-wrap { width: 100%; height: 100%; transition: transform .2s ease; transform-origin: center center; }
+  .field-map-svg-wrap svg { display: block; }
+  .map-controls { position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .map-controls .pg-btn { background: #fff; }
+  .compass { position: absolute; bottom: 12px; left: 12px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.92); border: 1px solid var(--card-line); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text-soft); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .map-scale { position: absolute; bottom: 12px; right: 12px; background: rgba(255,255,255,0.92); border: 1px solid var(--card-line); border-radius: 8px; padding: 4px 9px; font-size: 10.5px; font-weight: 700; color: var(--text-soft); }
+  .field-stop-list { display: flex; flex-direction: column; }
+  .field-stop-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--card-line); cursor: pointer; }
+  .field-stop-row:hover { background: var(--surface); }
+  .field-stop-row:last-child { border-bottom: none; }
+  .field-stop-row .num { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
+  .field-stop-row .body { flex: 1; min-width: 0; }
+  .field-stop-row .t { font-size: 12.8px; font-weight: 700; }
+  .field-stop-row .d { font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -558,6 +578,7 @@ const ICONS = {
   waves: `<path d="M2 12c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/><path d="M2 18c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0"/>`,
   droplet: `<path d="M12 2s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/>`,
   help: `<circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.7 2.7 0 0 1 5.2.9c0 1.8-2.5 2.2-2.5 3.7"/><path d="M12 17.3h.01"/>`,
+  mapPin: `<path d="M12 22s7-7.58 7-13a7 7 0 0 0-14 0c0 5.42 7 13 7 13z"/><circle cx="12" cy="9" r="2.6"/>`,
 };
 function ic(name, extra=""){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" ${extra}>${ICONS[name]}</svg>`; }
 
@@ -570,6 +591,7 @@ const NAV = [
   {id:"lbs", label:"สวิตช์ตัดตอน (LBS)", icon:"branch"},
   {id:"substation", label:"สถานีย่อย", icon:"server"},
   {id:"workorder", label:"ใบงาน", icon:"clipboard"},
+  {id:"fieldnav", label:"นำทางตรวจภาคสนาม", icon:"mapPin"},
   {id:"inspection", label:"ใบตรวจสอบบำรุงรักษา", icon:"checklist"},
   {id:"cost", label:"ต้นทุนบำรุงรักษา", icon:"coin"},
   {id:"reports", label:"รายงาน", icon:"chart"},
@@ -853,6 +875,135 @@ function renderWorkOrderChips(){
     return `<div class="chip ${st.status===g.value?"active":""}" onclick="setTableStatus('workorder','${g.value}')">${g.label}<span class="n">${count}</span></div>`;
   }).join("");
 }
+
+/* ===================== FIELD NAVIGATION MAP ===================== */
+// Approximate real-world coordinates for the districts our demo data uses, so distances
+// and the "open in Google Maps" hand-off are grounded in real geography (Samut Prakan).
+const DISTRICT_COORDS = {
+  "บางพลี": { lat:13.6034, lng:100.7043 },
+  "บางพลีน้อย": { lat:13.5980, lng:100.6900 },
+  "ตำหรุ": { lat:13.5900, lng:100.7250 },
+  "สำโรง": { lat:13.6100, lng:100.5950 },
+  "บางเสาธง": { lat:13.5750, lng:100.7200 },
+  "พระสมุทรเจดีย์": { lat:13.6010, lng:100.5520 },
+  "เมืองสมุทรปราการ": { lat:13.5990, lng:100.5970 },
+  "บางบ่อ": { lat:13.5330, lng:100.8850 },
+};
+const FIELD_ORIGIN = { lat:13.5990, lng:100.5970, label:"ศูนย์ปฏิบัติการ เขตเมืองสมุทรปราการ" };
+const MAP_BOUNDS = { minLat:13.51, maxLat:13.65, minLng:100.53, maxLng:100.90 };
+
+function getAssetDistrict(tableId, row){
+  if (!row) return null;
+  if (tableId === "feeder") return row.name;
+  if (tableId === "transformer") return row.place;
+  if (tableId === "lbs") return row.place;
+  if (tableId === "substation") return row.name;
+  return null;
+}
+function haversineKm(lat1, lng1, lat2, lng2){
+  const R = 6371, toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2-lat1), dLng = toRad(lng2-lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+function projectLatLng(lat, lng){
+  const x = 60 + (lng - MAP_BOUNDS.minLng) / (MAP_BOUNDS.maxLng - MAP_BOUNDS.minLng) * 680;
+  const y = 40 + (1 - (lat - MAP_BOUNDS.minLat) / (MAP_BOUNDS.maxLat - MAP_BOUNDS.minLat)) * 420;
+  return { x, y };
+}
+
+let FIELD_STOPS = [];
+function buildFieldStops(){
+  const wost = TableState["workorder"];
+  if (!wost){ FIELD_STOPS = []; return; }
+  const pending = wost.data.filter(r => r.status === "รอดำเนินการ" || r.status === "เกินกำหนด");
+  FIELD_STOPS = pending.slice(0, 14).map(wo => {
+    const assetRow = ASSET_DATA[wo.assetTableId] ? ASSET_DATA[wo.assetTableId].find(a => a.code === wo.assetCode) : null;
+    const district = getAssetDistrict(wo.assetTableId, assetRow) || "เมืองสมุทรปราการ";
+    const coord = DISTRICT_COORDS[district] || DISTRICT_COORDS["เมืองสมุทรปราการ"];
+    // small deterministic offset so pins in the same district don't stack exactly on top of each other
+    const seed = wo.code.charCodeAt(wo.code.length-1) - 48;
+    const lat = coord.lat + ((seed % 10) - 5) * 0.0022;
+    const lng = coord.lng + ((seed % 7) - 3) * 0.0026;
+    return { wo, district, lat, lng, distKm: haversineKm(FIELD_ORIGIN.lat, FIELD_ORIGIN.lng, lat, lng) };
+  }).sort((a,b) => a.distKm - b.distKm);
+}
+
+function renderFieldMap(){
+  const mapWrap = document.getElementById("fieldMapSvgWrap");
+  const listEl = document.getElementById("fieldStopsList");
+  const countEl = document.getElementById("fieldStopsCount");
+  if (!mapWrap) return;
+  const stops = FIELD_STOPS;
+  const originXY = projectLatLng(FIELD_ORIGIN.lat, FIELD_ORIGIN.lng);
+
+  const water = `
+    <path d="M55,20 C110,140 75,270 105,470 L150,470 C120,300 155,170 120,20 Z" fill="#bcd7ea" opacity="0.55"/>
+    <path d="M20,430 C280,485 540,485 780,440 L780,480 L20,480 Z" fill="#bcd7ea" opacity="0.55"/>
+  `;
+  const districtBlobs = Object.entries(DISTRICT_COORDS).map(([name, c]) => {
+    const p = projectLatLng(c.lat, c.lng);
+    return `<ellipse cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" rx="66" ry="42" fill="#dbe7f3" opacity="0.5"/>
+      <text x="${p.x.toFixed(1)}" y="${(p.y-50).toFixed(1)}" text-anchor="middle" font-size="10.5" fill="#5b6478" font-weight="700">${name}</text>`;
+  }).join("");
+  const roadLines = stops.map(s => {
+    const p = projectLatLng(s.lat, s.lng);
+    return `<line x1="${originXY.x.toFixed(1)}" y1="${originXY.y.toFixed(1)}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}" stroke="#c7cfdb" stroke-width="1.6" stroke-dasharray="1 6" stroke-linecap="round"/>`;
+  }).join("");
+  const pins = stops.map((s, i) => {
+    const p = projectLatLng(s.lat, s.lng);
+    const color = s.wo.status === "เกินกำหนด" ? "#e5484d" : "#f0a323";
+    return `<g onclick="showFieldStopDetail(${i})" style="cursor:pointer;">
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="10" fill="${color}" stroke="#fff" stroke-width="2"/>
+      <text x="${p.x.toFixed(1)}" y="${(p.y+3.5).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="800">${i+1}</text>
+    </g>`;
+  }).join("");
+  const originPin = `
+    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="15" fill="#2f6fed" opacity="0.18"/>
+    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="7" fill="#2f6fed" stroke="#fff" stroke-width="2"/>
+    <text x="${originXY.x.toFixed(1)}" y="${(originXY.y-18).toFixed(1)}" text-anchor="middle" font-size="10" fill="#2f6fed" font-weight="800">ตำแหน่งของฉัน</text>`;
+
+  mapWrap.innerHTML = `<svg viewBox="0 0 800 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="800" height="500" fill="#eef3f8"/>
+    ${water}
+    ${districtBlobs}
+    ${roadLines}
+    ${pins}
+    ${originPin}
+  </svg>`;
+
+  if (countEl) countEl.textContent = `(${stops.length})`;
+  if (listEl){
+    listEl.innerHTML = stops.map((s, i) => `
+      <div class="field-stop-row" onclick="showFieldStopDetail(${i})">
+        <div class="num">${i+1}</div>
+        <div class="body"><div class="t">${s.wo.equip}</div><div class="d">${s.district} · ${s.distKm.toFixed(1)} กม. จากศูนย์ปฏิบัติการ</div></div>
+        ${statusBadge(s.wo.status)}
+      </div>`).join("") || `<div style="padding:26px; text-align:center; color:var(--text-faint);">ไม่มีงานที่ต้องออกตรวจภาคสนามในขณะนี้</div>`;
+  }
+}
+
+window.showFieldStopDetail = function(i){
+  const s = FIELD_STOPS[i]; if (!s) return;
+  const gmapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${FIELD_ORIGIN.lat},${FIELD_ORIGIN.lng}&destination=${s.lat},${s.lng}`;
+  const body = `<div class="mini-stat-list">
+    <div class="mini-stat-row"><span class="lbl">เลขที่ใบงาน</span><span class="val">${s.wo.code}</span></div>
+    <div class="mini-stat-row"><span class="lbl">อุปกรณ์</span><span class="val">${s.wo.equip}</span></div>
+    <div class="mini-stat-row"><span class="lbl">พื้นที่</span><span class="val">${s.district}</span></div>
+    <div class="mini-stat-row"><span class="lbl">ระยะทางโดยประมาณ</span><span class="val">${s.distKm.toFixed(1)} กม.</span></div>
+    <div class="mini-stat-row"><span class="lbl">สถานะ</span><span class="val">${statusBadge(s.wo.status)}</span></div>
+  </div>`;
+  openModal(`จุดตรวจ #${i+1} — ${s.wo.code}`, body,
+    `<a class="btn" href="${gmapsUrl}" target="_blank" rel="noopener" style="text-decoration:none; display:inline-flex; align-items:center; gap:7px;">${ic('mapPin')} เปิดนำทางใน Google Maps</a>
+     <button class="btn primary" onclick="closeModal(); goToEquipment('${s.wo.assetTableId}','${s.wo.assetCode}')">ดูอุปกรณ์</button>`);
+};
+
+let fieldMapZoom = 1;
+window.zoomFieldMap = function(delta){
+  fieldMapZoom = Math.min(2, Math.max(1, fieldMapZoom + delta*0.25));
+  const wrap = document.getElementById("fieldMapSvgWrap");
+  if (wrap) wrap.style.transform = `scale(${fieldMapZoom})`;
+};
 
 /* ===================== PAGE: DASHBOARD ===================== */
 const pageDashboard = `
@@ -1138,6 +1289,35 @@ const pageWorkOrder = `
   </div>
   <div id="workorder-table-wrap" class="table-wrap"></div>
   <div class="table-foot"><div class="count" id="workorder-count"></div><div class="pager" id="workorder-pager"></div></div>
+</div>
+`;
+
+/* ===================== PAGE: FIELD NAVIGATION ===================== */
+const pageFieldNav = `
+<div class="page-head">
+  <div><h1>นำทางตรวจภาคสนาม</h1><p>จุดตรวจของใบงานที่รอดำเนินการ/เกินกำหนด เรียงตามระยะทางจากศูนย์ปฏิบัติการ กดจุดหรือรายการเพื่อดูรายละเอียดและเปิดนำทาง</p></div>
+</div>
+<div class="grid two-col">
+  <div class="card">
+    <div class="panel-head" style="padding:18px 20px 0;"><h3>รายการจุดตรวจ <span id="fieldStopsCount" style="color:var(--text-faint); font-weight:600;"></span></h3></div>
+    <div id="fieldStopsList" class="field-stop-list"><div style="padding:26px; text-align:center; color:var(--text-faint);">กำลังโหลด...</div></div>
+  </div>
+  <div class="card">
+    <div class="field-map-toolbar">
+      <div class="legend-inline"><span class="dot" style="background:var(--brand)"></span>ตำแหน่งของฉัน</div>
+      <div class="legend-inline"><span class="dot" style="background:var(--amber)"></span>รอดำเนินการ</div>
+      <div class="legend-inline"><span class="dot" style="background:var(--red)"></span>เกินกำหนด</div>
+    </div>
+    <div class="field-map-canvas">
+      <div id="fieldMapSvgWrap" class="field-map-svg-wrap"></div>
+      <div class="map-controls">
+        <button class="pg-btn" onclick="zoomFieldMap(1)" title="ซูมเข้า">+</button>
+        <button class="pg-btn" onclick="zoomFieldMap(-1)" title="ซูมออก">−</button>
+      </div>
+      <div class="compass">N<br>↑</div>
+      <div class="map-scale">เขตสมุทรปราการ</div>
+    </div>
+  </div>
 </div>
 `;
 
@@ -1705,6 +1885,7 @@ const pageGuide = `
   <a href="#guide-pm">วางแผน PM</a>
   <a href="#guide-asset">สายป้อน / หม้อแปลง / LBS / สถานีย่อย</a>
   <a href="#guide-workorder">ใบงาน</a>
+  <a href="#guide-fieldnav">นำทางตรวจภาคสนาม</a>
   <a href="#guide-inspection">ใบตรวจสอบบำรุงรักษา</a>
   <a href="#guide-cost">ต้นทุนบำรุงรักษา</a>
   <a href="#guide-reports">รายงาน</a>
@@ -1759,6 +1940,17 @@ const pageGuide = `
     </ul>
   </div>
 
+  <div class="guide-section" id="guide-fieldnav">
+    <h3><span class="ic">${ic('mapPin')}</span>นำทางตรวจภาคสนาม</h3>
+    <p>แผนที่แสดงจุดที่ต้องออกตรวจของใบงานที่ยังรอดำเนินการหรือเกินกำหนด อ้างอิงพื้นที่จริงของอุปกรณ์ในระบบ เรียงตามระยะทางจากศูนย์ปฏิบัติการ</p>
+    <ul class="guide-list">
+      <li>กดหมุดบนแผนที่ หรือรายการด้านซ้าย เพื่อดูรายละเอียดจุดตรวจ</li>
+      <li>ปุ่ม <b>เปิดนำทางใน Google Maps</b> จะเปิดแอป/เว็บ Google Maps พร้อมเส้นทางจริงให้ทันที</li>
+      <li>ปุ่ม <b>ดูอุปกรณ์</b> พาไปหน้าอุปกรณ์ตัวนั้นในระบบ</li>
+      <li>ใช้ปุ่ม + / − มุมขวาบนของแผนที่เพื่อซูมเข้า-ออก</li>
+    </ul>
+  </div>
+
   <div class="guide-section" id="guide-inspection">
     <h3><span class="ic">${ic('checklist')}</span>ใบตรวจสอบบำรุงรักษา</h3>
     <p>รวมแบบตรวจสอบ (SF-07) และคู่มือการปฏิบัติงาน (SW-OH) ของอุปกรณ์ 11 ประเภท</p>
@@ -1805,6 +1997,7 @@ const pages = [
   {id:"lbs", html: assetPage(lbsCfg)},
   {id:"substation", html: assetPage(substationCfg)},
   {id:"workorder", html: pageWorkOrder},
+  {id:"fieldnav", html: pageFieldNav},
   {id:"inspection", html: pageInspection},
   {id:"cost", html: pageCost},
   {id:"reports", html: pageReports},
@@ -1836,6 +2029,8 @@ initAssetTable("substation", { data: ASSET_DATA.substation, columns: substationC
 initAssetTable("workorder", { data: makeWorkOrderRows(ASSET_DATA), columns: workOrderCfg.columns, searchKeys: ["code","equip","owner"], pageSize: 4, statusOptions: workOrderCfg.statusOptions });
 
 renderDashboardWidgets();
+buildFieldStops();
+renderFieldMap();
 
 /* ===================== CHARTS (plain inline SVG — no library, no network) ===================== */
 // Every chart is hand-drawn as SVG in plain JS. This removes the whole class of
