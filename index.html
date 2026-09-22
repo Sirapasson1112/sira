@@ -453,6 +453,9 @@ function goTo(id){
   document.querySelectorAll(".page").forEach(e => e.classList.toggle("active", e.id === "page-"+id));
   document.getElementById("sidebar").classList.remove("open");
   window.scrollTo({top:0, behavior:"instant"});
+  // Charts on a page that was hidden (display:none) at creation time render at 0x0.
+  // Whenever a page becomes visible, (re)build its charts once real layout exists.
+  requestAnimationFrame(() => { if (window.initChartsFor) window.initChartsFor(id); });
 }
 
 /* ===================== helpers ===================== */
@@ -841,61 +844,87 @@ pages.forEach((p,i)=>{
 });
 
 /* ===================== CHARTS ===================== */
+// Charts are created lazily, page by page: a canvas inside a hidden (display:none)
+// page has zero size, and Chart.js bakes that zero size in at creation time — so
+// every page's charts are only built the first time that page is actually shown.
 Chart.defaults.font.family = "'Noto Sans Thai','Inter',sans-serif";
 Chart.defaults.color = "#8992a3";
 
-new Chart(document.getElementById("chartCompliance"), {
-  type: "bar",
-  data: {
-    labels: ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."],
-    datasets: [{
-      data: [78,82,85,80,88,91,89,94,92],
-      backgroundColor: "#2f6fed",
-      borderRadius: 5,
-      maxBarThickness: 26,
-    }]
-  },
-  options: {
-    responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display:false } },
-    scales: {
-      y: { beginAtZero:true, max:100, grid:{color:"#e4e8f0"}, ticks:{callback:v=>v+"%"} },
-      x: { grid:{display:false} }
-    }
-  }
-});
-
 function donut(id, values, colors, cutout="72%"){
-  new Chart(document.getElementById(id), {
+  const el = document.getElementById(id);
+  if (!el) return;
+  new Chart(el, {
     type: "doughnut",
     data: { datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
     options: { responsive:true, maintainAspectRatio:false, cutout, plugins:{legend:{display:false}, tooltip:{enabled:true}} }
   });
 }
-donut("chartDashDonut", [292,18,10], ["#17a261","#f0a323","#e5484d"]);
-donut("chartPmDonut", [71,29], ["#2f6fed","#e4e8f0"]);
-donut("chartCostDonut", [26,56,13,5], ["#2f6fed","#f0a323","#17a261","#8992a3"]);
 
-new Chart(document.getElementById("chartCostBar"), {
-  type: "bar",
-  data: {
-    labels: ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],
-    datasets: [
-      { label:"อะไหล่", data:[40,42,38,45,50,48,55,60,58,52,47,44], backgroundColor:"#2f6fed", stack:"s" },
-      { label:"ผู้รับเหมา", data:[70,68,72,75,80,78,85,88,84,79,74,71], backgroundColor:"#f0a323", stack:"s" },
-      { label:"ค่าแรง", data:[18,17,19,20,22,21,23,25,24,22,20,19], backgroundColor:"#17a261", stack:"s" },
-      { label:"อื่นๆ", data:[8,7,9,8,10,9,11,12,10,9,8,7], backgroundColor:"#8992a3", stack:"s" },
-    ]
-  },
-  options: {
-    responsive:true, maintainAspectRatio:false,
-    plugins: { legend: { position:"bottom", labels:{boxWidth:9, boxHeight:9, usePointStyle:true, pointStyle:"circle"} } },
-    scales: {
-      x: { stacked:true, grid:{display:false} },
-      y: { stacked:true, grid:{color:"#e4e8f0"}, ticks:{callback:v=>(v*1000).toLocaleString()} }
+function initDashboardCharts(){
+  const el = document.getElementById("chartCompliance");
+  if (!el) return;
+  new Chart(el, {
+    type: "bar",
+    data: {
+      labels: ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."],
+      datasets: [{
+        data: [78,82,85,80,88,91,89,94,92],
+        backgroundColor: "#2f6fed",
+        borderRadius: 5,
+        maxBarThickness: 26,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display:false } },
+      scales: {
+        y: { beginAtZero:true, max:100, grid:{color:"#e4e8f0"}, ticks:{callback:v=>v+"%"} },
+        x: { grid:{display:false} }
+      }
     }
-  }
-});
+  });
+  donut("chartDashDonut", [292,18,10], ["#17a261","#f0a323","#e5484d"]);
+}
+
+function initPmPlanningCharts(){
+  donut("chartPmDonut", [71,29], ["#2f6fed","#e4e8f0"]);
+}
+
+function initCostCharts(){
+  donut("chartCostDonut", [26,56,13,5], ["#2f6fed","#f0a323","#17a261","#8992a3"]);
+  const el = document.getElementById("chartCostBar");
+  if (!el) return;
+  new Chart(el, {
+    type: "bar",
+    data: {
+      labels: ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],
+      datasets: [
+        { label:"อะไหล่", data:[40,42,38,45,50,48,55,60,58,52,47,44], backgroundColor:"#2f6fed", stack:"s" },
+        { label:"ผู้รับเหมา", data:[70,68,72,75,80,78,85,88,84,79,74,71], backgroundColor:"#f0a323", stack:"s" },
+        { label:"ค่าแรง", data:[18,17,19,20,22,21,23,25,24,22,20,19], backgroundColor:"#17a261", stack:"s" },
+        { label:"อื่นๆ", data:[8,7,9,8,10,9,11,12,10,9,8,7], backgroundColor:"#8992a3", stack:"s" },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend: { position:"bottom", labels:{boxWidth:9, boxHeight:9, usePointStyle:true, pointStyle:"circle"} } },
+      scales: {
+        x: { stacked:true, grid:{display:false} },
+        y: { stacked:true, grid:{color:"#e4e8f0"}, ticks:{callback:v=>(v*1000).toLocaleString()} }
+      }
+    }
+  });
+}
+
+const chartInitDone = {};
+const chartInitFns = { dashboard: initDashboardCharts, pmplanning: initPmPlanningCharts, cost: initCostCharts };
+window.initChartsFor = function(pageId){
+  if (chartInitDone[pageId] || !chartInitFns[pageId]) return;
+  chartInitFns[pageId]();
+  chartInitDone[pageId] = true;
+};
+// Dashboard is the page shown on load, so build its charts right away.
+window.initChartsFor("dashboard");
 </script>
 </body>
 </html>
