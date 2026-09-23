@@ -632,6 +632,7 @@ const ICONS = {
   chevL: `<path d="m15 18-6-6 6-6"/>`,
   chevR: `<path d="m9 18 6-6-6-6"/>`,
   download: `<path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/>`,
+  upload: `<path d="M12 21V9"/><path d="m7 13 5-5 5 5"/><path d="M5 21h14"/>`,
   file: `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6"/>`,
   checklist: `<rect x="3.5" y="3" width="17" height="18" rx="2"/><path d="m7.5 8 1.3 1.3L11 7"/><path d="M13 8h5.2"/><path d="m7.5 14 1.3 1.3L11 13"/><path d="M13 14h5.2"/>`,
   arrowLeft: `<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>`,
@@ -761,6 +762,132 @@ window.runTopSearch = function(query){
   const q = (query || "").trim();
   if (!q){ showToast("กรุณาพิมพ์คำค้นหา"); return; }
   showToast(`ค้นหา "${q}" — เลือกเมนูด้านซ้ายเพื่อดูรายการที่เกี่ยวข้อง`);
+};
+
+/* ===================== IMPORT / EXPORT (CSV for tables, JSON for inspection forms) ===================== */
+// Resolves the platform's "downloads" runtime capability once and reuses it; on a surface
+// that doesn't grant it (or hasn't loaded window.claude at all), every export call degrades
+// to a clear message instead of silently doing nothing.
+let downloadsCapPromise = null;
+function getDownloadsCap(){
+  if (downloadsCapPromise) return downloadsCapPromise;
+  downloadsCapPromise = (async () => {
+    try {
+      if (typeof claude === "undefined" || !claude.use) return null;
+      return await claude.use("downloads");
+    } catch(e){ return null; }
+  })();
+  return downloadsCapPromise;
+}
+async function saveFile(filename, data){
+  const cap = await getDownloadsCap();
+  if (!cap){ showToast("ไม่รองรับการบันทึกไฟล์ในมุมมองนี้"); return false; }
+  try {
+    await cap.save({ filename, data });
+    return true;
+  } catch(e){
+    if (e && e.code === "declined") return false; // the person just said no — not an error
+    showToast("ไม่สามารถบันทึกไฟล์ได้ (" + ((e && e.code) || "error") + ")");
+    return false;
+  }
+}
+
+function csvEscape(v){
+  const s = String(v ?? "");
+  return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function toCSV(rows, columns){
+  const keys = columns.map(c => c.key).concat("status");
+  const headers = columns.map(c => c.label).concat("สถานะ");
+  const lines = [headers.map(csvEscape).join(",")];
+  rows.forEach(r => lines.push(keys.map(k => csvEscape(r[k])).join(",")));
+  return lines.join("\r\n");
+}
+// Small RFC4180-ish parser: handles quoted fields, escaped quotes, and CRLF/LF.
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQuotes){
+      if (c === '"'){ if (text[i+1] === '"'){ field += '"'; i++; } else inQuotes = false; }
+      else field += c;
+    } else if (c === '"'){ inQuotes = true; }
+    else if (c === ','){ row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r"){
+      if (c === "\r" && text[i+1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+window.exportTableCSV = async function(tableId){
+  const st = TableState[tableId]; if (!st) return;
+  const ok = await saveFile(tableId + "-export.csv", toCSV(st.data, st.config.columns));
+  if (ok) showToast(`ส่งออก ${st.data.length} รายการเป็น CSV เรียบร้อยแล้ว`);
+};
+window.importTableCSV = function(tableId){
+  const st = TableState[tableId]; if (!st) return;
+  const input = document.createElement("input");
+  input.type = "file"; input.accept = ".csv,text/csv";
+  input.onchange = () => {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rows = parseCSV(String(reader.result || ""));
+      if (rows.length < 2){ showToast("ไฟล์ CSV นี้ไม่มีข้อมูล"); return; }
+      const keys = st.config.columns.map(c => c.key).concat("status");
+      const defaultStatus = statusOptionsFor(tableId)[0];
+      let added = 0;
+      rows.slice(1).forEach((cells, idx) => {
+        if (!cells.some(c => c !== "")) return;
+        const row = { id: tableId + "-imp-" + Date.now() + "-" + idx };
+        keys.forEach((k, i) => { row[k] = cells[i] !== undefined ? cells[i] : ""; });
+        if (!row.status) row.status = defaultStatus;
+        st.data.unshift(row);
+        added++;
+      });
+      st.page = 1;
+      renderTable(tableId);
+      showToast(added ? `นำเข้าข้อมูล ${added} รายการเรียบร้อยแล้ว` : "ไม่พบแถวข้อมูลที่นำเข้าได้");
+    };
+    reader.readAsText(file, "utf-8");
+  };
+  input.click();
+};
+
+window.exportInspectionForm = async function(code){
+  const data = paperInputs().map(el => el.type === "radio" ? (el.checked ? 1 : 0) : el.value);
+  const ok = await saveFile("inspection-" + code + ".json", JSON.stringify({ code, data }, null, 2));
+  if (ok) showToast("ส่งออกแบบตรวจสอบเป็นไฟล์เรียบร้อยแล้ว");
+};
+window.importInspectionForm = function(code){
+  const input = document.createElement("input");
+  input.type = "file"; input.accept = ".json,application/json";
+  input.onchange = () => {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try { parsed = JSON.parse(String(reader.result || "")); }
+      catch(e){ showToast("ไฟล์นี้ไม่ใช่ไฟล์แบบตรวจสอบที่ถูกต้อง"); return; }
+      const data = Array.isArray(parsed) ? parsed : parsed.data;
+      if (!Array.isArray(data)){ showToast("ไฟล์นี้ไม่ใช่ไฟล์แบบตรวจสอบที่ถูกต้อง"); return; }
+      const inputs = paperInputs();
+      inputs.forEach((el, i) => {
+        if (i >= data.length) return;
+        if (el.type === "radio") el.checked = !!data[i];
+        else el.value = data[i];
+      });
+      showToast("นำเข้าข้อมูลแบบตรวจสอบเรียบร้อยแล้ว");
+    };
+    reader.readAsText(file, "utf-8");
+  };
+  input.click();
 };
 
 /* ===================== helpers ===================== */
@@ -1253,7 +1380,11 @@ function assetPage(cfg){
   return `
   <div class="page-head">
     <div><h1>${cfg.title}</h1><p>${cfg.sub}</p></div>
-    <div class="head-actions"><button class="btn primary" onclick="openAddAssetModal('${cfg.tableId}')">${ic('plus')} ${cfg.addLabel}</button></div>
+    <div class="head-actions">
+      <button class="btn" onclick="importTableCSV('${cfg.tableId}')">${ic('upload')} นำเข้า CSV</button>
+      <button class="btn" onclick="exportTableCSV('${cfg.tableId}')">${ic('download')} ส่งออก CSV</button>
+      <button class="btn primary" onclick="openAddAssetModal('${cfg.tableId}')">${ic('plus')} ${cfg.addLabel}</button>
+    </div>
   </div>
   <div class="grid kpis">
     <div class="card kpi"><div class="kpi-icon blue">${ic(cfg.icon)}</div><div class="kpi-body"><div class="kpi-label">กำหนด</div><div class="kpi-value num" id="${cfg.tableId}-kpi-total">${cfg.stats[0]}</div></div></div>
@@ -1358,7 +1489,11 @@ const workOrderCfg = {
 const pageWorkOrder = `
 <div class="page-head">
   <div><h1>ใบงาน (Work Order)</h1><p>รายการใบงานบำรุงรักษาทั้งหมด</p></div>
-  <div class="head-actions"><button class="btn primary" onclick="openAddAssetModal('workorder')">${ic('plus')} สร้างใบงาน</button></div>
+  <div class="head-actions">
+    <button class="btn" onclick="importTableCSV('workorder')">${ic('upload')} นำเข้า CSV</button>
+    <button class="btn" onclick="exportTableCSV('workorder')">${ic('download')} ส่งออก CSV</button>
+    <button class="btn primary" onclick="openAddAssetModal('workorder')">${ic('plus')} สร้างใบงาน</button>
+  </div>
 </div>
 <div class="card">
   <div class="chip-row" id="workorder-chips"></div>
@@ -1630,6 +1765,8 @@ function paperFooter(f){
     <div class="paper-doc-footer"><span>ปรับปรุงครั้งที่ 0 วันที่...</span><span>${f.code}</span></div>
     <div class="insp-actions" style="border:none; padding:14px 0 0;">
       <button class="btn" onclick="window.print()">${ic('download')} พิมพ์แบบฟอร์ม</button>
+      <button class="btn" onclick="importInspectionForm('${f.code}')">${ic('upload')} นำเข้าไฟล์</button>
+      <button class="btn" onclick="exportInspectionForm('${f.code}')">${ic('download')} ส่งออกไฟล์</button>
       <button class="btn primary" onclick="saveInspectionForm('${f.code}')">${ic('plus')} บันทึกแบบตรวจสอบ</button>
     </div>
   `;
@@ -2017,6 +2154,8 @@ const pageGuide = `
       <li>ไอคอน 👁 <b>ดู</b> เปิดรายละเอียด และมีปุ่ม "ใบงานที่เกี่ยวข้อง" เชื่อมไปดูใบงานของอุปกรณ์ตัวนั้น</li>
       <li>ไอคอน ✏️ <b>แก้ไข</b> เปิดฟอร์มแก้ไขข้อมูลแถวนั้น</li>
       <li>ปุ่ม "+ เพิ่ม..." มุมขวาบน เพิ่มรายการใหม่เข้าตาราง</li>
+      <li>ปุ่ม <b>ส่งออก CSV</b> บันทึกข้อมูลทั้งหมดในตารางเป็นไฟล์ CSV เปิดใน Excel ได้ทันที</li>
+      <li>ปุ่ม <b>นำเข้า CSV</b> เลือกไฟล์ CSV (แถวแรกเป็นหัวตาราง) เพื่อเพิ่มหลายรายการเข้าตารางในครั้งเดียว</li>
     </ul>
   </div>
 
@@ -2027,6 +2166,7 @@ const pageGuide = `
       <li>แถบชิปด้านบน (ทั้งหมด / รอดำเนินการ / กำลังดำเนินการ / เสร็จสิ้น / เกินกำหนด / ยกเลิก) กรองใบงานตามสถานะ</li>
       <li>กดชื่ออุปกรณ์ในตาราง (ตัวหนังสือสีน้ำเงิน) เพื่อกระโดดไปหน้าอุปกรณ์นั้นทันที</li>
       <li>"+ สร้างใบงาน" เพิ่มใบงานใหม่เข้าระบบ</li>
+      <li>ปุ่ม <b>ส่งออก CSV</b> / <b>นำเข้า CSV</b> ใช้บันทึกหรือเพิ่มใบงานเป็นชุดจากไฟล์ได้เช่นเดียวกับหน้าอุปกรณ์</li>
     </ul>
   </div>
 
@@ -2049,6 +2189,7 @@ const pageGuide = `
       <li>กรอกข้อมูลแล้วกด <b>บันทึกแบบตรวจสอบ</b> ระบบจะจำค่าที่กรอกไว้ในเบราว์เซอร์นี้ เปิดใหม่ครั้งหน้าจะขึ้นค่าเดิมให้</li>
       <li>ปุ่ม <b>พิมพ์แบบฟอร์ม / พิมพ์คู่มือ</b> จัดหน้าให้พร้อมพิมพ์ทันที (ซ่อนเมนูและปุ่มต่างๆ อัตโนมัติ)</li>
       <li>การ์ดของหม้อแปลง / LBS / สถานีย่อย มีลิงก์ "ดูอุปกรณ์ในระบบ" เชื่อมไปหน้าตารางอุปกรณ์จริง</li>
+      <li>ปุ่ม <b>ส่งออกไฟล์</b> บันทึกคำตอบที่กรอกไว้เป็นไฟล์ (เผื่อสำรองหรือส่งต่อ) และ <b>นำเข้าไฟล์</b> โหลดไฟล์ที่เคยส่งออกไว้กลับเข้ามากรอกในฟอร์มอีกครั้ง</li>
     </ul>
   </div>
 
