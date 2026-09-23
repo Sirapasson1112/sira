@@ -10,29 +10,29 @@
 
 <style>
   :root {
-    --ink: #0c1324;
-    --ink-2: #121b33;
-    --ink-3: #1b2645;
-    --line-on-ink: rgba(255,255,255,0.09);
-    --surface: #eef1f7;
-    --card: #ffffff;
-    --card-line: #e4e8f0;
-    --text: #101a2e;
-    --text-soft: #5b6478;
-    --text-faint: #8992a3;
-    --brand: #2f6fed;
-    --brand-ink: #1c4fc4;
-    --brand-soft: #e8effe;
-    --amber: #f0a323;
-    --amber-soft: #fdf1dc;
-    --green: #17a261;
-    --green-soft: #e4f7ee;
-    --red: #e5484d;
-    --red-soft: #fde9ea;
-    --gray-soft: #eef0f4;
+    --ink: #2b2015;
+    --ink-2: #3a2c1c;
+    --ink-3: #4a3826;
+    --line-on-ink: rgba(255,255,255,0.08);
+    --surface: #f7f1e4;
+    --card: #fffdf7;
+    --card-line: #e9ddc3;
+    --text: #3b2f20;
+    --text-soft: #7d6b52;
+    --text-faint: #a3906e;
+    --brand: #c17f2e;
+    --brand-ink: #9c6620;
+    --brand-soft: #f3e3c8;
+    --amber: #dc9438;
+    --amber-soft: #f7e8cc;
+    --green: #74915a;
+    --green-soft: #e8efdc;
+    --red: #c15d42;
+    --red-soft: #f3e0d6;
+    --gray-soft: #efe7d6;
     --radius-card: 16px;
     --radius-sm: 10px;
-    --shadow-card: 0 1px 2px rgba(16,26,46,0.04), 0 8px 24px -14px rgba(16,26,46,0.14);
+    --shadow-card: 0 1px 2px rgba(59,47,32,0.05), 0 8px 24px -14px rgba(59,47,32,0.16);
     color-scheme: light;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
@@ -40,31 +40,31 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --surface: #0a0e18;
-      --card: #121a2c;
-      --card-line: #232e48;
-      --text: #eef1f7;
-      --text-soft: #a7b0c4;
-      --text-faint: #6d7690;
-      --brand-soft: #172443;
-      --amber-soft: #2c220f;
-      --green-soft: #0f2820;
-      --red-soft: #2c1518;
-      --gray-soft: #1a2338;
+      --surface: #16110b;
+      --card: #221a12;
+      --card-line: #3a2d1e;
+      --text: #f2e9d8;
+      --text-soft: #c2ad8c;
+      --text-faint: #8f7c60;
+      --brand-soft: #3a2c17;
+      --amber-soft: #372911;
+      --green-soft: #212a19;
+      --red-soft: #34201a;
+      --gray-soft: #2a2115;
     }
   }
   :root[data-theme="dark"] {
-    --surface: #0a0e18;
-    --card: #121a2c;
-    --card-line: #232e48;
-    --text: #eef1f7;
-    --text-soft: #a7b0c4;
-    --text-faint: #6d7690;
-    --brand-soft: #172443;
-    --amber-soft: #2c220f;
-    --green-soft: #0f2820;
-    --red-soft: #2c1518;
-    --gray-soft: #1a2338;
+    --surface: #16110b;
+    --card: #221a12;
+    --card-line: #3a2d1e;
+    --text: #f2e9d8;
+    --text-soft: #c2ad8c;
+    --text-faint: #8f7c60;
+    --brand-soft: #3a2c17;
+    --amber-soft: #372911;
+    --green-soft: #212a19;
+    --red-soft: #34201a;
+    --gray-soft: #2a2115;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
@@ -79,7 +79,7 @@
 
   html { overflow-x: hidden; }
   .app { display: flex; min-height: 100%; }
-  .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(8,13,24,0.5); z-index: 19; opacity: 0; transition: opacity .2s ease; }
+  .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(30,22,12,0.5); z-index: 19; opacity: 0; transition: opacity .2s ease; }
   .sidebar-backdrop.show { display: block; opacity: 1; }
 
   /* ---------- Sidebar ---------- */
@@ -87,7 +87,7 @@
     width: 240px;
     flex: 0 0 240px;
     background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%);
-    color: #cbd3e6;
+    color: #ddd0b8;
     display: flex;
     flex-direction: column;
     position: sticky;
@@ -103,35 +103,35 @@
   }
   .brand-mark {
     width: 34px; height: 34px; border-radius: 9px;
-    background: linear-gradient(135deg, var(--brand) 0%, #5b9bff 100%);
+    background: linear-gradient(135deg, var(--brand) 0%, #e0ac5c 100%);
     display: flex; align-items: center; justify-content: center;
     flex: none;
-    box-shadow: 0 4px 14px -4px rgba(47,111,237,0.7);
+    box-shadow: 0 4px 14px -4px rgba(193,127,46,0.6);
   }
   .brand-mark svg { width: 18px; height: 18px; }
   .brand-text { line-height: 1.2; }
   .brand-text .t1 { font-weight: 800; font-size: 14.5px; color: #fff; letter-spacing: 0.2px; }
-  .brand-text .t2 { font-size: 11px; color: #8b96b3; font-weight: 500; }
+  .brand-text .t2 { font-size: 11px; color: #b8a382; font-weight: 500; }
 
   .nav { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; }
   .nav-item {
     display: flex; align-items: center; gap: 11px;
     padding: 9px 12px; border-radius: 10px;
-    font-size: 13.5px; font-weight: 500; color: #a7b1cc;
+    font-size: 13.5px; font-weight: 500; color: #c8b895;
     cursor: pointer; user-select: none;
     transition: background 0.15s ease, color 0.15s ease;
     border: 1px solid transparent;
   }
   .nav-item svg { width: 17px; height: 17px; flex: none; opacity: 0.85; }
-  .nav-item:hover { background: rgba(255,255,255,0.05); color: #e7ebf5; }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: #f3ead9; }
   .nav-item.active {
-    background: linear-gradient(90deg, rgba(47,111,237,0.28), rgba(47,111,237,0.06));
-    color: #ffffff;
-    border-color: rgba(94,145,255,0.25);
+    background: linear-gradient(90deg, rgba(193,127,46,0.32), rgba(193,127,46,0.06));
+    color: #fff8ea;
+    border-color: rgba(224,172,92,0.3);
   }
   .nav-item.active svg { opacity: 1; }
   .nav-foot { padding: 14px 20px 18px; border-top: 1px solid var(--line-on-ink); }
-  .nav-foot .nav-item { color: #8b96b3; }
+  .nav-foot .nav-item { color: #b8a382; }
 
   /* ---------- Main ---------- */
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -168,7 +168,7 @@
   .profile { display: flex; align-items: center; gap: 10px; padding-left: 10px; border-left: 1px solid var(--card-line); }
   .avatar {
     width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg,#8bb4ff,#2f6fed);
+    background: linear-gradient(135deg,#e0ac5c,#c17f2e);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-weight: 700; font-size: 13px; flex: none;
   }
@@ -193,7 +193,7 @@
     cursor: pointer; white-space: nowrap;
   }
   .btn svg { width: 15px; height: 15px; }
-  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 6px 16px -6px rgba(47,111,237,0.6); }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 6px 16px -6px rgba(193,127,46,0.5); }
   .btn.primary:hover { background: var(--brand-ink); }
   .btn:hover { background: var(--surface); }
   .btn.primary:hover { background: var(--brand-ink); }
@@ -1027,16 +1027,16 @@ function renderFieldMap(){
   }).join("");
   const pins = stops.map((s, i) => {
     const p = projectLatLng(s.lat, s.lng);
-    const color = s.wo.status === "เกินกำหนด" ? "#e5484d" : "#f0a323";
+    const color = s.wo.status === "เกินกำหนด" ? "#c15d42" : "#dc9438";
     return `<g onclick="showFieldStopDetail(${i})" style="cursor:pointer;">
       <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="10" fill="${color}" stroke="#fff" stroke-width="2"/>
       <text x="${p.x.toFixed(1)}" y="${(p.y+3.5).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="800">${i+1}</text>
     </g>`;
   }).join("");
   const originPin = `
-    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="15" fill="#2f6fed" opacity="0.18"/>
-    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="7" fill="#2f6fed" stroke="#fff" stroke-width="2"/>
-    <text x="${originXY.x.toFixed(1)}" y="${(originXY.y-18).toFixed(1)}" text-anchor="middle" font-size="10" fill="#2f6fed" font-weight="800">ตำแหน่งของฉัน</text>`;
+    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="15" fill="#c17f2e" opacity="0.18"/>
+    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="7" fill="#c17f2e" stroke="#fff" stroke-width="2"/>
+    <text x="${originXY.x.toFixed(1)}" y="${(originXY.y-18).toFixed(1)}" text-anchor="middle" font-size="10" fill="#c17f2e" font-weight="800">ตำแหน่งของฉัน</text>`;
 
   mapWrap.innerHTML = `<svg viewBox="0 0 800 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect x="0" y="0" width="800" height="500" fill="#eef3f8"/>
@@ -1423,10 +1423,10 @@ const pageCost = `
         <div class="donut-center"><div class="big num" style="font-size:16px;">฿ 4,820,000</div><div class="small">รวมทั้งหมด</div></div>
       </div>
       <div class="legend">
-        <div class="legend-row"><span class="legend-dot" style="background:#2f6fed"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#f0a323"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#17a261"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#8992a3"></span><span class="lbl">อื่นๆ</span><span class="val num">5%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#c17f2e"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#dc9438"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#74915a"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#a3906e"></span><span class="lbl">อื่นๆ</span><span class="val num">5%</span></div>
       </div>
     </div>
   </div>
@@ -2123,7 +2123,7 @@ renderFieldMap();
 // Every chart is hand-drawn as SVG in plain JS. This removes the whole class of
 // "chart library failed to load" problems (blocked CDN, offline, stale cache) —
 // there is nothing to fetch and nothing that can fail to load.
-const GRID = "#e4e8f0", MUTED = "#8992a3";
+const GRID = "#e9ddc3", MUTED = "#a3906e";
 
 function svgBarChart(id, labels, values, color){
   const el = document.getElementById(id);
@@ -2204,19 +2204,19 @@ function svgStackedBar(id, labels, series){
 }
 
 function initDashboardCharts(){
-  svgBarChart("chartCompliance", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."], [78,82,85,80,88,91,89,94,92], "#2f6fed");
-  svgDonut("chartDashDonut", [292,18,10], ["#17a261","#f0a323","#e5484d"]);
+  svgBarChart("chartCompliance", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."], [78,82,85,80,88,91,89,94,92], "#c17f2e");
+  svgDonut("chartDashDonut", [292,18,10], ["#74915a","#dc9438","#c15d42"]);
 }
 function initPmPlanningCharts(){
-  svgDonut("chartPmDonut", [71,29], ["#2f6fed","#e4e8f0"]);
+  svgDonut("chartPmDonut", [71,29], ["#c17f2e","#e9ddc3"]);
 }
 function initCostCharts(){
-  svgDonut("chartCostDonut", [26,56,13,5], ["#2f6fed","#f0a323","#17a261","#8992a3"]);
+  svgDonut("chartCostDonut", [26,56,13,5], ["#c17f2e","#dc9438","#74915a","#a3906e"]);
   svgStackedBar("chartCostBar", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."], [
-    { name:"อะไหล่", color:"#2f6fed", data:[40,42,38,45,50,48,55,60,58,52,47,44] },
-    { name:"ผู้รับเหมา", color:"#f0a323", data:[70,68,72,75,80,78,85,88,84,79,74,71] },
-    { name:"ค่าแรง", color:"#17a261", data:[18,17,19,20,22,21,23,25,24,22,20,19] },
-    { name:"อื่นๆ", color:"#8992a3", data:[8,7,9,8,10,9,11,12,10,9,8,7] },
+    { name:"อะไหล่", color:"#c17f2e", data:[40,42,38,45,50,48,55,60,58,52,47,44] },
+    { name:"ผู้รับเหมา", color:"#dc9438", data:[70,68,72,75,80,78,85,88,84,79,74,71] },
+    { name:"ค่าแรง", color:"#74915a", data:[18,17,19,20,22,21,23,25,24,22,20,19] },
+    { name:"อื่นๆ", color:"#a3906e", data:[8,7,9,8,10,9,11,12,10,9,8,7] },
   ]);
 }
 
