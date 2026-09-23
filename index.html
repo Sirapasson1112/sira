@@ -926,9 +926,9 @@ function renderDashboardWidgets(){
   const trIssue = ASSET_DATA.transformer.find(r => r.status === "ซ่อมบำรุง");
   const doneWo = wost.data.find(r => r.status === "เสร็จสิ้น");
   DASH_ALERTS = [
-    lbsIssue ? { dot:"var(--red)", label:`${lbsIssue.code} อยู่ระหว่างซ่อมบำรุง`, date:"21 ก.ย. 68", tableId:"lbs", code:lbsIssue.code } : null,
-    trIssue ? { dot:"var(--amber)", label:`${trIssue.code} อยู่ระหว่างซ่อมบำรุง`, date:"21 ก.ย. 68", tableId:"transformer", code:trIssue.code } : null,
-    doneWo ? { dot:"var(--green)", label:`${doneWo.code} ดำเนินการเสร็จสิ้น`, date:"22 ก.ย. 68", tableId:"workorder", code:doneWo.code } : null,
+    lbsIssue ? { dot:"var(--red)", label:`${lbsIssue.code} อยู่ระหว่างซ่อมบำรุง`, date:"21 ก.ย. 69", tableId:"lbs", code:lbsIssue.code } : null,
+    trIssue ? { dot:"var(--amber)", label:`${trIssue.code} อยู่ระหว่างซ่อมบำรุง`, date:"21 ก.ย. 69", tableId:"transformer", code:trIssue.code } : null,
+    doneWo ? { dot:"var(--green)", label:`${doneWo.code} ดำเนินการเสร็จสิ้น`, date:"22 ก.ย. 69", tableId:"workorder", code:doneWo.code } : null,
   ].filter(Boolean);
   const listEl = document.getElementById("dash-alerts-list");
   if (listEl) listEl.innerHTML = DASH_ALERTS.map(a => `<div class="mini-stat-row" style="cursor:pointer;" onclick="goToEquipment('${a.tableId}','${a.code}')"><span class="dot" style="background:${a.dot}"></span><span class="lbl">${a.label}</span><span class="val" style="font-size:11px; color:var(--text-faint); font-weight:600;">${a.date}</span></div>`).join("");
@@ -1085,10 +1085,10 @@ const pageDashboard = `
 <div class="page-head">
   <div>
     <h1>ภาพรวมงานบำรุงรักษาเชิงป้องกัน (PM)</h1>
-    <p>สรุปสถานะงาน PM ทั้งหมดของหน่วยงาน ณ วันที่ 22 ก.ย. 2568</p>
+    <p>สรุปสถานะงาน PM ทั้งหมดของหน่วยงาน ณ วันที่ 23 ก.ย. 2569</p>
   </div>
   <div class="head-actions">
-    <button class="btn" onclick="showToast('เลือกช่วงวันที่ (เดโม)')">${ic('calendar')} 22 ก.ย. 2568</button>
+    <button class="btn" onclick="showToast('เลือกช่วงวันที่ (เดโม)')">${ic('calendar')} 23 ก.ย. 2569</button>
     <button class="btn primary" onclick="openCreatePmModal()">${ic('plus')} สร้างงาน PM</button>
   </div>
 </div>
@@ -1163,7 +1163,7 @@ const PM_EVENTS = [
 ];
 const pagePmPlanning = `
 <div class="page-head">
-  <div><h1>วางแผนงานบำรุงรักษาเชิงป้องกัน (PM)</h1><p>วางแผนงาน PM ประจำเดือนกันยายน 2568</p></div>
+  <div><h1>วางแผนงานบำรุงรักษาเชิงป้องกัน (PM)</h1><p>วางแผนงาน PM ประจำเดือนกันยายน 2569</p></div>
   <div class="head-actions">
     <button class="btn" onclick="showToast('กำลังแสดงมุมมองปฏิทิน')">มุมมองปฏิทิน</button>
     <button class="btn" onclick="showPmListView()">มุมมองรายการ</button>
@@ -1173,7 +1173,7 @@ const pagePmPlanning = `
 <div class="grid two-col">
   <div class="card">
     <div class="cal-head">
-      <div><h3>กันยายน 2568</h3><div class="sub">แผนงาน PM ทั้งหมดในเดือนนี้</div></div>
+      <div><h3>กันยายน 2569</h3><div class="sub">แผนงาน PM ทั้งหมดในเดือนนี้</div></div>
       <div class="cal-nav"><button class="pg-btn" onclick="showToast('เดือนก่อนหน้า (เดโม)')">${ic('chevL')}</button><button class="pg-btn" onclick="showToast('เดือนถัดไป (เดโม)')">${ic('chevR')}</button></div>
     </div>
     <div class="cal-grid">
@@ -1226,8 +1226,8 @@ function buildCalendar(){
   return html;
 }
 window.showPmListView = function(){
-  const items = PM_EVENTS.map(e => `<div class="mini-stat-row" ${e.tableId?`style="cursor:pointer;" onclick="closeModal(); goTo('${e.tableId}')"`:""}><span class="dot" style="background:${e.c==="blue"?"var(--brand)":e.c==="amber"?"var(--amber)":e.c==="green"?"var(--green)":"#7c879c"}"></span><span class="lbl">${e.t}</span><span class="val" style="font-size:11.5px; color:var(--text-faint); font-weight:600;">${e.day} ก.ย. 68</span></div>`).join("");
-  openModal("มุมมองรายการ — งาน PM เดือนกันยายน 2568", `<div class="mini-stat-list">${items}</div>`, `<button class="btn" onclick="closeModal()">ปิด</button>`);
+  const items = PM_EVENTS.map(e => `<div class="mini-stat-row" ${e.tableId?`style="cursor:pointer;" onclick="closeModal(); goTo('${e.tableId}')"`:""}><span class="dot" style="background:${e.c==="blue"?"var(--brand)":e.c==="amber"?"var(--amber)":e.c==="green"?"var(--green)":"#7c879c"}"></span><span class="lbl">${e.t}</span><span class="val" style="font-size:11.5px; color:var(--text-faint); font-weight:600;">${e.day} ก.ย. 69</span></div>`).join("");
+  openModal("มุมมองรายการ — งาน PM เดือนกันยายน 2569", `<div class="mini-stat-list">${items}</div>`, `<button class="btn" onclick="closeModal()">ปิด</button>`);
 };
 window.openCreatePmModal = function(){
   openModal("สร้างงาน PM ใหม่", `
@@ -1341,7 +1341,7 @@ function makeWorkOrderRows(assetData){
   const rows = [];
   for (let i=0; i<120; i++){
     const asset = pool[i % pool.length];
-    rows.push({ id:"wo-"+i, code:"PM-"+padNum(67+i,4), equip:asset.label, assetTableId:asset.tableId, assetCode:asset.code, date:((i%28)+1)+" ก.ย. 68", owner:people[i%people.length], status:seq[i] });
+    rows.push({ id:"wo-"+i, code:"PM-"+padNum(67+i,4), equip:asset.label, assetTableId:asset.tableId, assetCode:asset.code, date:((i%28)+1)+" ก.ย. 69", owner:people[i%people.length], status:seq[i] });
   }
   return rows;
 }
@@ -1399,9 +1399,9 @@ const pageFieldNav = `
 /* ===================== PAGE: MAINTENANCE COST ===================== */
 const pageCost = `
 <div class="page-head">
-  <div><h1>ต้นทุนบำรุงรักษา</h1><p>สรุปค่าใช้จ่ายด้านบำรุงรักษา ปีงบประมาณ 2568</p></div>
+  <div><h1>ต้นทุนบำรุงรักษา</h1><p>สรุปค่าใช้จ่ายด้านบำรุงรักษา ปีงบประมาณ 2569</p></div>
   <div class="head-actions">
-    <select class="select-sm" onchange="showToast('กำลังโหลดข้อมูล '+this.value)"><option>ปี 2568</option><option>ปี 2567</option></select>
+    <select class="select-sm" onchange="showToast('กำลังโหลดข้อมูล '+this.value)"><option>ปี 2569</option><option>ปี 2568</option></select>
     <select class="select-sm" onchange="showToast('เปลี่ยนมุมมองเป็น '+this.value)"><option>ทั้งปี</option><option>รายเดือน</option></select>
   </div>
 </div>
