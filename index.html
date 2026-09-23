@@ -1307,9 +1307,9 @@ const pageDashboard = `
         <div class="donut-center"><div class="big num">92%</div><div class="small">สำเร็จตามแผน</div></div>
       </div>
       <div class="legend">
-        <div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><span class="lbl">เสร็จสิ้น</span><span class="val num">292 (91%)</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:var(--amber)"></span><span class="lbl">รอดำเนินการ</span><span class="val num">18 (5.6%)</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span><span class="lbl">เกินกำหนด</span><span class="val num">10 (3.1%)</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#16a34a"></span><span class="lbl">เสร็จสิ้น</span><span class="val num">292 (91%)</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#f0a323"></span><span class="lbl">รอดำเนินการ</span><span class="val num">18 (5.6%)</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#dc2626"></span><span class="lbl">เกินกำหนด</span><span class="val num">10 (3.1%)</span></div>
       </div>
     </div>
   </div>
@@ -1611,10 +1611,10 @@ const pageCost = `
         <div class="donut-center"><div class="big num" style="font-size:16px;">฿ 4,820,000</div><div class="small">รวมทั้งหมด</div></div>
       </div>
       <div class="legend">
-        <div class="legend-row"><span class="legend-dot" style="background:#5b7a99"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#cf9c3f"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#6f9268"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#9a9aa0"></span><span class="lbl">อื่นๆ</span><span class="val num">5%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#2563eb"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#f0a323"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#16a34a"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#64748b"></span><span class="lbl">อื่นๆ</span><span class="val num">5%</span></div>
       </div>
     </div>
   </div>
@@ -2318,6 +2318,9 @@ renderFieldMap();
 // "chart library failed to load" problems (blocked CDN, offline, stale cache) —
 // there is nothing to fetch and nothing that can fail to load.
 const GRID = "#d6d6d3", MUTED = "#68686f";
+// Charts read best with more saturated colors than the muted UI accent palette — these are
+// used only for chart fills/legends, not for badges, buttons, or other chrome.
+const CHART_BLUE = "#2563eb", CHART_AMBER = "#f0a323", CHART_GREEN = "#16a34a", CHART_RED = "#dc2626", CHART_GRAY = "#64748b";
 
 function svgBarChart(id, labels, values, color){
   const el = document.getElementById(id);
@@ -2399,19 +2402,19 @@ function svgStackedBar(id, labels, series){
 }
 
 function initDashboardCharts(){
-  svgBarChart("chartCompliance", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."], [78,82,85,80,88,91,89,94,92], "#5b7a99");
-  svgDonut("chartDashDonut", [292,18,10], ["#6f9268","#cf9c3f","#c1594a"]);
+  svgBarChart("chartCompliance", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."], [78,82,85,80,88,91,89,94,92], CHART_BLUE);
+  svgDonut("chartDashDonut", [292,18,10], [CHART_GREEN, CHART_AMBER, CHART_RED]);
 }
 function initPmPlanningCharts(){
-  svgDonut("chartPmDonut", [71,29], ["#5b7a99","#e3e3e0"]);
+  svgDonut("chartPmDonut", [71,29], [CHART_BLUE, "#e3e3e0"]);
 }
 function initCostCharts(){
-  svgDonut("chartCostDonut", [26,56,13,5], ["#5b7a99","#cf9c3f","#6f9268","#9a9aa0"]);
+  svgDonut("chartCostDonut", [26,56,13,5], [CHART_BLUE, CHART_AMBER, CHART_GREEN, CHART_GRAY]);
   svgStackedBar("chartCostBar", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."], [
-    { name:"อะไหล่", color:"#5b7a99", data:[40,42,38,45,50,48,55,60,58,52,47,44] },
-    { name:"ผู้รับเหมา", color:"#cf9c3f", data:[70,68,72,75,80,78,85,88,84,79,74,71] },
-    { name:"ค่าแรง", color:"#6f9268", data:[18,17,19,20,22,21,23,25,24,22,20,19] },
-    { name:"อื่นๆ", color:"#9a9aa0", data:[8,7,9,8,10,9,11,12,10,9,8,7] },
+    { name:"อะไหล่", color:CHART_BLUE, data:[40,42,38,45,50,48,55,60,58,52,47,44] },
+    { name:"ผู้รับเหมา", color:CHART_AMBER, data:[70,68,72,75,80,78,85,88,84,79,74,71] },
+    { name:"ค่าแรง", color:CHART_GREEN, data:[18,17,19,20,22,21,23,25,24,22,20,19] },
+    { name:"อื่นๆ", color:CHART_GRAY, data:[8,7,9,8,10,9,11,12,10,9,8,7] },
   ]);
 }
 
