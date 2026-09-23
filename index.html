@@ -517,6 +517,10 @@
   .switch input:checked + .slider { background: var(--brand); }
   .switch input:checked + .slider::before { transform: translateX(18px); }
   .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
+  body.role-user .admin-only { display: none !important; }
+  .role-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 100px; font-size: 11.5px; font-weight: 700; }
+  .role-badge.admin { background: var(--brand-soft); color: var(--brand-ink); }
+  .role-badge.user { background: var(--gray-soft); color: var(--text-soft); }
   .cell-link { color: var(--brand-ink); cursor: pointer; font-weight: 600; }
   .cell-link:hover { text-decoration: underline; }
   .cal-ev { cursor: pointer; }
@@ -586,7 +590,7 @@
     <div class="nav-foot">
       <div class="nav-item" data-page="settings" onclick="goTo('settings')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z"/></svg>
-        <span>ตั้งค่า</span>
+        <span id="navSettingsLabel">ตั้งค่า</span>
       </div>
     </div>
   </aside>
@@ -602,6 +606,8 @@
         <input type="text" id="topSearchInput" placeholder="ค้นหาสายป้อน, อุปกรณ์, สถานที่..." onkeydown="if(event.key==='Enter') runTopSearch(this.value)">
       </div>
       <div class="topbar-spacer"></div>
+      <button class="btn" id="langToggleBtn" style="min-width:44px; justify-content:center;" title="Switch language / เปลี่ยนภาษา" onclick="setLang(LANG==='en'?'th':'en')">EN</button>
+      <span id="topRoleBadge"></span>
       <div class="icon-btn" id="notifBellBtn" title="การแจ้งเตือน" onclick="toggleNotifications(event)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
         <span class="dot"></span>
@@ -652,26 +658,90 @@ const ICONS = {
 };
 function ic(name, extra=""){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" ${extra}>${ICONS[name]}</svg>`; }
 
+/* ===================== LANGUAGE (TH / EN) =====================
+   Covers the app's chrome — nav, page headers, status labels, table column headers —
+   which is what a person scans first. Deep content sourced from the real regulatory
+   documents (the 11 inspection checklists, the 11 SW-OH work-instruction manuals) and
+   the long-form User Guide stay Thai-only: translating safety/technical document text
+   accurately is a different, much larger job than translating UI chrome, and getting it
+   wrong there is riskier than leaving it Thai. */
+let LANG = (() => { try { return localStorage.getItem("lang") || "th"; } catch(e){ return "th"; } })();
+const STATUS_EN = {
+  "ใช้งาน":"Active", "ซ่อมบำรุง":"Maintenance", "หยุดใช้งาน":"Out of service",
+  "รอดำเนินการ":"Pending", "กำลังดำเนินการ":"In progress", "เสร็จสิ้น":"Completed",
+  "เกินกำหนด":"Overdue", "ยกเลิก":"Cancelled",
+};
+const COL_EN = {
+  "รหัสสายป้อน":"Feeder code", "ชื่อสายป้อน":"Feeder name", "ระดับแรงดัน (kV)":"Voltage (kV)", "สถานี":"Station",
+  "รหัสหม้อแปลง":"Transformer code", "ขนาด (kVA)":"Size (kVA)", "แบบ":"Type", "สถานที่":"Location",
+  "รหัส LBS":"LBS code", "ประเภท":"Type",
+  "รหัสสถานีย่อย":"Substation code", "ชื่อสถานีย่อย":"Substation name", "แรงดัน (kV)":"Voltage (kV)",
+  "เลขที่ใบงาน":"WO number", "อุปกรณ์":"Equipment", "วันที่":"Date", "ผู้รับผิดชอบ":"Owner",
+};
+const PAGE_HEAD_EN = {
+  dashboard: ["Preventive Maintenance Overview", "Summary of all PM work status"],
+  pmplanning: ["PM Planning", "Plan preventive-maintenance work for the month"],
+  workorder: ["Work Orders", "All maintenance work orders"],
+  fieldnav: ["Field Navigation", "Field-inspection stops for pending/overdue work orders, nearest first — tap a pin or list item for details and directions"],
+  inspection: ["Inspection Forms", "Maintenance inspection checklists and work-instruction manuals for 11 equipment types"],
+  feeder: ["Feeder", "All feeders in your area of responsibility"],
+  transformer: ["Distribution Transformer", "All distribution transformers"],
+  lbs: ["Load Break Switch (LBS)", "All load break switches"],
+  substation: ["Unit Substation", "All unit substations"],
+  cost: ["Maintenance Cost", "Budget and monthly maintenance spend"],
+  reports: ["Reports", "View summary reports"],
+  guide: ["User Guide", "How to use each part of the CMMS system (Thai content)"],
+  settings: ["Settings", "Account and notification settings"],
+};
+window.setLang = function(lang){
+  LANG = lang === "en" ? "en" : "th";
+  try { localStorage.setItem("lang", LANG); } catch(e){}
+  applyLanguage();
+};
+function applyLanguage(){
+  document.querySelectorAll(".nav-item[data-page]").forEach(el => {
+    const entry = NAV.find(n => n.id === el.dataset.page);
+    if (entry) el.querySelector("span").textContent = LANG === "en" ? entry.labelEn : entry.label;
+  });
+  const settingsLabel = document.getElementById("navSettingsLabel");
+  if (settingsLabel) settingsLabel.textContent = LANG === "en" ? "Settings" : "ตั้งค่า";
+  Object.entries(PAGE_HEAD_EN).forEach(([id, [h1, p]]) => {
+    const page = document.getElementById("page-"+id);
+    if (!page) return;
+    const h1El = page.querySelector(".page-head h1");
+    const pEl = page.querySelector(".page-head p");
+    if (h1El && !h1El.dataset.th) h1El.dataset.th = h1El.textContent;
+    if (pEl && !pEl.dataset.th) pEl.dataset.th = pEl.textContent;
+    if (h1El) h1El.textContent = LANG === "en" ? h1 : h1El.dataset.th;
+    if (pEl) pEl.textContent = LANG === "en" ? p : pEl.dataset.th;
+  });
+  ["feeder","transformer","lbs","substation","workorder"].forEach(id => { if (TableState[id]) renderTable(id); });
+  const btn = document.getElementById("langToggleBtn");
+  if (btn) btn.textContent = LANG === "en" ? "TH" : "EN";
+}
+function tStatus(status){ return LANG === "en" ? (STATUS_EN[status] || status) : status; }
+function tCol(label){ return LANG === "en" ? (COL_EN[label] || label) : label; }
+
 /* ===================== NAV ===================== */
 const NAV = [
   // 1) ภาพรวม
-  {id:"dashboard", label:"หน้าหลัก", icon:"dashboard"},
+  {id:"dashboard", label:"หน้าหลัก", labelEn:"Dashboard", icon:"dashboard"},
   // 2) วางแผนงาน
-  {id:"pmplanning", label:"วางแผน PM", icon:"calendar"},
+  {id:"pmplanning", label:"วางแผน PM", labelEn:"PM Planning", icon:"calendar"},
   // 3) ออกใบงาน → 4) นำทางไปหน้างาน → 5) ตรวจสอบหน้างาน (ลำดับการทำงานจริงของช่างภาคสนาม)
-  {id:"workorder", label:"ใบงาน", icon:"clipboard"},
-  {id:"fieldnav", label:"นำทางตรวจภาคสนาม", icon:"mapPin"},
-  {id:"inspection", label:"ใบตรวจสอบบำรุงรักษา", icon:"checklist"},
+  {id:"workorder", label:"ใบงาน", labelEn:"Work Orders", icon:"clipboard"},
+  {id:"fieldnav", label:"นำทางตรวจภาคสนาม", labelEn:"Field Navigation", icon:"mapPin"},
+  {id:"inspection", label:"ใบตรวจสอบบำรุงรักษา", labelEn:"Inspection Forms", icon:"checklist"},
   // 6) ทะเบียนอุปกรณ์ (ข้อมูลอ้างอิง เปิดดู/แก้ไขได้ทุกเมื่อ ไม่ผูกกับลำดับงาน)
-  {id:"feeder", label:"สายป้อน (Feeder)", icon:"zap"},
-  {id:"transformer", label:"หม้อแปลงจำหน่าย", icon:"box"},
-  {id:"lbs", label:"สวิตช์ตัดตอน (LBS)", icon:"branch"},
-  {id:"substation", label:"สถานีย่อย", icon:"server"},
+  {id:"feeder", label:"สายป้อน (Feeder)", labelEn:"Feeder", icon:"zap"},
+  {id:"transformer", label:"หม้อแปลงจำหน่าย", labelEn:"Transformer", icon:"box"},
+  {id:"lbs", label:"สวิตช์ตัดตอน (LBS)", labelEn:"LBS", icon:"branch"},
+  {id:"substation", label:"สถานีย่อย", labelEn:"Unit Substation", icon:"server"},
   // 7) สรุปผล/ต้นทุนหลังงานเสร็จ
-  {id:"cost", label:"ต้นทุนบำรุงรักษา", icon:"coin"},
-  {id:"reports", label:"รายงาน", icon:"chart"},
+  {id:"cost", label:"ต้นทุนบำรุงรักษา", labelEn:"Maintenance Cost", icon:"coin"},
+  {id:"reports", label:"รายงาน", labelEn:"Reports", icon:"chart"},
   // 8) ช่วยเหลือ
-  {id:"guide", label:"คู่มือการใช้งาน", icon:"help"},
+  {id:"guide", label:"คู่มือการใช้งาน", labelEn:"User Guide", icon:"help"},
 ];
 const navList = document.getElementById("navList");
 NAV.forEach(n=>{
@@ -682,6 +752,22 @@ NAV.forEach(n=>{
   el.innerHTML = ic(n.icon) + `<span>${n.label}</span>`;
   navList.appendChild(el);
 });
+
+/* ===================== ROLE-BASED ACCESS (admin / user) ===================== */
+let USER_ROLE = (() => { try { return localStorage.getItem("userRole") || "admin"; } catch(e){ return "admin"; } })();
+function applyRoleToBody(){
+  document.body.classList.toggle("role-user", USER_ROLE === "user");
+}
+window.setUserRole = function(role){
+  USER_ROLE = role === "user" ? "user" : "admin";
+  try { localStorage.setItem("userRole", USER_ROLE); } catch(e){}
+  applyRoleToBody();
+  showToast(USER_ROLE === "user" ? "เปลี่ยนเป็นโหมดผู้ใช้งานทั่วไป (User) — จำกัดสิทธิ์แก้ไข/เพิ่มข้อมูล" : "เปลี่ยนเป็นโหมดผู้ดูแลระบบ (Admin) — สิทธิ์เต็ม");
+};
+applyRoleToBody();
+function roleBadgeHtml(){
+  return `<span id="topRoleBadge" class="role-badge ${USER_ROLE}" title="ไปที่ตั้งค่าเพื่อเปลี่ยนบทบาท" style="cursor:pointer;" onclick="goTo('settings')">${USER_ROLE==='admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้งานทั่วไป'}</span>`;
+}
 
 function toggleSidebarDrawer(){
   const open = document.getElementById("sidebar").classList.toggle("open");
@@ -789,13 +875,31 @@ function getDownloadsCap(){
 }
 async function saveFile(filename, data){
   const cap = await getDownloadsCap();
-  if (!cap){ showToast("ไม่รองรับการบันทึกไฟล์ในมุมมองนี้"); return false; }
+  if (cap){
+    try {
+      await cap.save({ filename, data });
+      return true;
+    } catch(e){
+      if (e && e.code === "declined") return false; // the person just said no — not an error
+      // fall through to the plain-browser fallback below for any other failure
+    }
+  }
+  // Outside Claude's own artifact viewer (hosted on GitHub Pages, opened as a local
+  // file, etc.) there is no "downloads" capability — but a completely ordinary
+  // Blob + <a download> works fine there, since none of the artifact sandbox's
+  // restrictions apply to a normally-hosted page.
   try {
-    await cap.save({ filename, data });
+    const blob = new Blob([data], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
     return true;
   } catch(e){
-    if (e && e.code === "declined") return false; // the person just said no — not an error
-    showToast("ไม่สามารถบันทึกไฟล์ได้ (" + ((e && e.code) || "error") + ")");
+    showToast("เบราว์เซอร์นี้ไม่รองรับการบันทึกไฟล์");
     return false;
   }
 }
@@ -908,7 +1012,7 @@ function statusBadge(status){
     "กำลังดำเนินการ":"blue",
     "ยกเลิก":"gray",
   };
-  return badge(status, map[status] || "gray");
+  return badge(tStatus(status), map[status] || "gray");
 }
 /* ===================== DATA TABLE ENGINE (search + filter + real pagination + add/view/edit) ===================== */
 const TableState = {};
@@ -951,7 +1055,7 @@ function renderTable(tableId){
   const startIdx = (st.page - 1) * st.pageSize;
   const pageRows = rows.slice(startIdx, startIdx + st.pageSize);
   const cols = st.config.columns;
-  const thead = cols.map(c => `<th>${c.label}</th>`).join("") + "<th>สถานะ</th><th>จัดการ</th>";
+  const thead = cols.map(c => `<th>${tCol(c.label)}</th>`).join("") + `<th>${LANG==="en"?"Status":"สถานะ"}</th><th>${LANG==="en"?"Actions":"จัดการ"}</th>`;
   const tbody = pageRows.map(r => {
     const cells = cols.map(c => {
       if (tableId === "workorder" && c.key === "equip" && r.assetTableId){
@@ -961,7 +1065,7 @@ function renderTable(tableId){
     }).join("");
     return `<tr>${cells}<td>${statusBadge(r.status)}</td><td>
       <button class="row-icon-btn" title="ดู" onclick="viewAssetRow('${tableId}','${r.id}')">${ic('eye')}</button>
-      <button class="row-icon-btn" title="แก้ไข" onclick="editAssetRow('${tableId}','${r.id}')">${ic('edit')}</button>
+      <button class="row-icon-btn admin-only" title="แก้ไข" onclick="editAssetRow('${tableId}','${r.id}')">${ic('edit')}</button>
     </td></tr>`;
   }).join("") || `<tr><td colspan="${cols.length+2}" style="text-align:center; color:var(--text-faint); padding:26px;">ไม่พบข้อมูลที่ตรงกับการค้นหา</td></tr>`;
   const tableWrap = document.getElementById(tableId+"-table-wrap");
@@ -1253,6 +1357,19 @@ window.showFieldStopDetail = function(i){
      <button class="btn primary" onclick="closeModal(); goToEquipment('${s.wo.assetTableId}','${s.wo.assetCode}')">ดูอุปกรณ์</button>`);
 };
 
+window.openFullRoute = function(){
+  if (!FIELD_STOPS.length){ showToast("ไม่มีจุดตรวจในขณะนี้"); return; }
+  // Google's web directions URL accepts a practical maximum of around 9-10 stops total;
+  // take the nearest ones first (FIELD_STOPS is already sorted by distance).
+  const chain = FIELD_STOPS.slice(0, 9);
+  const last = chain[chain.length - 1];
+  const waypoints = chain.slice(0, -1).map(s => `${s.lat},${s.lng}`).join("|");
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${FIELD_ORIGIN.lat},${FIELD_ORIGIN.lng}&destination=${last.lat},${last.lng}`;
+  if (waypoints) url += `&waypoints=${encodeURIComponent(waypoints)}`;
+  window.open(url, "_blank", "noopener");
+  if (FIELD_STOPS.length > chain.length) showToast(`เปิดเส้นทาง ${chain.length} จุดแรกที่ใกล้ที่สุด (Google Maps จำกัดจำนวนจุดต่อเส้นทาง)`);
+};
+
 let fieldMapZoom = 1;
 window.zoomFieldMap = function(delta){
   fieldMapZoom = Math.min(2, Math.max(1, fieldMapZoom + delta*0.25));
@@ -1269,7 +1386,7 @@ const pageDashboard = `
   </div>
   <div class="head-actions">
     <button class="btn" onclick="showToast('เลือกช่วงวันที่ (เดโม)')">${ic('calendar')} 23 ก.ย. 2569</button>
-    <button class="btn primary" onclick="openCreatePmModal()">${ic('plus')} สร้างงาน PM</button>
+    <button class="btn primary admin-only" onclick="openCreatePmModal()">${ic('plus')} สร้างงาน PM</button>
   </div>
 </div>
 
@@ -1347,18 +1464,18 @@ const pagePmPlanning = `
   <div class="head-actions">
     <button class="btn" onclick="showToast('กำลังแสดงมุมมองปฏิทิน')">มุมมองปฏิทิน</button>
     <button class="btn" onclick="showPmListView()">มุมมองรายการ</button>
-    <button class="btn primary" onclick="openCreatePmModal()">${ic('plus')} สร้างงาน PM</button>
+    <button class="btn primary admin-only" onclick="openCreatePmModal()">${ic('plus')} สร้างงาน PM</button>
   </div>
 </div>
 <div class="grid two-col">
   <div class="card">
     <div class="cal-head">
-      <div><h3>กันยายน 2569</h3><div class="sub">แผนงาน PM ทั้งหมดในเดือนนี้</div></div>
-      <div class="cal-nav"><button class="pg-btn" onclick="showToast('เดือนก่อนหน้า (เดโม)')">${ic('chevL')}</button><button class="pg-btn" onclick="showToast('เดือนถัดไป (เดโม)')">${ic('chevR')}</button></div>
+      <div><h3 id="calMonthLabel">กันยายน 2569</h3><div class="sub">แผนงาน PM ทั้งหมดในเดือนนี้</div></div>
+      <div class="cal-nav"><button class="pg-btn" onclick="shiftCalMonth(-1)">${ic('chevL')}</button><button class="pg-btn" onclick="shiftCalMonth(1)">${ic('chevR')}</button></div>
     </div>
     <div class="cal-grid">
       ${["อา","จ","อ","พ","พฤ","ศ","ส"].map(d=>`<div class="cal-dow">${d}</div>`).join("")}
-      ${buildCalendar()}
+      <div id="calDaysGrid" style="display:contents;"></div>
     </div>
     <div class="cal-legend">
       <div class="item"><span class="dot" style="background:var(--brand)"></span>Feeder</div>
@@ -1388,23 +1505,37 @@ const pagePmPlanning = `
   </div>
 </div>
 `;
-function buildCalendar(){
-  // Sept, generic 5-week layout starting Monday as day 1 for demo purposes
-  const startOffset = 1; // 1 = grid starts sun blank, mon=1
-  const daysInMonth = 30;
+const CAL_BASE_YEAR = 2026, CAL_BASE_MONTH = 8; // September 2026 CE = กันยายน 2569
+let CAL_MONTH_OFFSET = 0;
+const THAI_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+function renderCalendarView(){
+  const label = document.getElementById("calMonthLabel");
+  const grid = document.getElementById("calDaysGrid");
+  if (!label || !grid) return;
+  const base = new Date(CAL_BASE_YEAR, CAL_BASE_MONTH + CAL_MONTH_OFFSET, 1);
+  const year = base.getFullYear(), month = base.getMonth();
+  label.textContent = `${THAI_MONTHS[month]} ${year + 543}`;
+  const isSampleMonth = CAL_MONTH_OFFSET === 0; // our sample PM_EVENTS data is only for the current month
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startWeekday = new Date(year, month, 1).getDay(); // 0 = Sunday
   const byDay = {};
-  PM_EVENTS.forEach(e => { (byDay[e.day] = byDay[e.day] || []).push(e); });
+  if (isSampleMonth) PM_EVENTS.forEach(e => { (byDay[e.day] = byDay[e.day] || []).push(e); });
   let html = "";
-  for(let i=0;i<startOffset;i++) html += `<div class="cal-cell muted"></div>`;
-  for(let d=1; d<=daysInMonth; d++){
+  for (let i = 0; i < startWeekday; i++) html += `<div class="cal-cell muted"></div>`;
+  for (let d = 1; d <= daysInMonth; d++){
     const evs = byDay[d] || [];
     html += `<div class="cal-cell"><div class="d">${d}</div>${evs.map(e=>`<div class="cal-ev ${e.c}" ${e.tableId?`onclick="goTo('${e.tableId}')"`:""}>${e.t}</div>`).join("")}</div>`;
   }
-  const total = startOffset + daysInMonth;
+  const total = startWeekday + daysInMonth;
   const rem = (7 - (total % 7)) % 7;
-  for(let i=0;i<rem;i++) html += `<div class="cal-cell muted"></div>`;
-  return html;
+  for (let i = 0; i < rem; i++) html += `<div class="cal-cell muted"></div>`;
+  grid.innerHTML = html;
 }
+window.shiftCalMonth = function(delta){
+  CAL_MONTH_OFFSET += delta;
+  renderCalendarView();
+  if (CAL_MONTH_OFFSET !== 0) showToast("เดือนนี้ยังไม่มีข้อมูลตัวอย่างงาน PM");
+};
 window.showPmListView = function(){
   const items = PM_EVENTS.map(e => `<div class="mini-stat-row" ${e.tableId?`style="cursor:pointer;" onclick="closeModal(); goTo('${e.tableId}')"`:""}><span class="dot" style="background:${e.c==="blue"?"var(--brand)":e.c==="amber"?"var(--amber)":e.c==="green"?"var(--green)":"#7c879c"}"></span><span class="lbl">${e.t}</span><span class="val" style="font-size:11.5px; color:var(--text-faint); font-weight:600;">${e.day} ก.ย. 69</span></div>`).join("");
   openModal("มุมมองรายการ — งาน PM เดือนกันยายน 2569", `<div class="mini-stat-list">${items}</div>`, `<button class="btn" onclick="closeModal()">ปิด</button>`);
@@ -1431,9 +1562,9 @@ function assetPage(cfg){
   <div class="page-head">
     <div><h1>${cfg.title}</h1><p>${cfg.sub}</p></div>
     <div class="head-actions">
-      <button class="btn" onclick="importTableCSV('${cfg.tableId}')">${ic('upload')} นำเข้า CSV</button>
+      <button class="btn admin-only" onclick="importTableCSV('${cfg.tableId}')">${ic('upload')} นำเข้า CSV</button>
       <button class="btn" onclick="exportTableCSV('${cfg.tableId}')">${ic('download')} ส่งออก CSV</button>
-      <button class="btn primary" onclick="openAddAssetModal('${cfg.tableId}')">${ic('plus')} ${cfg.addLabel}</button>
+      <button class="btn primary admin-only" onclick="openAddAssetModal('${cfg.tableId}')">${ic('plus')} ${cfg.addLabel}</button>
     </div>
   </div>
   <div class="grid kpis">
@@ -1540,9 +1671,9 @@ const pageWorkOrder = `
 <div class="page-head">
   <div><h1>ใบงาน (Work Order)</h1><p>รายการใบงานบำรุงรักษาทั้งหมด</p></div>
   <div class="head-actions">
-    <button class="btn" onclick="importTableCSV('workorder')">${ic('upload')} นำเข้า CSV</button>
+    <button class="btn admin-only" onclick="importTableCSV('workorder')">${ic('upload')} นำเข้า CSV</button>
     <button class="btn" onclick="exportTableCSV('workorder')">${ic('download')} ส่งออก CSV</button>
-    <button class="btn primary" onclick="openAddAssetModal('workorder')">${ic('plus')} สร้างใบงาน</button>
+    <button class="btn primary admin-only" onclick="openAddAssetModal('workorder')">${ic('plus')} สร้างใบงาน</button>
   </div>
 </div>
 <div class="card">
@@ -1565,7 +1696,9 @@ const pageFieldNav = `
     <div class="legend-inline"><span class="dot" style="background:var(--brand)"></span>ตำแหน่งของฉัน</div>
     <div class="legend-inline"><span class="dot" style="background:var(--amber)"></span>รอดำเนินการ</div>
     <div class="legend-inline"><span class="dot" style="background:var(--red)"></span>เกินกำหนด</div>
-    <a class="btn" style="margin-left:auto; text-decoration:none;" href="https://www.google.com/maps/@${FIELD_ORIGIN.lat},${FIELD_ORIGIN.lng},12z" target="_blank" rel="noopener">${ic('mapPin')} เปิดแผนที่จริงใน Google Maps</a>
+    <span style="margin-left:auto;"></span>
+    <button class="btn" onclick="openFullRoute()">${ic('mapPin')} เปิดเส้นทางตรวจทั้งหมดใน Google Maps</button>
+    <a class="btn" style="text-decoration:none;" href="https://www.google.com/maps/@${FIELD_ORIGIN.lat},${FIELD_ORIGIN.lng},12z" target="_blank" rel="noopener">${ic('mapPin')} เปิดภาพรวมแผนที่จริง</a>
   </div>
   <div class="field-map-canvas field-map-canvas-hero">
     <div id="fieldMapSvgWrap" class="field-map-svg-wrap"></div>
@@ -1718,8 +1851,9 @@ const INSPECTION_FORMS = [
       {title:"อุปกรณ์ควบคุม RMU", items:["ตัวตรวจสอบแรงดัน","ตัวตรวจสอบการลัดวงจร","แรงดันไฟฟ้าเลี้ยงอุปกรณ์ (RMU)","สภาพแบตเตอรี่หรือ UPS (ถ้ามี)","FRTU (ถ้ามี)","อุปกรณ์ควบคุมอื่นๆ"]},
       {title:"ระบบ ATF", items:["ระบบการปลด-สับด้วยไฟฟ้า (ถ้ามี)","ระบบ ATF ที่ RMU (ถ้ามี)","การทดสอบ ATF"]},
       {title:"หม้อแปลง", items:["ตัวถังหม้อแปลง","Bushing HV-LV","สายหน้าหม้อแปลง HV-LV","LV Ground","HV Ground","แรงดันไฟฟ้าเลี้ยงอุปกรณ์"]},
-      {title:"อุปกรณ์ด้านแรงต่ำ", items:["สภาพทั่วไป CB หรือ FUSE","สายไฟฟ้า","บัสบาร์","เครื่องวัดไฟฟ้า","CT-TLM Meter (ถ้ามี)","จุดร้อนแดงส่องด้วยกล้องเทอร์โมวิชั่น"]},
-    ]
+      {title:"อุปกรณ์ด้านแรงต่ำ", items:["สภาพทั่วไป CB หรือ FUSE","สายไฟฟ้า","บัสบาร์","เครื่องวัดไฟฟ้า","CT-TLM Meter (ถ้ามี)"]},
+    ],
+    pages: 2,
   },
   { code:"SF-07-0-020", title:"แบบตรวจสอบบำรุงรักษา Capacitor Bank 12-24 kV ในสายป้อน", equip:"Capacitor Bank 12-24 kV", icon:"zap", kind:"checklist",
     header:["Station ID","สถานที่","สายป้อน","GIS","Lat.","Long.","MEA No.","ยี่ห้อ","ชนิด CONTROL","ชนิด Switch"],
@@ -1830,28 +1964,78 @@ window.saveInspectionForm = function(code){
   const inputs = paperInputs();
   const data = inputs.map(el => el.type === "radio" ? (el.checked ? 1 : 0) : el.value);
   try {
-    localStorage.setItem("insp-"+code, JSON.stringify(data));
-    showToast(`บันทึกแบบตรวจสอบ ${code} แล้ว`);
+    localStorage.setItem("insp-"+code, JSON.stringify({ data, savedAt: new Date().toISOString() }));
+    showToast(`บันทึกแบบตรวจสอบ ${code} ไว้ในเบราว์เซอร์นี้แล้ว — กด "ส่งออกไฟล์" ถ้าต้องการเก็บถาวรหรือส่งต่อ`);
+    const banner = document.getElementById("insp-saved-banner");
+    if (banner) banner.remove();
   } catch(e){
     showToast("ไม่สามารถบันทึกได้ในเบราว์เซอร์นี้");
   }
 };
-function loadInspectionForm(code){
+function getSavedInspection(code){
   let raw;
-  try { raw = localStorage.getItem("insp-"+code); } catch(e){ return; }
-  if (!raw) return;
-  let data;
-  try { data = JSON.parse(raw); } catch(e){ return; }
+  try { raw = localStorage.getItem("insp-"+code); } catch(e){ return null; }
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    // support the old format (plain array) saved before we started recording a timestamp
+    return Array.isArray(parsed) ? { data: parsed, savedAt: null } : parsed;
+  } catch(e){ return null; }
+}
+function loadInspectionForm(code){
+  const saved = getSavedInspection(code);
+  if (!saved) return;
   const inputs = paperInputs();
-  inputs.forEach((el, i) => {
-    if (i >= data.length) return;
-    if (el.type === "radio") el.checked = !!data[i];
-    else el.value = data[i];
+  saved.data.forEach((v, i) => {
+    if (i >= inputs.length) return;
+    const el = inputs[i];
+    if (el.type === "radio") el.checked = !!v;
+    else el.value = v;
   });
+  const wrap = document.querySelector(".paper-wrap");
+  if (wrap && saved.savedAt){
+    const when = new Date(saved.savedAt).toLocaleString("th-TH", { dateStyle:"medium", timeStyle:"short" });
+    const banner = document.createElement("div");
+    banner.id = "insp-saved-banner";
+    banner.style.cssText = "margin:0 0 14px; padding:10px 14px; border-radius:10px; background:var(--brand-soft); color:var(--brand-ink); font-size:12.5px; font-weight:600;";
+    banner.textContent = `พบข้อมูลที่บันทึกไว้ในเบราว์เซอร์นี้เมื่อ ${when} — โหลดคำตอบเดิมให้แล้ว`;
+    wrap.insertBefore(banner, wrap.firstChild);
+  }
 }
 
 function renderChecklistForm(f){
+  if (f.pages === 2) return renderTwoPageChecklistForm(f);
   return `${paperTitle(f)}${paperFieldRows(f.header)}${paperChecklistTable(f)}${paperFooter(f)}`;
+}
+
+// The original SF-07-0-019 (Unit Substation) form is printed as 2 pages: page 1 is the
+// equipment checklist, page 2 is the on-site voltage/current measurement record. Reflect
+// that structure instead of collapsing everything into a single page.
+function renderTwoPageChecklistForm(f){
+  const page2 = `
+    <div class="paper-doc-footer" style="border:none; margin:4px 0 10px;"><span>หน้า 2 ของ 2</span><span>${f.code}</span></div>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="4">ตรวจสอบวัดกระแสและแรงดันไฟฟ้า (ด้านแรงต่ำ)</td></tr>
+      <tr><td class="lbl">เวลา</td><td><input type="text" placeholder="เช่น 13:45 น."></td><td class="lbl">วัดหน้างาน</td><td><label class="paper-check"><input type="checkbox">TLM</label></td></tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="6">แรงดันไฟฟ้า (V)</td></tr>
+      <tr><td class="lbl">V1-N</td><td><input type="text"></td><td class="lbl">V2-N</td><td><input type="text"></td><td class="lbl">V3-N</td><td><input type="text"></td></tr>
+      <tr><td class="lbl">V1-2</td><td><input type="text"></td><td class="lbl">V1-3</td><td><input type="text"></td><td class="lbl">V2-3</td><td><input type="text"></td></tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="8">กระแสไฟฟ้า (A)</td></tr>
+      <tr><td class="lbl">IN</td><td><input type="text"></td><td class="lbl">I1</td><td><input type="text"></td><td class="lbl">I2</td><td><input type="text"></td><td class="lbl">I3</td><td><input type="text"></td></tr>
+    </table>
+    <table class="paper-table">
+      <tr class="paper-section-row"><td colspan="2">จุดร้อนแดงส่องด้วยกล้องเทอร์โมวิชั่น</td></tr>
+      <tr><td class="paper-check-cell"><label class="paper-check"><input type="radio" name="hotspotck">ปกติ</label></td><td class="paper-check-cell"><label class="paper-check"><input type="radio" name="hotspotck">ผิดปกติ</label></td></tr>
+      <tr><td class="lbl">ผลรวมกระแสหน้าหม้อแปลงฯ ทั้งหมด</td><td><input type="text"></td></tr>
+    </table>
+  `;
+  return `${paperTitle(f)}
+    <div class="paper-doc-footer" style="border:none; margin:0 0 10px;"><span>หน้า 1 ของ 2</span><span>${f.code}</span></div>
+    ${paperFieldRows(f.header)}${paperChecklistTable(f)}${page2}${paperFooter(f)}`;
 }
 
 function renderOilForm(f){
@@ -2095,6 +2279,8 @@ function renderInspectionList(){
   root.innerHTML = `<div class="insp-grid">` + INSPECTION_FORMS.map((f,i) => {
     const linkTableId = INSPECTION_ASSET_LINK[i];
     const assetLink = linkTableId ? `<div class="link-inline" style="font-size:11px; margin-top:6px;" onclick="event.stopPropagation(); goTo('${linkTableId}')">ดูอุปกรณ์ในระบบ →</div>` : "";
+    const saved = getSavedInspection(f.code);
+    const savedBadge = saved ? `<div style="font-size:10.5px; color:var(--green-ink); font-weight:700; margin-top:6px;">✓ มีข้อมูลที่บันทึกไว้แล้ว</div>` : "";
     return `
     <div class="card insp-card" onclick="openInspectionForm(${i})">
       <div class="ic">${ic(f.icon || "checklist")}</div>
@@ -2102,6 +2288,7 @@ function renderInspectionList(){
       <div class="t">${f.title}</div>
       <div class="d">${f.equip}</div>
       ${assetLink}
+      ${savedBadge}
     </div>`;
   }).join("") + `</div>`;
 }
@@ -2141,7 +2328,7 @@ window.toggleEmailNotif = function(el){
 };
 const pageSettings = `
 <div class="page-head"><div><h1>ตั้งค่า</h1><p>ตั้งค่าบัญชีและการแจ้งเตือนของระบบ</p></div></div>
-<div class="card panel" style="max-width:560px;">
+<div class="card panel" style="max-width:560px; margin-bottom:16px;">
   <div class="panel-head"><h3>บัญชีผู้ใช้</h3></div>
   <div class="mini-stat-list">
     <div class="mini-stat-row"><span class="lbl">ชื่อ-นามสกุล</span><span class="val">สิริลักษณ์ วงศ์สุวรรณ</span></div>
@@ -2150,7 +2337,34 @@ const pageSettings = `
     <div class="mini-stat-row"><span class="lbl">การแจ้งเตือนทางอีเมล</span><span class="val"><label class="switch"><input type="checkbox" ${emailNotifOn?"checked":""} onchange="toggleEmailNotif(this)"><span class="slider"></span></label></span></div>
   </div>
 </div>
+<div class="card panel" style="max-width:560px;">
+  <div class="panel-head"><h3>สิทธิ์การเข้าใช้งาน</h3></div>
+  <p style="padding:0 20px; margin:0 0 12px; font-size:12.5px; color:var(--text-soft); line-height:1.7;">โหมด <b>ผู้ดูแลระบบ (Admin)</b> แก้ไข/เพิ่ม/นำเข้าข้อมูลได้ทุกส่วน โหมด <b>ผู้ใช้งานทั่วไป (User)</b> ดูข้อมูล กรอกแบบตรวจสอบ และส่งออกไฟล์ได้ แต่จะซ่อนปุ่มเพิ่ม/แก้ไข/นำเข้าข้อมูลไว้</p>
+  <div class="mini-stat-list">
+    <div class="mini-stat-row">
+      <span class="lbl">บทบาทปัจจุบัน</span>
+      <span class="val" id="roleButtons"></span>
+    </div>
+    <div class="mini-stat-row">
+      <span class="lbl">ภาษา / Language</span>
+      <span class="val">
+        <button class="btn" onclick="setLang('th')">ไทย</button>
+        <button class="btn" onclick="setLang('en')">English</button>
+      </span>
+    </div>
+  </div>
+</div>
 `;
+function roleButtonsHtml(){
+  return `<button class="btn ${USER_ROLE==='admin'?'primary':''}" style="margin-right:6px;" onclick="setUserRole('admin'); renderRoleButtons();">ผู้ดูแลระบบ (Admin)</button>
+    <button class="btn ${USER_ROLE==='user'?'primary':''}" onclick="setUserRole('user'); renderRoleButtons();">ผู้ใช้งานทั่วไป (User)</button>`;
+}
+window.renderRoleButtons = function(){
+  const el = document.getElementById("roleButtons");
+  if (el) el.innerHTML = roleButtonsHtml();
+  const badge = document.getElementById("topRoleBadge");
+  if (badge) badge.outerHTML = roleBadgeHtml();
+};
 
 /* ===================== PAGE: USER GUIDE ===================== */
 const pageGuide = `
@@ -2309,6 +2523,9 @@ initAssetTable("substation", { data: ASSET_DATA.substation, columns: substationC
 initAssetTable("workorder", { data: makeWorkOrderRows(ASSET_DATA), columns: workOrderCfg.columns, searchKeys: ["code","equip","owner"], pageSize: 4, statusOptions: workOrderCfg.statusOptions });
 
 renderDashboardWidgets();
+renderCalendarView();
+renderRoleButtons();
+applyLanguage();
 buildFieldStops();
 renderFieldMap();
 
