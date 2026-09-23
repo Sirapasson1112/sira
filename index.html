@@ -20,18 +20,18 @@
     --text: #24242a;
     --text-soft: #68686f;
     --text-faint: #9a9aa0;
-    --brand: #5b7a99;
-    --brand-ink: #3f5a75;
-    --brand-soft: #e6edf3;
-    --amber: #cf9c3f;
-    --amber-ink: #8a6b24;
-    --amber-soft: #f5ecd6;
-    --green: #6f9268;
-    --green-ink: #47643f;
-    --green-soft: #e6efe3;
-    --red: #c1594a;
-    --red-ink: #954a3d;
-    --red-soft: #f5e2dd;
+    --brand: #2f6fed;
+    --brand-ink: #1d4ed8;
+    --brand-soft: #dbe7fd;
+    --amber: #f59e0b;
+    --amber-ink: #b45309;
+    --amber-soft: #fef3c7;
+    --green: #16a34a;
+    --green-ink: #15803d;
+    --green-soft: #dcfce7;
+    --red: #ef4444;
+    --red-ink: #b91c1c;
+    --red-soft: #fee2e2;
     --gray-soft: #eeeeec;
     --radius-card: 16px;
     --radius-sm: 10px;
@@ -106,10 +106,10 @@
   }
   .brand-mark {
     width: 34px; height: 34px; border-radius: 9px;
-    background: linear-gradient(135deg, var(--brand) 0%, #8aa9c4 100%);
+    background: linear-gradient(135deg, var(--brand) 0%, #5b9bff 100%);
     display: flex; align-items: center; justify-content: center;
     flex: none;
-    box-shadow: 0 4px 14px -4px rgba(91,122,153,0.5);
+    box-shadow: 0 4px 14px -4px rgba(47,111,237,0.65);
   }
   .brand-mark svg { width: 18px; height: 18px; }
   .brand-text { line-height: 1.2; }
@@ -128,9 +128,9 @@
   .nav-item svg { width: 17px; height: 17px; flex: none; opacity: 1; }
   .nav-item:hover { background: rgba(255,255,255,0.06); color: #f0f0f2; }
   .nav-item.active {
-    background: linear-gradient(90deg, rgba(91,122,153,0.35), rgba(91,122,153,0.08));
+    background: linear-gradient(90deg, rgba(47,111,237,0.4), rgba(47,111,237,0.1));
     color: #ffffff;
-    border-color: rgba(138,169,196,0.35);
+    border-color: rgba(91,155,255,0.4);
   }
   .nav-item.active svg { opacity: 1; }
   .nav-foot { padding: 14px 20px 18px; border-top: 1px solid var(--line-on-ink); }
@@ -171,7 +171,7 @@
   .profile { display: flex; align-items: center; gap: 10px; padding-left: 10px; border-left: 1px solid var(--card-line); }
   .avatar {
     width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg,#8aa9c4,#5b7a99);
+    background: linear-gradient(135deg,#5b9bff,#2f6fed);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-weight: 700; font-size: 13px; flex: none;
   }
@@ -196,7 +196,7 @@
     cursor: pointer; white-space: nowrap;
   }
   .btn svg { width: 15px; height: 15px; }
-  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 6px 16px -6px rgba(91,122,153,0.4); }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 6px 16px -6px rgba(47,111,237,0.45); }
   .btn.primary:hover { background: var(--brand-ink); }
   .btn:hover { background: var(--surface); }
   .btn.primary:hover { background: var(--brand-ink); }
@@ -1204,7 +1204,7 @@ function renderFieldMap(){
   const pinPath = "M0,-24 C8.8,-24 16,-16.8 16,-8 C16,3 0,20 0,20 C0,20 -16,3 -16,-8 C-16,-16.8 -8.8,-24 0,-24 Z";
   const pins = stops.map((s, i) => {
     const p = projectLatLng(s.lat, s.lng);
-    const color = s.wo.status === "เกินกำหนด" ? "#c1594a" : "#cf9c3f";
+    const color = s.wo.status === "เกินกำหนด" ? "#ef4444" : "#f59e0b";
     return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})" onclick="showFieldStopDetail(${i})" style="cursor:pointer;" filter="url(#pinShadow)">
       <path d="${pinPath}" fill="${color}" stroke="#fff" stroke-width="1.6"/>
       <circle cx="0" cy="-8" r="7.5" fill="#fff"/>
@@ -1307,9 +1307,9 @@ const pageDashboard = `
         <div class="donut-center"><div class="big num">92%</div><div class="small">สำเร็จตามแผน</div></div>
       </div>
       <div class="legend">
-        <div class="legend-row"><span class="legend-dot" style="background:#16a34a"></span><span class="lbl">เสร็จสิ้น</span><span class="val num">292 (91%)</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#f0a323"></span><span class="lbl">รอดำเนินการ</span><span class="val num">18 (5.6%)</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#dc2626"></span><span class="lbl">เกินกำหนด</span><span class="val num">10 (3.1%)</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><span class="lbl">เสร็จสิ้น</span><span class="val num">292 (91%)</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--amber)"></span><span class="lbl">รอดำเนินการ</span><span class="val num">18 (5.6%)</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span><span class="lbl">เกินกำหนด</span><span class="val num">10 (3.1%)</span></div>
       </div>
     </div>
   </div>
@@ -1611,9 +1611,9 @@ const pageCost = `
         <div class="donut-center"><div class="big num" style="font-size:16px;">฿ 4,820,000</div><div class="small">รวมทั้งหมด</div></div>
       </div>
       <div class="legend">
-        <div class="legend-row"><span class="legend-dot" style="background:#2563eb"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#f0a323"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#16a34a"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--brand)"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--amber)"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
         <div class="legend-row"><span class="legend-dot" style="background:#64748b"></span><span class="lbl">อื่นๆ</span><span class="val num">5%</span></div>
       </div>
     </div>
@@ -2320,7 +2320,7 @@ renderFieldMap();
 const GRID = "#d6d6d3", MUTED = "#68686f";
 // Charts read best with more saturated colors than the muted UI accent palette — these are
 // used only for chart fills/legends, not for badges, buttons, or other chrome.
-const CHART_BLUE = "#2563eb", CHART_AMBER = "#f0a323", CHART_GREEN = "#16a34a", CHART_RED = "#dc2626", CHART_GRAY = "#64748b";
+const CHART_BLUE = "#2f6fed", CHART_AMBER = "#f59e0b", CHART_GREEN = "#16a34a", CHART_RED = "#ef4444", CHART_GRAY = "#64748b";
 
 function svgBarChart(id, labels, values, color){
   const el = document.getElementById(id);
