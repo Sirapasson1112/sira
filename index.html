@@ -10,29 +10,32 @@
 
 <style>
   :root {
-    --ink: #6b5940;
-    --ink-2: #7c6950;
-    --ink-3: #8c7a5f;
-    --line-on-ink: rgba(255,255,255,0.1);
-    --surface: #ece7dc;
-    --card: #f8f5ee;
-    --card-line: #ddd5c1;
-    --text: #4a3c2a;
-    --text-soft: #8a7a60;
-    --text-faint: #b0a084;
-    --brand: #c9a874;
-    --brand-ink: #a98a58;
-    --brand-soft: #eddcbb;
-    --amber: #d6b384;
-    --amber-soft: #f1ddb6;
-    --green: #a0b491;
-    --green-soft: #dee8cf;
-    --red: #cf9c8c;
-    --red-soft: #ecd5c9;
-    --gray-soft: #e9e0cb;
+    --ink: #26262b;
+    --ink-2: #313136;
+    --ink-3: #3c3c42;
+    --line-on-ink: rgba(255,255,255,0.08);
+    --surface: #f4f4f2;
+    --card: #ffffff;
+    --card-line: #e3e3e0;
+    --text: #24242a;
+    --text-soft: #68686f;
+    --text-faint: #9a9aa0;
+    --brand: #5b7a99;
+    --brand-ink: #3f5a75;
+    --brand-soft: #e6edf3;
+    --amber: #cf9c3f;
+    --amber-ink: #8a6b24;
+    --amber-soft: #f5ecd6;
+    --green: #6f9268;
+    --green-ink: #47643f;
+    --green-soft: #e6efe3;
+    --red: #c1594a;
+    --red-ink: #954a3d;
+    --red-soft: #f5e2dd;
+    --gray-soft: #eeeeec;
     --radius-card: 16px;
     --radius-sm: 10px;
-    --shadow-card: 0 2px 3px rgba(59,47,32,0.06), 0 10px 26px -14px rgba(59,47,32,0.2);
+    --shadow-card: 0 1px 2px rgba(20,20,25,0.04), 0 8px 24px -14px rgba(20,20,25,0.14);
     color-scheme: light;
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
@@ -40,31 +43,31 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --surface: #16110b;
-      --card: #221a12;
-      --card-line: #3a2d1e;
-      --text: #f2e9d8;
-      --text-soft: #c2ad8c;
-      --text-faint: #8f7c60;
-      --brand-soft: #3a2c17;
-      --amber-soft: #372911;
-      --green-soft: #212a19;
-      --red-soft: #34201a;
-      --gray-soft: #2a2115;
+      --surface: #121214;
+      --card: #1b1b1e;
+      --card-line: #2f2f33;
+      --text: #eeeef0;
+      --text-soft: #b4b4ba;
+      --text-faint: #7c7c83;
+      --brand-soft: #223142;
+      --amber-soft: #372c14;
+      --green-soft: #1c2a1a;
+      --red-soft: #33201b;
+      --gray-soft: #232326;
     }
   }
   :root[data-theme="dark"] {
-    --surface: #16110b;
-    --card: #221a12;
-    --card-line: #3a2d1e;
-    --text: #f2e9d8;
-    --text-soft: #c2ad8c;
-    --text-faint: #8f7c60;
-    --brand-soft: #3a2c17;
-    --amber-soft: #372911;
-    --green-soft: #212a19;
-    --red-soft: #34201a;
-    --gray-soft: #2a2115;
+    --surface: #121214;
+    --card: #1b1b1e;
+    --card-line: #2f2f33;
+    --text: #eeeef0;
+    --text-soft: #b4b4ba;
+    --text-faint: #7c7c83;
+    --brand-soft: #223142;
+    --amber-soft: #372c14;
+    --green-soft: #1c2a1a;
+    --red-soft: #33201b;
+    --gray-soft: #232326;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
@@ -79,7 +82,7 @@
 
   html { overflow-x: hidden; }
   .app { display: flex; min-height: 100%; }
-  .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(30,22,12,0.5); z-index: 19; opacity: 0; transition: opacity .2s ease; }
+  .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(15,15,17,0.5); z-index: 19; opacity: 0; transition: opacity .2s ease; }
   .sidebar-backdrop.show { display: block; opacity: 1; }
 
   /* ---------- Sidebar ---------- */
@@ -87,7 +90,7 @@
     width: 240px;
     flex: 0 0 240px;
     background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%);
-    color: #ddd0b8;
+    color: #d6d6da;
     display: flex;
     flex-direction: column;
     position: sticky;
@@ -103,35 +106,35 @@
   }
   .brand-mark {
     width: 34px; height: 34px; border-radius: 9px;
-    background: linear-gradient(135deg, var(--brand) 0%, #ecd3ab 100%);
+    background: linear-gradient(135deg, var(--brand) 0%, #8aa9c4 100%);
     display: flex; align-items: center; justify-content: center;
     flex: none;
-    box-shadow: 0 4px 14px -4px rgba(201,168,116,0.4);
+    box-shadow: 0 4px 14px -4px rgba(91,122,153,0.5);
   }
   .brand-mark svg { width: 18px; height: 18px; }
   .brand-text { line-height: 1.2; }
   .brand-text .t1 { font-weight: 800; font-size: 14.5px; color: #fff; letter-spacing: 0.2px; }
-  .brand-text .t2 { font-size: 11px; color: #b8a382; font-weight: 500; }
+  .brand-text .t2 { font-size: 11px; color: #97979d; font-weight: 500; }
 
   .nav { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; }
   .nav-item {
     display: flex; align-items: center; gap: 11px;
     padding: 9px 12px; border-radius: 10px;
-    font-size: 13.5px; font-weight: 500; color: #c8b895;
+    font-size: 13.5px; font-weight: 500; color: #b8b8be;
     cursor: pointer; user-select: none;
     transition: background 0.15s ease, color 0.15s ease;
     border: 1px solid transparent;
   }
   .nav-item svg { width: 17px; height: 17px; flex: none; opacity: 0.85; }
-  .nav-item:hover { background: rgba(255,255,255,0.05); color: #f3ead9; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #f0f0f2; }
   .nav-item.active {
-    background: linear-gradient(90deg, rgba(201,168,116,0.3), rgba(201,168,116,0.06));
-    color: #fff8ea;
-    border-color: rgba(236,211,171,0.3);
+    background: linear-gradient(90deg, rgba(91,122,153,0.35), rgba(91,122,153,0.08));
+    color: #ffffff;
+    border-color: rgba(138,169,196,0.35);
   }
   .nav-item.active svg { opacity: 1; }
   .nav-foot { padding: 14px 20px 18px; border-top: 1px solid var(--line-on-ink); }
-  .nav-foot .nav-item { color: #b8a382; }
+  .nav-foot .nav-item { color: #97979d; }
 
   /* ---------- Main ---------- */
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -168,7 +171,7 @@
   .profile { display: flex; align-items: center; gap: 10px; padding-left: 10px; border-left: 1px solid var(--card-line); }
   .avatar {
     width: 36px; height: 36px; border-radius: 50%;
-    background: linear-gradient(135deg,#ecd3ab,#c9a874);
+    background: linear-gradient(135deg,#8aa9c4,#5b7a99);
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-weight: 700; font-size: 13px; flex: none;
   }
@@ -193,7 +196,7 @@
     cursor: pointer; white-space: nowrap;
   }
   .btn svg { width: 15px; height: 15px; }
-  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 6px 16px -6px rgba(201,168,116,0.35); }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; box-shadow: 0 6px 16px -6px rgba(91,122,153,0.4); }
   .btn.primary:hover { background: var(--brand-ink); }
   .btn:hover { background: var(--surface); }
   .btn.primary:hover { background: var(--brand-ink); }
@@ -208,15 +211,15 @@
   .kpi { padding: 18px 18px 16px; display: flex; align-items: flex-start; gap: 13px; }
   .kpi-icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex: none; }
   .kpi-icon svg { width: 19px; height: 19px; }
-  .kpi-icon.blue { background: var(--brand-soft); color: var(--brand); }
-  .kpi-icon.green { background: var(--green-soft); color: var(--green); }
-  .kpi-icon.amber { background: var(--amber-soft); color: var(--amber); }
-  .kpi-icon.red { background: var(--red-soft); color: var(--red); }
+  .kpi-icon.blue { background: var(--brand-soft); color: var(--brand-ink); }
+  .kpi-icon.green { background: var(--green-soft); color: var(--green-ink); }
+  .kpi-icon.amber { background: var(--amber-soft); color: var(--amber-ink); }
+  .kpi-icon.red { background: var(--red-soft); color: var(--red-ink); }
   .kpi-body { min-width: 0; }
   .kpi-label { font-size: 12px; color: var(--text-soft); font-weight: 600; margin-bottom: 3px; }
   .kpi-value { font-size: 23px; font-weight: 800; line-height: 1.15; }
   .kpi-sub { font-size: 11.5px; font-weight: 600; margin-top: 3px; }
-  .kpi-sub.up { color: var(--green); }
+  .kpi-sub.up { color: var(--green-ink); }
   .kpi-sub.pct { color: var(--text-faint); }
 
   .two-col { grid-template-columns: 1.6fr 1fr; align-items: stretch; }
@@ -225,7 +228,7 @@
   .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .panel-head h3 { font-size: 14.5px; font-weight: 700; margin: 0; }
   .panel-head .muted { font-size: 12px; color: var(--text-faint); }
-  .link-more { font-size: 12px; color: var(--brand); font-weight: 600; cursor: pointer; }
+  .link-more { font-size: 12px; color: var(--brand-ink); font-weight: 600; cursor: pointer; }
 
   .donut-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px; }
   .donut-canvas-box { position: relative; width: 168px; height: 168px; margin-bottom: 6px; }
@@ -254,10 +257,10 @@
     border-radius: 100px; font-size: 11.5px; font-weight: 700;
   }
   .badge::before { content:""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-  .badge.green { background: var(--green-soft); color: var(--green); }
-  .badge.amber { background: var(--amber-soft); color: var(--amber); }
-  .badge.red { background: var(--red-soft); color: var(--red); }
-  .badge.blue { background: var(--brand-soft); color: var(--brand); }
+  .badge.green { background: var(--green-soft); color: var(--green-ink); }
+  .badge.amber { background: var(--amber-soft); color: var(--amber-ink); }
+  .badge.red { background: var(--red-soft); color: var(--red-ink); }
+  .badge.blue { background: var(--brand-soft); color: var(--brand-ink); }
   .badge.gray { background: var(--gray-soft); color: var(--text-faint); }
   .row-icon-btn {
     width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--card-line);
@@ -320,7 +323,7 @@
   .rep-tab.active { background: var(--card); color: var(--text); box-shadow: 0 1px 3px rgba(16,26,46,0.1); }
   .rep-list { display: flex; flex-direction: column; gap: 12px; }
   .rep-card { display: flex; align-items: center; gap: 14px; padding: 16px 18px; }
-  .rep-ic { width: 42px; height: 42px; border-radius: 11px; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; flex: none; }
+  .rep-ic { width: 42px; height: 42px; border-radius: 11px; background: var(--brand-soft); color: var(--brand-ink); display: flex; align-items: center; justify-content: center; flex: none; }
   .rep-ic svg { width: 19px; height: 19px; }
   .rep-body { flex: 1; min-width: 0; }
   .rep-body .t { font-weight: 700; font-size: 13.5px; margin-bottom: 2px; }
@@ -329,16 +332,16 @@
   /* Inspection forms */
   .insp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .insp-card { padding: 16px 17px; cursor: pointer; transition: border-color .15s ease; }
-  .insp-card:hover { border-color: var(--brand); }
-  .insp-card .code { font-size: 11px; font-weight: 700; color: var(--brand); font-family: "Inter","Noto Sans Thai",sans-serif; margin-bottom: 6px; }
-  .insp-card .ic { width: 38px; height: 38px; border-radius: 10px; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .insp-card:hover { border-color: var(--brand-ink); }
+  .insp-card .code { font-size: 11px; font-weight: 700; color: var(--brand-ink); font-family: "Inter","Noto Sans Thai",sans-serif; margin-bottom: 6px; }
+  .insp-card .ic { width: 38px; height: 38px; border-radius: 10px; background: var(--brand-soft); color: var(--brand-ink); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
   .insp-card .ic svg { width: 17px; height: 17px; }
   .insp-card .t { font-size: 13.5px; font-weight: 700; line-height: 1.4; margin-bottom: 4px; }
   .insp-card .d { font-size: 11.5px; color: var(--text-faint); }
   .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--text-soft); cursor: pointer; margin-bottom: 14px; }
   .back-link svg { width: 14px; height: 14px; }
   .insp-detail-head { padding: 20px 22px 16px; border-bottom: 1px solid var(--card-line); }
-  .insp-detail-head .code { font-size: 11.5px; font-weight: 700; color: var(--brand); margin-bottom: 4px; font-family: "Inter","Noto Sans Thai",sans-serif; }
+  .insp-detail-head .code { font-size: 11.5px; font-weight: 700; color: var(--brand-ink); margin-bottom: 4px; font-family: "Inter","Noto Sans Thai",sans-serif; }
   .insp-detail-head h2 { font-size: 17px; font-weight: 800; margin: 0; }
   .insp-header-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 16px; padding: 18px 22px; }
   .insp-field label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-soft); margin-bottom: 5px; }
@@ -510,21 +513,21 @@
   .switch input:checked + .slider { background: var(--brand); }
   .switch input:checked + .slider::before { transform: translateX(18px); }
   .pg-btn:disabled { opacity: .4; cursor: not-allowed; }
-  .cell-link { color: var(--brand); cursor: pointer; font-weight: 600; }
+  .cell-link { color: var(--brand-ink); cursor: pointer; font-weight: 600; }
   .cell-link:hover { text-decoration: underline; }
   .cal-ev { cursor: pointer; }
   .rep-card .d { cursor: default; }
-  .link-inline { color: var(--brand); cursor: pointer; font-weight: 600; text-decoration: none; }
+  .link-inline { color: var(--brand-ink); cursor: pointer; font-weight: 600; text-decoration: none; }
   .link-inline:hover { text-decoration: underline; }
 
   /* User guide */
   .guide-toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
   .guide-toc a { padding: 7px 14px; border-radius: 9px; background: var(--surface); border: 1px solid var(--card-line); font-size: 12.5px; font-weight: 700; color: var(--text-soft); text-decoration: none; cursor: pointer; }
-  .guide-toc a:hover { background: var(--brand-soft); color: var(--brand); }
+  .guide-toc a:hover { background: var(--brand-soft); color: var(--brand-ink); }
   .guide-section { scroll-margin-top: 90px; padding: 20px 22px; border-bottom: 1px solid var(--card-line); }
   .guide-section:last-child { border-bottom: none; }
   .guide-section h3 { display: flex; align-items: center; gap: 10px; font-size: 14.5px; font-weight: 800; margin: 0 0 4px; }
-  .guide-section .ic { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-soft); color: var(--brand); display: flex; align-items: center; justify-content: center; flex: none; }
+  .guide-section .ic { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-soft); color: var(--brand-ink); display: flex; align-items: center; justify-content: center; flex: none; }
   .guide-section .ic svg { width: 16px; height: 16px; }
   .guide-section p { margin: 4px 0 0; font-size: 13px; color: var(--text-soft); line-height: 1.7; }
   .guide-list { margin: 10px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: var(--text-soft); }
@@ -546,7 +549,7 @@
   .field-stop-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--card-line); cursor: pointer; }
   .field-stop-row:hover { background: var(--surface); }
   .field-stop-row:last-child { border-bottom: none; }
-  .field-stop-row .num { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
+  .field-stop-row .num { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-ink); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
   .field-stop-row .body { flex: 1; min-width: 0; }
   .field-stop-row .t { font-size: 12.8px; font-weight: 700; }
   .field-stop-row .d { font-size: 11.5px; color: var(--text-faint); margin-top: 2px; }
@@ -1027,16 +1030,16 @@ function renderFieldMap(){
   }).join("");
   const pins = stops.map((s, i) => {
     const p = projectLatLng(s.lat, s.lng);
-    const color = s.wo.status === "เกินกำหนด" ? "#cf9c8c" : "#d6b384";
+    const color = s.wo.status === "เกินกำหนด" ? "#c1594a" : "#cf9c3f";
     return `<g onclick="showFieldStopDetail(${i})" style="cursor:pointer;">
       <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="10" fill="${color}" stroke="#fff" stroke-width="2"/>
       <text x="${p.x.toFixed(1)}" y="${(p.y+3.5).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="#fff" font-weight="800">${i+1}</text>
     </g>`;
   }).join("");
   const originPin = `
-    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="15" fill="#c9a874" opacity="0.18"/>
-    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="7" fill="#c9a874" stroke="#fff" stroke-width="2"/>
-    <text x="${originXY.x.toFixed(1)}" y="${(originXY.y-18).toFixed(1)}" text-anchor="middle" font-size="10" fill="#c9a874" font-weight="800">ตำแหน่งของฉัน</text>`;
+    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="15" fill="#5b7a99" opacity="0.18"/>
+    <circle cx="${originXY.x.toFixed(1)}" cy="${originXY.y.toFixed(1)}" r="7" fill="#5b7a99" stroke="#fff" stroke-width="2"/>
+    <text x="${originXY.x.toFixed(1)}" y="${(originXY.y-18).toFixed(1)}" text-anchor="middle" font-size="10" fill="#5b7a99" font-weight="800">ตำแหน่งของฉัน</text>`;
 
   mapWrap.innerHTML = `<svg viewBox="0 0 800 500" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
     <rect x="0" y="0" width="800" height="500" fill="#eef3f8"/>
@@ -1407,7 +1410,7 @@ const pageCost = `
 </div>
 <div class="grid cost-kpis" style="margin-bottom:16px;">
   <div class="card cost-kpi"><div class="lbl">งบประมาณ</div><div class="v num">฿ 1,250,000</div></div>
-  <div class="card cost-kpi"><div class="lbl">ใช้ไปแล้ว</div><div class="v num" style="color:var(--red)">฿ 2,680,000</div></div>
+  <div class="card cost-kpi"><div class="lbl">ใช้ไปแล้ว</div><div class="v num" style="color:var(--red-ink)">฿ 2,680,000</div></div>
   <div class="card cost-kpi"><div class="lbl">ค่าผู้รับเหมา</div><div class="v num">฿ 620,000</div></div>
   <div class="card cost-kpi"><div class="lbl">อื่นๆ</div><div class="v num">฿ 270,000</div></div>
 </div>
@@ -1423,10 +1426,10 @@ const pageCost = `
         <div class="donut-center"><div class="big num" style="font-size:16px;">฿ 4,820,000</div><div class="small">รวมทั้งหมด</div></div>
       </div>
       <div class="legend">
-        <div class="legend-row"><span class="legend-dot" style="background:#c9a874"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#d6b384"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#a0b491"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
-        <div class="legend-row"><span class="legend-dot" style="background:#c2b299"></span><span class="lbl">อื่นๆ</span><span class="val num">5%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#5b7a99"></span><span class="lbl">อะไหล่</span><span class="val num">26%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#cf9c3f"></span><span class="lbl">ผู้รับเหมา</span><span class="val num">56%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#6f9268"></span><span class="lbl">ค่าแรง</span><span class="val num">13%</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#9a9aa0"></span><span class="lbl">อื่นๆ</span><span class="val num">5%</span></div>
       </div>
     </div>
   </div>
@@ -1456,7 +1459,7 @@ const REPORTS = [
   { t:"รายงานเหตุขัดข้อง", d:"สรุปเหตุขัดข้องแยกตามพื้นที่",
     body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">เหตุขัดข้องทั้งหมด (เดือนนี้)</span><span class="val">7 ครั้ง</span></div><div class="mini-stat-row"><span class="lbl">พื้นที่ที่เกิดบ่อยที่สุด</span><span class="val">บางเสาธง</span></div></div>` },
   { t:"รายงานการเบิกจ่ายงบประมาณ", d:"ใช้จ่ายเทียบงบประมาณรายปี",
-    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">งบประมาณ</span><span class="val">฿1,250,000</span></div><div class="mini-stat-row"><span class="lbl">ใช้ไปแล้ว</span><span class="val">฿2,680,000</span></div><div class="mini-stat-row"><span class="lbl">ส่วนต่าง</span><span class="val" style="color:var(--red);">เกินงบ ฿1,430,000</span></div></div>` },
+    body:`<div class="mini-stat-list"><div class="mini-stat-row"><span class="lbl">งบประมาณ</span><span class="val">฿1,250,000</span></div><div class="mini-stat-row"><span class="lbl">ใช้ไปแล้ว</span><span class="val">฿2,680,000</span></div><div class="mini-stat-row"><span class="lbl">ส่วนต่าง</span><span class="val" style="color:var(--red-ink);">เกินงบ ฿1,430,000</span></div></div>` },
 ];
 function reportCardHtml(r, i){
   return `<div class="card rep-card">
@@ -2123,7 +2126,7 @@ renderFieldMap();
 // Every chart is hand-drawn as SVG in plain JS. This removes the whole class of
 // "chart library failed to load" problems (blocked CDN, offline, stale cache) —
 // there is nothing to fetch and nothing that can fail to load.
-const GRID = "#ddd5c1", MUTED = "#a89a7d";
+const GRID = "#e3e3e0", MUTED = "#9a9aa0";
 
 function svgBarChart(id, labels, values, color){
   const el = document.getElementById(id);
@@ -2204,19 +2207,19 @@ function svgStackedBar(id, labels, series){
 }
 
 function initDashboardCharts(){
-  svgBarChart("chartCompliance", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."], [78,82,85,80,88,91,89,94,92], "#c9a874");
-  svgDonut("chartDashDonut", [292,18,10], ["#a0b491","#d6b384","#cf9c8c"]);
+  svgBarChart("chartCompliance", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย."], [78,82,85,80,88,91,89,94,92], "#5b7a99");
+  svgDonut("chartDashDonut", [292,18,10], ["#6f9268","#cf9c3f","#c1594a"]);
 }
 function initPmPlanningCharts(){
-  svgDonut("chartPmDonut", [71,29], ["#c9a874","#ddd5c1"]);
+  svgDonut("chartPmDonut", [71,29], ["#5b7a99","#e3e3e0"]);
 }
 function initCostCharts(){
-  svgDonut("chartCostDonut", [26,56,13,5], ["#c9a874","#d6b384","#a0b491","#c2b299"]);
+  svgDonut("chartCostDonut", [26,56,13,5], ["#5b7a99","#cf9c3f","#6f9268","#9a9aa0"]);
   svgStackedBar("chartCostBar", ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."], [
-    { name:"อะไหล่", color:"#c9a874", data:[40,42,38,45,50,48,55,60,58,52,47,44] },
-    { name:"ผู้รับเหมา", color:"#d6b384", data:[70,68,72,75,80,78,85,88,84,79,74,71] },
-    { name:"ค่าแรง", color:"#a0b491", data:[18,17,19,20,22,21,23,25,24,22,20,19] },
-    { name:"อื่นๆ", color:"#c2b299", data:[8,7,9,8,10,9,11,12,10,9,8,7] },
+    { name:"อะไหล่", color:"#5b7a99", data:[40,42,38,45,50,48,55,60,58,52,47,44] },
+    { name:"ผู้รับเหมา", color:"#cf9c3f", data:[70,68,72,75,80,78,85,88,84,79,74,71] },
+    { name:"ค่าแรง", color:"#6f9268", data:[18,17,19,20,22,21,23,25,24,22,20,19] },
+    { name:"อื่นๆ", color:"#9a9aa0", data:[8,7,9,8,10,9,11,12,10,9,8,7] },
   ]);
 }
 
